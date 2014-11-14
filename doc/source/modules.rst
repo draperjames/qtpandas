@@ -25,11 +25,4 @@ CustomDelegates
 ---------------
 .. automodule:: CustomDelegates
     :members:
-    :show-inheritance:    
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    :show-inheritance:
