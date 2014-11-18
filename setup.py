@@ -33,7 +33,7 @@ class PyTest(TestCommand):
         errcode = pytest.main(self.test_args)
         sys.exit(errcode)
 
-tests_require = ['pytest', 'pytest-qt']
+tests_require = ['pyside', 'pytest', 'pytest-cov', 'pytest-qt']
 setup(
     name='pandas-qt',
     version=pandasqt.__version__,
