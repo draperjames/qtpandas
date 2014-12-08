@@ -71,9 +71,9 @@ class TestWidget(QtGui.QWidget):
         self.rightLayout.addWidget(self.dataListView)
         self.rightLayout.addWidget(self.dataComboBox)
 
-        self.listViewColumnDtypes = QtGui.QTableView(self)
+        self.tableViewColumnDtypes = QtGui.QTableView(self)
         self.rightLayout.addWidget(QtGui.QLabel('dtypes'))
-        self.rightLayout.addWidget(self.listViewColumnDtypes)
+        self.rightLayout.addWidget(self.tableViewColumnDtypes)
         self.buttonGotToColumn = QtGui.QPushButton("got to column")
         self.rightLayout.addWidget(self.buttonGotToColumn)
         self.buttonGotToColumn.clicked.connect(self.gotToColumn)
@@ -100,9 +100,9 @@ class TestWidget(QtGui.QWidget):
             columnModel.appendRow(QtGui.QStandardItem(column))
         self.chooseColumnComboBox.setModel(columnModel)
 
-        self.listViewColumnDtypes.setModel(dataModel.columnDtypeModel())
-        self.listViewColumnDtypes.horizontalHeader().setDefaultSectionSize(200)
-        self.listViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.listViewColumnDtypes))
+        self.tableViewColumnDtypes.setModel(dataModel.columnDtypeModel())
+        self.tableViewColumnDtypes.horizontalHeader().setDefaultSectionSize(200)
+        self.tableViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.tableViewColumnDtypes))
         dataModel.dtypeChanged.connect(self.updateDelegates)
         dataModel.changingDtypeFailed.connect(self.changeColumnValue)
 
@@ -112,7 +112,6 @@ class TestWidget(QtGui.QWidget):
 
     def updateDelegates(self, column=None):
         print "update delegate for column", column
-        self.oldDelegates = self.delegates
         self.delegates = setDelegatesFromDtype(self.dataTableView)
 
     def gotToColumn(self):

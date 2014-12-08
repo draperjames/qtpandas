@@ -340,9 +340,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                     value = numpy.bool_(value)
                 elif columnDtype in self._dateDtypes:
                     try:
-                        return numpy.datetime64(value.toString(self.timestampFormat))
+                        value = numpy.datetime64(value.toString(self.timestampFormat))
                     except AttributeError:
-                        return value
+                        value = value
                     except:
                         raise
                 else:

@@ -153,7 +153,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
             dtype, language = self._dtypeTranslator.lookup(value)
 
             if dtype is not None:
-                print "compare", np.dtype(index.data(role=Qt.UserRole))
+                #print "compare", np.dtype(index.data(role=Qt.UserRole))
                 if dtype != np.dtype(index.data(role=Qt.UserRole)):
                     col = index.column()
                     #row = self._dataFrame.columns[index.column()]
