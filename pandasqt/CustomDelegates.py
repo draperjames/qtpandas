@@ -47,7 +47,7 @@ def setDelegatesFromDtype(tableView):
                 delegate = CustomDoubleSpinboxDelegate(floatInfo.min, floatInfo.max, decimals=model._float_precisions[str(columnDtype)])
                 itemDelegates[columnName] = delegate
                 tableView.setItemDelegateForColumn(i, delegate)
-            else:
+            elif columnDtype == object:
                 delegate = TextDelegate()
                 itemDelegates[columnName] = delegate
                 tableView.setItemDelegateForColumn(i, delegate)
