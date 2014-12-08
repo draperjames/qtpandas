@@ -47,6 +47,11 @@ def setDelegatesFromDtype(tableView):
                 delegate = CustomDoubleSpinboxDelegate(floatInfo.min, floatInfo.max, decimals=model._float_precisions[str(columnDtype)])
                 itemDelegates[columnName] = delegate
                 tableView.setItemDelegateForColumn(i, delegate)
+            else:
+                delegate = TextDelegate()
+                itemDelegates[columnName] = delegate
+                tableView.setItemDelegateForColumn(i, delegate)
+
         return itemDelegates
     else:
         raise AttributeError, "no model set"
@@ -199,6 +204,61 @@ class CustomDoubleSpinboxDelegate(QtGui.QItemDelegate):
 
         Args:
             spinBox (QDoubleSpinBox): editor widget.
+            option (QStyleOptionViewItem): controls how editor widget appears.
+            index (QModelIndex): model data index.
+        """
+        editor.setGeometry(option.rect)
+
+class TextDelegate(QtGui.QItemDelegate):
+    """delegate for all kind of text."""
+
+    def __init__(self):
+        """construct a new instance of a BigIntSpinboxDelegate.
+
+        Args:
+
+        """
+        super(TextDelegate, self).__init__()
+
+    def createEditor(self, parent, option, index):
+        """Returns the widget used to edit the item specified by index for editing. The parent widget and style option are used to control how the editor widget appears.
+
+        Args:
+            parent (QWidget): parent widget.
+            option (QStyleOptionViewItem): controls how editor widget appears.
+            index (QModelIndex): model data index.
+        """
+        editor = QtGui.QLineEdit(parent)
+        return editor
+
+    def setEditorData(self, editor, index):
+        """Sets the data to be displayed and edited by the editor from the data model item specified by the model index.
+
+        Args:
+            editor (QtGui.QLineEdit): editor widget.
+            index (QModelIndex): model data index.
+        """
+        if index.isValid():
+            value = index.model().data(index, QtCore.Qt.EditRole)
+            editor.setText(unicode(value))
+
+    def setModelData(self, editor, model, index):
+        """Gets data from the editor widget and stores it in the specified model at the item index.
+
+        Args:
+            editor (QtGui.QLineEdit): editor widget.
+            model (QAbstractItemModel): parent model.
+            index (QModelIndex): model data index.
+        """
+        if index.isValid():
+            value = editor.text()
+            model.setData(index, value, QtCore.Qt.EditRole)
+
+    def updateEditorGeometry(self, editor, option, index):
+        """Updates the editor for the item specified by index according to the style option given.
+
+        Args:
+            editor (QtGui.QLineEdit): editor widget.
             option (QStyleOptionViewItem): controls how editor widget appears.
             index (QModelIndex): model data index.
         """

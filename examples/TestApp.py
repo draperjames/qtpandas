@@ -15,7 +15,7 @@ except ImportError:
 
 import sys
 import pandas
-from pandasqt import DataFrameModel, setDelegatesFromDtype
+from pandasqt import DataFrameModel, setDelegatesFromDtype, DtypeComboDelegate
 from util import getCsvData, getRandomData
 
 class TestWidget(QtGui.QWidget):
@@ -24,6 +24,9 @@ class TestWidget(QtGui.QWidget):
         super(TestWidget, self).__init__(parent)
         self.resize(1680, 756)
         self.move(0, 0)
+
+        self.language = 'en'
+        self.delegates = None
 
         self.df = pandas.DataFrame()
 
@@ -68,6 +71,13 @@ class TestWidget(QtGui.QWidget):
         self.rightLayout.addWidget(self.dataListView)
         self.rightLayout.addWidget(self.dataComboBox)
 
+        self.listViewColumnDtypes = QtGui.QTableView(self)
+        self.rightLayout.addWidget(QtGui.QLabel('dtypes'))
+        self.rightLayout.addWidget(self.listViewColumnDtypes)
+        self.buttonGotToColumn = QtGui.QPushButton("got to column")
+        self.rightLayout.addWidget(self.buttonGotToColumn)
+        self.buttonGotToColumn.clicked.connect(self.gotToColumn)
+
         self.chooseColumnComboBox.currentIndexChanged.connect(self.setModelColumn)
 
         self.dataListView.mouseReleaseEvent = self.mouseReleaseEvent
@@ -80,7 +90,7 @@ class TestWidget(QtGui.QWidget):
         self.dataTableView.setModel(dataModel)
         self.dataComboBox.setModel(dataModel)
 
-        self.delegates = setDelegatesFromDtype(self.dataTableView)
+        self.updateDelegates()
 
         self.dataTableView.resizeColumnsToContents()
 
@@ -90,9 +100,31 @@ class TestWidget(QtGui.QWidget):
             columnModel.appendRow(QtGui.QStandardItem(column))
         self.chooseColumnComboBox.setModel(columnModel)
 
+        self.listViewColumnDtypes.setModel(dataModel.columnDtypeModel())
+        self.listViewColumnDtypes.horizontalHeader().setDefaultSectionSize(200)
+        self.listViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.listViewColumnDtypes))
+        dataModel.dtypeChanged.connect(self.updateDelegates)
+        dataModel.changingDtypeFailed.connect(self.changeColumnValue)
+
     def setModelColumn(self, index):
         self.dataListView.setModelColumn(index)
         self.dataComboBox.setModelColumn(index)
+
+    def updateDelegates(self, column=None):
+        print "update delegate for column", column
+        self.oldDelegates = self.delegates
+        self.delegates = setDelegatesFromDtype(self.dataTableView)
+
+    def gotToColumn(self):
+        print "go to column"
+        index = self.dataTableView.model().index(7, 0)
+        self.dataTableView.setCurrentIndex(index)
+
+    def changeColumnValue(self, columnName, index, dtype):
+        print "failed to change", columnName, "to", dtype
+        print index.data(), index.isValid()
+        self.dataTableView.setCurrentIndex(index)
+
 
 if __name__ == '__main__':
 

@@ -19,6 +19,7 @@ except ImportError:
 
 import pandas
 import numpy
+from ColumnDtypeModel import ColumnDtypeModel
 
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
@@ -28,6 +29,11 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             Used in data method.
         sortingAboutToStart (QtCore.pyqtSignal): emitted directly before sorting starts.
         sortingFinished (QtCore.pyqtSignal): emitted, when sorting finished.
+        dtypeChanged (QtCore.pyqtSignal(columnName)): passed from related ColumnDtypeModel
+            if a columns dtype has changed.
+        changingDtypeFailed (QtCore.pyqtSignal(columnName, index, dtype)): 
+            passed from related ColumnDtypeModel.
+            emitted after a column has changed it's data type.
     """
 
     _float_precisions = {
@@ -67,6 +73,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
     sortingAboutToStart = QtCore.pyqtSignal()
     sortingFinished = QtCore.pyqtSignal()
+    dtypeChanged = QtCore.pyqtSignal(object)
+    changingDtypeFailed = QtCore.pyqtSignal(object, QtCore.QModelIndex, object)
 
     def __init__(self, dataFrame=None, copyDataFrame=False):
         """the __init__ method.
@@ -74,6 +82,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         Args:
             dataFrame (pandas.core.frame.DataFrame, optional): initializes the model with given DataFrame. 
                 If none is given an empty DataFrame will be set. defaults to None.
+            copyDataFrame (bool, optional): create a copy of dataFrame or use it as is. defaults to False.
+                If you use it as is, you can change it from outside otherwise you have to reset the dataFrame
+                after external changes.
 
         """
         super(DataFrameModel, self).__init__()
@@ -114,6 +125,15 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             self._dataFrame = dataFrame.copy()
         else:
             self._dataFrame = dataFrame
+
+        self._columnDtypeModel = ColumnDtypeModel(dataFrame)
+        self._columnDtypeModel.dtypeChanged.connect(
+            lambda columnName: self.dtypeChanged.emit(columnName)
+        )
+        self._columnDtypeModel.changingDtypeFailed.connect(
+            lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
+        )
+
         self.signalUpdate()
 
     @property
@@ -319,7 +339,12 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 elif columnDtype in self._boolDtypes:
                     value = numpy.bool_(value)
                 elif columnDtype in self._dateDtypes:
-                    value = numpy.datetime64(value.toString(self.timestampFormat))
+                    try:
+                        return numpy.datetime64(value.toString(self.timestampFormat))
+                    except AttributeError:
+                        return value
+                    except:
+                        raise
                 else:
                     raise TypeError, "try to set unhandled data type"
 
@@ -389,3 +414,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             filterCondition (): filter to use.
         """
         pass
+
+    def columnDtypeModel(self):
+        """returns a ColumnDtypeModel"""
+        return self._columnDtypeModel

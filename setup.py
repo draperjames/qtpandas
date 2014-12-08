@@ -7,6 +7,16 @@ import codecs
 import os
 import sys
 
+try:
+    import sip
+except ImportError as e:
+    raise e, "install sip first (comming with PyQt4)"
+
+try:
+    import PyQt4
+except ImportError as e:
+    raise e, "install PyQt4 or PySide"
+
 import pandasqt
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -42,7 +52,7 @@ setup(
     namespace_packages = ['pandasqt'],
     author='Matthias Ludwig',
     tests_require=tests_require,
-    install_requires=['pandas'],
+    install_requires=['pandas >= 0.15.1'],
     cmdclass={'test': PyTest},
     author_email='m.Ludwig@datalyze-solutions.com',
     description='catches exceptions inside qt applications and writes them to a message box and into a log file',
