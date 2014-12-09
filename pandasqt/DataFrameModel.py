@@ -98,6 +98,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self._timestampFormat = Qt.ISODate
 
+        self._dataFrameOriginal = None
         #self._dataCache = {}
         #self._idx = index.Index()
         #self._idxCache = []
@@ -128,6 +129,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         """
         assert isinstance(dataFrame, pandas.core.frame.DataFrame), "not of type pandas.core.frame.DataFrame"
+        self.layoutAboutToBeChanged.emit()
         if copyDataFrame:
             self._dataFrame = dataFrame.copy()
         else:
@@ -140,7 +142,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._columnDtypeModel.changingDtypeFailed.connect(
             lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
         )
-        self.signalUpdate()
+        self.layoutChanged.emit()
 
     @property
     def timestampFormat(self):
@@ -161,11 +163,6 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         """
         assert isinstance(timestampFormat, unicode) or timestampFormat.__class__.__name__ == "DateFormat", "not of type unicode"
         self._timestampFormat = timestampFormat
-
-    def signalUpdate(self):
-        """Emit layoutAboutToBeChanged and layoutChanged to inform views of changes"""
-        self.layoutAboutToBeChanged.emit()
-        self.layoutChanged.emit()
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         """return the header depending on section, orientation and Qt::ItemDataRole
@@ -198,7 +195,6 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
         """return data depending on index, Qt::ItemDataRole and data type of the column.
-        Caches data in _dataCache to speed up rendering.
 
         Args:
             index (QtCore.QModelIndex): Index to define column and row you want to return
@@ -230,12 +226,54 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
             raises TypeError if an unhandled dtype is found in column.
         """
-        start = time.time()
+        #start = time.time()
 
         if not index.isValid():
             return None
 
-        result = self._data(index, role)
+        def convertValue(row, col, columnDtype):
+            value = None
+            if columnDtype == object:
+                value = self._dataFrame.ix[row, col]
+            elif columnDtype in self._floatDtypes:
+                value = round(float(self._dataFrame.ix[row, col]), self._float_precisions[str(columnDtype)])
+            elif columnDtype in self._intDtypes:
+                value = int(self._dataFrame.ix[row, col])
+            elif columnDtype in self._boolDtypes:
+                value = bool(self._dataFrame.ix[row, col])
+            elif columnDtype in self._dateDtypes:
+                value = numpy.datetime64(self._dataFrame.ix[row, col])
+                value = QtCore.QDateTime.fromString(str(value), self.timestampFormat)
+            else:
+                raise TypeError, "returning unhandled data type"
+            return value
+
+        row = self._dataFrame.index[index.row()]
+        col = self._dataFrame.columns[index.column()]        
+        columnDtype = self._dataFrame[col].dtype
+
+        if role == Qt.DisplayRole:
+            # return the value if you wanne show True/False as text
+            if columnDtype == numpy.bool:
+                result = None
+            else:
+                result = convertValue(row, col, columnDtype)
+        elif role  == Qt.EditRole:
+            result = convertValue(row, col, columnDtype)
+        elif role  == Qt.CheckStateRole:
+            if columnDtype == numpy.bool_:
+                if convertValue(row, col, columnDtype):
+                    result = Qt.Checked
+                else:
+                    result = Qt.Unchecked
+            else:
+                result = None
+        elif role == Qt.UserRole:
+            result = self._dataFrame.ix[row, col]
+        else:
+            result = None
+            
+        #print "getdata", (time.time() - start) * 1000
         return result
 
         # TODO: rework index to use a rtree for saving instead of a dict
@@ -253,111 +291,6 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 #result = self._idxCache[indexLookup[0]]
                 #print "from cache:", (time.time() - start) * 1000
             #return result
-
-        #if role in self._dataCache.keys():
-            #cachedData = self._dataCache[role]
-            #if index in cachedData.keys():
-                #result = cachedData[index]
-                ##print "from cache:", (time.time() - start) * 1000
-                #return result
-            #else:
-                #result = self._data(index, role)
-                ## add result to the cache
-                #self._dataCache[role][index] = result
-                ##print "_data (no role):", (time.time() - start) * 1000
-                #return result
-        #else:
-            #result = self._data(index, role)
-            ## add result to the cache
-            #self._dataCache[role] = {index: result}
-            ##print "_data (no index):", (time.time() - start) * 1000
-            #return result
-
-    def _data(self, index, role=Qt.DisplayRole):
-        """return data depending on index, Qt::ItemDataRole and data type of the column.
-        Just does the convertion without caching.
-
-        Args:
-            index (QtCore.QModelIndex): Index to define column and row you want to return
-            role (Qt::ItemDataRole): Define which data you want to return.
-
-        Returns:
-            None if index is invalid
-            None if role is none of: DisplayRole, EditRole, CheckStateRole, UserRole
-
-            if role DisplayRole:
-                unmodified _dataFrame value if column dtype is object (string or unicode).
-                _dataFrame value as int or long if column dtype is in _intDtypes.
-                _dataFrame value as float if column dtype is in _floatDtypes. Rounds to defined precision (look at: _float16_precision, _float32_precision).
-                None if column dtype is in _boolDtypes.
-                QDateTime if column dtype is numpy.timestamp64[ns]. Uses timestampFormat as conversion template.
-
-            if role EditRole:
-                unmodified _dataFrame value if column dtype is object (string or unicode).
-                _dataFrame value as int or long if column dtype is in _intDtypes.
-                _dataFrame value as float if column dtype is in _floatDtypes. Rounds to defined precision (look at: _float16_precision, _float32_precision).
-                _dataFrame value as bool if column dtype is in _boolDtypes.
-                QDateTime if column dtype is numpy.timestamp64[ns]. Uses timestampFormat as conversion template.
-
-            if role CheckStateRole:
-                Qt.Checked or Qt.Unchecked if dtype is numpy.bool_ otherwise None for all other dtypes.
-
-            if role UserRole:
-                unmodified _dataFrame value.
-
-            raises TypeError if an unhandled dtype is found in column.
-        """
-        if not index.isValid():
-            return None
-
-        value = None
-        row = self._dataFrame.index[index.row()]
-        col = self._dataFrame.columns[index.column()]
-        columnDtype = self._dataFrame[col].dtype
-
-        if columnDtype == object:
-            value = self._dataFrame.ix[row, col]
-        elif columnDtype in self._floatDtypes:
-            value = round(float(self._dataFrame.ix[row, col]), self._float_precisions[str(columnDtype)])
-        elif columnDtype in self._intDtypes:
-            value = int(self._dataFrame.ix[row, col])
-        elif columnDtype in self._boolDtypes:
-            value = bool(self._dataFrame.ix[row, col])
-        elif columnDtype in self._dateDtypes:
-            value = numpy.datetime64(self._dataFrame.ix[row, col])
-            value = QtCore.QDateTime.fromString(str(value), self.timestampFormat)
-        else:
-            raise TypeError, "returning unhandled data type"
-
-        if role == Qt.DisplayRole:
-            # return the value if you wanne show True/False as text
-            if columnDtype == numpy.bool:
-                #return None
-                result = None
-            else:
-                result = value
-                #return value
-        elif role  == Qt.EditRole:
-            return value
-        elif role  == Qt.CheckStateRole:
-            if columnDtype == numpy.bool_:
-                if value:
-                    result = Qt.Checked
-                    #return Qt.Checked
-                else:
-                    result = Qt.Unchecked
-                    #return Qt.Unchecked
-            else:
-                result = None
-                #return None
-        elif role == Qt.UserRole:
-            result = self._dataFrame.ix[row, col]
-            #return self._dataFrame.ix[row, col]
-        else:
-            result = None
-            #return None
-
-        return result
 
     def flags(self, index):
         """Returns the item flags for the given index as ored value, e.x.: Qt.ItemIsUserCheckable | Qt.ItemIsEditable
@@ -391,9 +324,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             role (Qt::ItemDataRole): Use this role to specify what you want to do.
 
         Returns:
-            True if value is changed. Calls signalUpdate after update.
+            True if value is changed. Calls layoutChanged after update.
             False if value is not different from original value.
         """
+        self.layoutAboutToBeChanged.emit()
         if index.isValid():
             if value != index.data(role):
 
@@ -442,7 +376,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                     raise TypeError, "try to set unhandled data type"
 
                 self._dataFrame.set_value(row, col, value)
-                self.signalUpdate()
+                self.layoutChanged.emit()
                 return True
             else:
                 return False
@@ -492,12 +426,13 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             order (Qt::SortOrder, optional): descending(1) or ascending(0). defaults to Qt.AscendingOrder
 
         Returns:
-            emits signalUpdate()
+            emits layoutChanged
         """
+        self.layoutAboutToBeChanged.emit()
         self.sortingAboutToStart.emit()
         column = self._dataFrame.columns[columnId]
         self._dataFrame.sort(column, ascending=not bool(order), inplace=True)
-        self.signalUpdate()
+        self.layoutChanged.emit()
         self.sortingFinished.emit() 
 
     def setFilter(self, filterCondition):
@@ -506,7 +441,27 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         Args:
             filterCondition (): filter to use.
         """
-        pass
+        #filterCondition = u"self._dataFrame['int8_value'] >= 10"
+
+        try:
+            self.layoutAboutToBeChanged.emit()
+            filterCondition = eval(filterCondition)
+
+            if self._dataFrameOriginal is not None:
+                self._dataFrame = self._dataFrameOriginal
+            self._dataFrameOriginal = self._dataFrame.copy()
+            self._dataFrame = self._dataFrame[filterCondition]
+            self.layoutChanged.emit()
+        except:
+            raise
+
+    def clearFilter(self):
+        """clear all filters"""
+        if self._dataFrameOriginal is not None:
+            self.layoutAboutToBeChanged.emit()
+            self._dataFrame = self._dataFrameOriginal
+            self._dataFrameOriginal = None
+            self.layoutChanged.emit()
 
     def columnDtypeModel(self):
         """returns a ColumnDtypeModel"""

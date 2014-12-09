@@ -67,15 +67,15 @@ def test_TimestampFormat():
         model.timestampFormat = "yy-MM-dd hh:mm"
     assert "unicode" in unicode(excinfo.value)
 
-def test_signalUpdate(qtbot):
-    model = DataFrameModel()
-    with qtbot.waitSignal(model.layoutAboutToBeChanged) as layoutAboutToBeChanged:
-        model.signalUpdate()
-    assert layoutAboutToBeChanged.signal_triggered
+#def test_signalUpdate(qtbot):
+    #model = DataFrameModel()
+    #with qtbot.waitSignal(model.layoutAboutToBeChanged) as layoutAboutToBeChanged:
+        #model.signalUpdate()
+    #assert layoutAboutToBeChanged.signal_triggered
 
-    with qtbot.waitSignal(model.layoutChanged) as blocker:
-        model.signalUpdate()
-    assert blocker.signal_triggered
+    #with qtbot.waitSignal(model.layoutChanged) as blocker:
+        #model.signalUpdate()
+    #assert blocker.signal_triggered
 
 @pytest.mark.parametrize(
     "orientation, role, index, expectedHeader", 

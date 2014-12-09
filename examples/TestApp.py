@@ -78,6 +78,15 @@ class TestWidget(QtGui.QWidget):
         self.rightLayout.addWidget(self.buttonGotToColumn)
         self.buttonGotToColumn.clicked.connect(self.gotToColumn)
 
+        self.buttonSetFilter = QtGui.QPushButton("set filter")
+        self.rightLayout.addWidget(self.buttonSetFilter)
+        self.buttonSetFilter.clicked.connect(self.setFilter)
+        self.buttonClearFilter = QtGui.QPushButton("clear filter")
+        self.rightLayout.addWidget(self.buttonClearFilter)
+        self.buttonClearFilter.clicked.connect(self.clearFilter)
+        self.lineEditFilterCondition = QtGui.QLineEdit("self._dataFrame['int8_value'] >= 10")
+        self.rightLayout.addWidget(self.lineEditFilterCondition)
+
         self.chooseColumnComboBox.currentIndexChanged.connect(self.setModelColumn)
 
         self.dataListView.mouseReleaseEvent = self.mouseReleaseEvent
@@ -124,6 +133,11 @@ class TestWidget(QtGui.QWidget):
         print index.data(), index.isValid()
         self.dataTableView.setCurrentIndex(index)
 
+    def setFilter(self):
+        self.dataTableView.model().setFilter(self.lineEditFilterCondition.text())
+
+    def clearFilter(self):
+        self.dataTableView.model().clearFilter()
 
 if __name__ == '__main__':
 
@@ -131,7 +145,7 @@ if __name__ == '__main__':
     widget = TestWidget()
     widget.show()
 
-    #widget.setDataFrame( getCsvData() )
-    widget.setDataFrame( getRandomData(2, 2) )
+    widget.setDataFrame( getCsvData() )
+    #widget.setDataFrame( getRandomData(2, 2) )
 
     app.exec_()

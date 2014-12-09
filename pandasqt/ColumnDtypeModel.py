@@ -76,9 +76,10 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
             dataFrame (pandas.core.frame.DataFrame): assign dataFrame to _dataFrame. Holds all the data displayed.
 
         """
+        self.layoutAboutToBeChanged.emit()
         assert isinstance(dataFrame, pandas.core.frame.DataFrame), "not of type pandas.core.frame.DataFrame"
         self._dataFrame = dataFrame
-        self.signalUpdate()
+        self.layoutChanged.emit()
 
     def autoApplyChanges(self):
         """getter to _autoApplyChanges """
@@ -96,11 +97,6 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
         """
         assert isinstance(autoApplyChanges, bool), 'not of type bool'
         self._autoApplyChanges = autoApplyChanges
-
-    def signalUpdate(self):
-        """Emit layoutAboutToBeChanged and layoutChanged to inform views of changes"""
-        self.layoutAboutToBeChanged.emit()
-        self.layoutChanged.emit()
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role != Qt.DisplayRole:
@@ -147,6 +143,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                 return None
 
     def setData(self, index, value, role=Qt.DisplayRole):
+        self.layoutAboutToBeChanged.emit()
         if index.isValid():
             #print "value", value
             #print "lookup", self._dtypeTranslator.lookup(value)
@@ -162,7 +159,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                     if self.autoApplyChanges():
                         try:
                             self._dataFrame[columnName] = self._dataFrame[columnName].astype(dtype)
-                            self.signalUpdate()
+                            self.layoutChanged.emit()
                             self.dtypeChanged.emit(columnName)
                             return True
                         #except ValueError as e:
