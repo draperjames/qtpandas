@@ -19,7 +19,7 @@ except ImportError:
 
 import pandas
 import numpy
-from rtree import index
+#from rtree import index
 from ColumnDtypeModel import ColumnDtypeModel
 
 import time
@@ -98,9 +98,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self._timestampFormat = Qt.ISODate
 
-        self._dataCache = {}
-        self._idx = index.Index()
-        self._idxCache = []
+        #self._dataCache = {}
+        #self._idx = index.Index()
+        #self._idxCache = []
 
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
