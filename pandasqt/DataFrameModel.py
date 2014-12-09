@@ -19,7 +19,10 @@ except ImportError:
 
 import pandas
 import numpy
+from rtree import index
 from ColumnDtypeModel import ColumnDtypeModel
+
+import time
 
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
@@ -95,6 +98,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self._timestampFormat = Qt.ISODate
 
+        self._dataCache = {}
+        self._idx = index.Index()
+        self._idxCache = []
+
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
 
@@ -133,7 +140,6 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._columnDtypeModel.changingDtypeFailed.connect(
             lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
         )
-
         self.signalUpdate()
 
     @property
@@ -191,7 +197,85 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 return None
 
     def data(self, index, role=Qt.DisplayRole):
-        """return data depending on index, Qt::ItemDataRole and data type of the column
+        """return data depending on index, Qt::ItemDataRole and data type of the column.
+        Caches data in _dataCache to speed up rendering.
+
+        Args:
+            index (QtCore.QModelIndex): Index to define column and row you want to return
+            role (Qt::ItemDataRole): Define which data you want to return.
+
+        Returns:
+            None if index is invalid
+            None if role is none of: DisplayRole, EditRole, CheckStateRole, UserRole
+
+            if role DisplayRole:
+                unmodified _dataFrame value if column dtype is object (string or unicode).
+                _dataFrame value as int or long if column dtype is in _intDtypes.
+                _dataFrame value as float if column dtype is in _floatDtypes. Rounds to defined precision (look at: _float16_precision, _float32_precision).
+                None if column dtype is in _boolDtypes.
+                QDateTime if column dtype is numpy.timestamp64[ns]. Uses timestampFormat as conversion template.
+
+            if role EditRole:
+                unmodified _dataFrame value if column dtype is object (string or unicode).
+                _dataFrame value as int or long if column dtype is in _intDtypes.
+                _dataFrame value as float if column dtype is in _floatDtypes. Rounds to defined precision (look at: _float16_precision, _float32_precision).
+                _dataFrame value as bool if column dtype is in _boolDtypes.
+                QDateTime if column dtype is numpy.timestamp64[ns]. Uses timestampFormat as conversion template.
+
+            if role CheckStateRole:
+                Qt.Checked or Qt.Unchecked if dtype is numpy.bool_ otherwise None for all other dtypes.
+
+            if role UserRole:
+                unmodified _dataFrame value.
+
+            raises TypeError if an unhandled dtype is found in column.
+        """
+        start = time.time()
+
+        if not index.isValid():
+            return None
+
+        result = self._data(index, role)
+        return result
+
+        # TODO: rework index to use a rtree for saving instead of a dict
+        #if role == Qt.DisplayRole:
+            #indexPoint = (index.row(), index.column(), index.row(), index.column())
+            ##print indexPoint
+
+            #indexLookup = list(self._idx.intersection(indexPoint))
+            #if indexLookup == []:
+                #result = self._data(index, role)
+                #self._idxCache.append(result)
+                #self._idx.insert(len(self._idxCache) - 1, indexPoint)
+                #print "_data (no index):", (time.time() - start) * 1000
+            #else:
+                #result = self._idxCache[indexLookup[0]]
+                #print "from cache:", (time.time() - start) * 1000
+            #return result
+
+        #if role in self._dataCache.keys():
+            #cachedData = self._dataCache[role]
+            #if index in cachedData.keys():
+                #result = cachedData[index]
+                ##print "from cache:", (time.time() - start) * 1000
+                #return result
+            #else:
+                #result = self._data(index, role)
+                ## add result to the cache
+                #self._dataCache[role][index] = result
+                ##print "_data (no role):", (time.time() - start) * 1000
+                #return result
+        #else:
+            #result = self._data(index, role)
+            ## add result to the cache
+            #self._dataCache[role] = {index: result}
+            ##print "_data (no index):", (time.time() - start) * 1000
+            #return result
+
+    def _data(self, index, role=Qt.DisplayRole):
+        """return data depending on index, Qt::ItemDataRole and data type of the column.
+        Just does the convertion without caching.
 
         Args:
             index (QtCore.QModelIndex): Index to define column and row you want to return
@@ -248,23 +332,32 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole:
             # return the value if you wanne show True/False as text
             if columnDtype == numpy.bool:
-                return None
+                #return None
+                result = None
             else:
-                return value
+                result = value
+                #return value
         elif role  == Qt.EditRole:
             return value
         elif role  == Qt.CheckStateRole:
             if columnDtype == numpy.bool_:
                 if value:
-                    return Qt.Checked
+                    result = Qt.Checked
+                    #return Qt.Checked
                 else:
-                    return Qt.Unchecked
+                    result = Qt.Unchecked
+                    #return Qt.Unchecked
             else:
-                return None
+                result = None
+                #return None
         elif role == Qt.UserRole:
-            return self._dataFrame.ix[row, col]
+            result = self._dataFrame.ix[row, col]
+            #return self._dataFrame.ix[row, col]
         else:
-            return None
+            result = None
+            #return None
+
+        return result
 
     def flags(self, index):
         """Returns the item flags for the given index as ored value, e.x.: Qt.ItemIsUserCheckable | Qt.ItemIsEditable

@@ -46,7 +46,7 @@ class TestWidget(QtGui.QWidget):
         self.buttonCsvData = QtGui.QPushButton("load csv data")
         self.buttonRandomData = QtGui.QPushButton("load random data")
         self.buttonCsvData.clicked.connect(lambda: self.setDataFrame( getCsvData() ))
-        self.buttonRandomData.clicked.connect(lambda: self.setDataFrame( getRandomData() ))
+        self.buttonRandomData.clicked.connect(lambda: self.setDataFrame( getRandomData(rows=100, columns=100) ))
 
         self.buttonLayout = QtGui.QHBoxLayout()
         self.buttonLayout.addWidget(self.buttonCsvData)
@@ -56,7 +56,7 @@ class TestWidget(QtGui.QWidget):
         self.setLayout(self.mainLayout)
         self.mainLayout.addLayout(self.buttonLayout)
         self.mainLayout.addWidget(self.dataTableView)
-        
+
         self.spinbox = QtGui.QSpinBox()
         self.mainLayout.addWidget(self.spinbox)
         self.spinbox.setMaximum(99999999999)
@@ -131,6 +131,7 @@ if __name__ == '__main__':
     widget = TestWidget()
     widget.show()
 
-    widget.setDataFrame( getCsvData() )
+    #widget.setDataFrame( getCsvData() )
+    widget.setDataFrame( getRandomData(2, 2) )
 
     app.exec_()
