@@ -107,11 +107,6 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                 return self.headers[section]
             except (IndexError, ):
                 return None
-        #elif orientation == Qt.Vertical:
-            #try:
-                #return self._dataFrame.columns[section]
-            #except (IndexError, ):
-                #return None
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():

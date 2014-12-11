@@ -19,10 +19,7 @@ except ImportError:
 
 import pandas
 import numpy
-#from rtree import index
 from ColumnDtypeModel import ColumnDtypeModel
-
-import time
 
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
@@ -99,9 +96,6 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._timestampFormat = Qt.ISODate
 
         self._dataFrameOriginal = None
-        #self._dataCache = {}
-        #self._idx = index.Index()
-        #self._idxCache = []
 
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
@@ -226,7 +220,6 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
             raises TypeError if an unhandled dtype is found in column.
         """
-        #start = time.time()
 
         if not index.isValid():
             return None
@@ -272,25 +265,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             result = self._dataFrame.ix[row, col]
         else:
             result = None
-            
-        #print "getdata", (time.time() - start) * 1000
         return result
-
-        # TODO: rework index to use a rtree for saving instead of a dict
-        #if role == Qt.DisplayRole:
-            #indexPoint = (index.row(), index.column(), index.row(), index.column())
-            ##print indexPoint
-
-            #indexLookup = list(self._idx.intersection(indexPoint))
-            #if indexLookup == []:
-                #result = self._data(index, role)
-                #self._idxCache.append(result)
-                #self._idx.insert(len(self._idxCache) - 1, indexPoint)
-                #print "_data (no index):", (time.time() - start) * 1000
-            #else:
-                #result = self._idxCache[indexLookup[0]]
-                #print "from cache:", (time.time() - start) * 1000
-            #return result
 
     def flags(self, index):
         """Returns the item flags for the given index as ored value, e.x.: Qt.ItemIsUserCheckable | Qt.ItemIsEditable
