@@ -19,7 +19,12 @@ except ImportError:
 
 import pandas
 import numpy
+
+import parser
+import re
+
 from ColumnDtypeModel import ColumnDtypeModel
+from DataSearch import DataSearch
 
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
@@ -96,6 +101,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._timestampFormat = Qt.ISODate
 
         self._dataFrameOriginal = None
+        self._search = DataSearch("nothing", "")
 
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
@@ -410,25 +416,33 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self.layoutChanged.emit()
         self.sortingFinished.emit() 
 
-    def setFilter(self, filterCondition):
+    def setFilter(self, search):
         """apply a filter and hide rows
 
         Args:
-            filterCondition (): filter to use.
+            search(pandasqt.DataSearch): data search object to use.
         """
-        #filterCondition = u"self._dataFrame['int8_value'] >= 10"
+        assert isinstance(search, DataSearch)
+        self._search = search
 
-        try:
-            self.layoutAboutToBeChanged.emit()
-            filterCondition = eval(filterCondition)
+        self.layoutAboutToBeChanged.emit()
 
-            if self._dataFrameOriginal is not None:
-                self._dataFrame = self._dataFrameOriginal
-            self._dataFrameOriginal = self._dataFrame.copy()
-            self._dataFrame = self._dataFrame[filterCondition]
+        if self._dataFrameOriginal is not None:
+            self._dataFrame = self._dataFrameOriginal
+        self._dataFrameOriginal = self._dataFrame.copy()
+
+        self._search.setDataFrame(self._dataFrame)
+        if self._search.isValid():
+            searchIndex = self._search.search()
+            self._dataFrame = self._dataFrame[searchIndex]
             self.layoutChanged.emit()
-        except:
-            raise
+            return self._search.searchIndexList()
+        else:
+            self.clearFilter()
+            self.layoutChanged.emit()
+            return pandas.Series([])
+
+        
 
     def clearFilter(self):
         """clear all filters"""

@@ -15,7 +15,7 @@ except ImportError:
 
 import sys
 import pandas
-from pandasqt import DataFrameModel, setDelegatesFromDtype, DtypeComboDelegate
+from pandasqt import DataFrameModel, setDelegatesFromDtype, DtypeComboDelegate, DataSearch
 from util import getCsvData, getRandomData
 
 class TestWidget(QtGui.QWidget):
@@ -84,7 +84,7 @@ class TestWidget(QtGui.QWidget):
         self.buttonClearFilter = QtGui.QPushButton("clear filter")
         self.rightLayout.addWidget(self.buttonClearFilter)
         self.buttonClearFilter.clicked.connect(self.clearFilter)
-        self.lineEditFilterCondition = QtGui.QLineEdit("self._dataFrame['int8_value'] >= 10")
+        self.lineEditFilterCondition = QtGui.QLineEdit("freeSearch('am')")
         self.rightLayout.addWidget(self.lineEditFilterCondition)
 
         self.chooseColumnComboBox.currentIndexChanged.connect(self.setModelColumn)
@@ -134,7 +134,10 @@ class TestWidget(QtGui.QWidget):
         self.dataTableView.setCurrentIndex(index)
 
     def setFilter(self):
-        self.dataTableView.model().setFilter(self.lineEditFilterCondition.text())
+        #filterIndex = eval(self.lineEditFilterCondition.text())
+        search = DataSearch("Test", self.lineEditFilterCondition.text())
+        self.dataTableView.model().setFilter(search)
+        #raise NotImplementedError
 
     def clearFilter(self):
         self.dataTableView.model().clearFilter()

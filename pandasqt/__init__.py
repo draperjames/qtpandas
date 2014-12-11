@@ -6,3 +6,4 @@ __version__ = '0.1.1'
 from DataFrameModel import DataFrameModel
 from ColumnDtypeModel import DtypeComboDelegate
 from CustomDelegates import setDelegatesFromDtype, BigIntSpinboxDelegate, CustomDoubleSpinboxDelegate
+from DataSearch import DataSearch
