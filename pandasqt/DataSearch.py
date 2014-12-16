@@ -56,7 +56,8 @@ class DataSearch(object):
             globals()[column] = self._dataFrame[column]
         globals()["freeSearch"] = self.freeSearch
         globals()["extentSearch"] = self.extentSearch
-
+        globals()["indexSearch"] = self.indexSearch
+        
         parsedSearch = parser.expr(self.filterString).compile()
         searchIndex = eval(parsedSearch)
         return searchIndex
@@ -68,6 +69,7 @@ class DataSearch(object):
     def searchIndexList(self):
         if self.isValid():
             searchIndex = self.search()
+            searchIndex = pd.Series(searchIndex)
             return searchIndex[searchIndex == True].index
 
     def freeSearch(self, searchString):
@@ -102,6 +104,17 @@ class DataSearch(object):
                 return np.logical_and(questionMin, questionMax)
             except:
                 raise
+
+    def indexSearch(self, indexes):
+        if not self._dataFrame.empty:
+            filter0 = self._dataFrame.index == -9999
+            for index in indexes:
+                filter1 = self._dataFrame.index == index
+                filter0 = np.logical_or(filter0, filter1)
+
+            return filter0
+        else:
+            return []
 
     #def applySearch(self):
         #filterCondition = self.search()        
