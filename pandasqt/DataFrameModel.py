@@ -78,6 +78,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         numpy.dtype('<M8[ns]')
     ]
 
+    _timestampFormat = Qt.ISODate
+
     sortingAboutToStart = QtCore.pyqtSignal()
     sortingFinished = QtCore.pyqtSignal()
     dtypeChanged = QtCore.pyqtSignal(object)
@@ -99,8 +101,6 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._dataFrame = pandas.DataFrame()
         if dataFrame is not None:
             self.setDataFrame(dataFrame, copyDataFrame=copyDataFrame)
-
-        self._timestampFormat = Qt.ISODate
 
         self._dataFrameOriginal = None
         self._search = DataSearch("nothing", "")
@@ -442,9 +442,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         else:
             self.clearFilter()
             self.layoutChanged.emit()
-            return pandas.Series([])
-
-
+            return pandas.core.index.Int64Index([])
 
     def clearFilter(self):
         """clear all filters"""

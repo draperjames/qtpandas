@@ -172,7 +172,6 @@ class TestDtypeComboDelegate(object):
         postedit_data = index.data(DTYPE_ROLE)
 
         assert preedit_data != postedit_data
-        qtbot.stopForInteraction()
 
 if __name__ == '__main__':
     pytest.main()
