@@ -33,11 +33,13 @@ class DataSearch(object):
 
     def dataFrame(self):
         return self._dataFrame
+
     def setDataFrame(self, dataFrame):
         self._dataFrame = dataFrame
 
     def filterString(self):
         return self._filterString
+
     def setFilterString(self, filterString):
         ## remove leading whitespaces, they will raise an identation error
         filterString = filterString.strip()
@@ -104,7 +106,7 @@ class DataSearch(object):
                 raise
 
     #def applySearch(self):
-        #filterCondition = self.search()        
+        #filterCondition = self.search()
         #resultingIndexes = self.table.dataFrame[filterCondition].index
         #resultingIndexesString = str(list(resultingIndexes)).replace('[', '(').replace(']', ')')
         #subsetString = u'"index" IN {0}'.format(resultingIndexesString)

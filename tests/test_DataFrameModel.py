@@ -18,7 +18,7 @@ import decimal
 import numpy
 import pandas
 
-from pandasqt.DataFrameModel import DataFrameModel
+from pandasqt.DataFrameModel import DataFrameModel, DATAFRAME_ROLE
 
 def test_initDataFrame():
     model = DataFrameModel()
@@ -42,9 +42,9 @@ def test_setDataFrame():
     assert "pandas.core.frame.DataFrame" in unicode(excinfo.value)
 
 @pytest.mark.parametrize(
-    "copy, operator", 
+    "copy, operator",
     [
-        (True, numpy.not_equal), 
+        (True, numpy.not_equal),
         (False, numpy.equal)
     ]
 )
@@ -78,7 +78,7 @@ def test_TimestampFormat():
     #assert blocker.signal_triggered
 
 @pytest.mark.parametrize(
-    "orientation, role, index, expectedHeader", 
+    "orientation, role, index, expectedHeader",
     [
         (Qt.Horizontal, Qt.EditRole, 0, None),
         (Qt.Vertical, Qt.EditRole, 0, None),
@@ -127,9 +127,9 @@ class TestSort(object):
         return DataFrameModel(dataFrame)
 
     @pytest.mark.parametrize(
-        "signal", 
+        "signal",
         [
-            "layoutAboutToBeChanged", 
+            "layoutAboutToBeChanged",
             "layoutChanged",
             "sortingAboutToStart",
             "sortingFinished",
@@ -144,7 +144,7 @@ class TestSort(object):
         model.sort(0)
 
     @pytest.mark.parametrize(
-        "testAscending, modelAscending, isIdentic", 
+        "testAscending, modelAscending, isIdentic",
         [
             (True, Qt.AscendingOrder, True),
             (False, Qt.DescendingOrder, True),
@@ -209,7 +209,7 @@ class TestData(object):
         assert model.data(index, role=Qt.DisplayRole) == value
         assert model.data(index, role=Qt.EditRole) == value
         assert model.data(index, role=Qt.CheckStateRole) == None
-        assert isinstance(model.data(index, role=Qt.UserRole), dtype)
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
 
     @pytest.mark.parametrize(
         "value, dtype, precision", [
@@ -245,8 +245,8 @@ class TestData(object):
             assert model.data(index, role=Qt.DisplayRole) == value
             assert model.data(index, role=Qt.EditRole) == value
         assert model.data(index, role=Qt.CheckStateRole) == None
-        assert isinstance(model.data(index, role=Qt.UserRole), dtype)
-        assert model.data(index, role=Qt.UserRole).dtype == dtype
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
+        assert model.data(index, role=DATAFRAME_ROLE).dtype == dtype
 
     #@pytest.mark.parametrize(
         #"border1, modifier, border2, dtype", [
@@ -257,7 +257,7 @@ class TestData(object):
             #("min", -1, "max", numpy.uint32),
             #("max", +1, "min", numpy.uint32),
             #("min", -1, "max", numpy.uint64),
-            ##("max", +1, "min", numpy.uint64),  # will raise OverFlowError caused by astype function, 
+            ##("max", +1, "min", numpy.uint64),  # will raise OverFlowError caused by astype function,
                                                 ## uneffects models data method
             #("min", -1, "max", numpy.int8),
             #("max", +1, "min", numpy.int8),
@@ -283,7 +283,7 @@ class TestData(object):
         #assert model.data(index) == getattr(ii, border2)
 
     @pytest.mark.parametrize(
-        "value, qtbool", 
+        "value, qtbool",
         [
             (True, Qt.Checked),
             (False, Qt.Unchecked)
@@ -300,8 +300,8 @@ class TestData(object):
         assert model.data(index, role=Qt.DisplayRole) == None
         assert model.data(index, role=Qt.EditRole) == value
         assert model.data(index, role=Qt.CheckStateRole) == qtbool
-        assert model.data(index, role=Qt.UserRole) == value
-        assert isinstance(model.data(index, role=Qt.UserRole), numpy.bool_)
+        assert model.data(index, role=DATAFRAME_ROLE) == value
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), numpy.bool_)
 
     def test_date(self, model, index):
         numpyDate = numpy.datetime64("1990-10-08T10:15:45+0100")
@@ -315,8 +315,8 @@ class TestData(object):
         assert model.data(index, role=Qt.DisplayRole) == qDate
         assert model.data(index, role=Qt.EditRole) == qDate
         assert model.data(index, role=Qt.CheckStateRole) == None
-        assert model.data(index, role=Qt.UserRole) == numpyDate
-        assert isinstance(model.data(index, role=Qt.UserRole), pandas.lib.Timestamp)
+        assert model.data(index, role=DATAFRAME_ROLE) == numpyDate
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), pandas.lib.Timestamp)
 
 class TestSetData(object):
 
@@ -366,11 +366,11 @@ class TestSetData(object):
         assert model.data(index, role=Qt.DisplayRole) == newValue
         assert model.data(index, role=Qt.EditRole) == newValue
         assert model.data(index, role=Qt.CheckStateRole) == None
-        assert model.data(index, role=Qt.UserRole) == newValue
-        assert isinstance(model.data(index, role=Qt.UserRole), dtype)
+        assert model.data(index, role=DATAFRAME_ROLE) == newValue
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
 
     @pytest.mark.parametrize(
-        "value, qtbool", 
+        "value, qtbool",
         [
             (True, Qt.Checked),
             (False, Qt.Unchecked)
@@ -388,8 +388,8 @@ class TestSetData(object):
         assert model.data(index, role=Qt.DisplayRole) == None
         assert model.data(index, role=Qt.EditRole) == value
         assert model.data(index, role=Qt.CheckStateRole) == qtbool
-        assert model.data(index, role=Qt.UserRole) == value
-        assert isinstance(model.data(index, role=Qt.UserRole), numpy.bool_)
+        assert model.data(index, role=DATAFRAME_ROLE) == value
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), numpy.bool_)
 
     def test_date(self, model, index):
         numpyDate = numpy.datetime64("1990-10-08T10:15:45+0100")
@@ -406,8 +406,8 @@ class TestSetData(object):
         assert model.data(index, role=Qt.DisplayRole) == newQDate
         assert model.data(index, role=Qt.EditRole) == newQDate
         assert model.data(index, role=Qt.CheckStateRole) == None
-        assert model.data(index, role=Qt.UserRole) == newDate
-        assert isinstance(model.data(index, role=Qt.UserRole), pandas.lib.Timestamp)
+        assert model.data(index, role=DATAFRAME_ROLE) == newDate
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), pandas.lib.Timestamp)
 
     @pytest.mark.parametrize(
         "value, dtype, precision", [
@@ -448,8 +448,8 @@ class TestSetData(object):
             assert model.data(index, role=Qt.DisplayRole) == newValue
             assert model.data(index, role=Qt.EditRole) == newValue
         assert model.data(index, role=Qt.CheckStateRole) == None
-        assert isinstance(model.data(index, role=Qt.UserRole), dtype)
-        assert model.data(index, role=Qt.UserRole).dtype == dtype
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
+        assert model.data(index, role=DATAFRAME_ROLE).dtype == dtype
 
     @pytest.mark.parametrize(
         "border, modifier, dtype", [

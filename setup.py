@@ -7,6 +7,7 @@ import codecs
 import os
 import sys
 
+# TODO: sip is only needed for PyQt4, they should be imported together.
 try:
     import sip
 except ImportError as e:
@@ -15,6 +16,7 @@ except ImportError as e:
 try:
     import PyQt4
 except ImportError as e:
+    # TODO: try to import PySide.
     raise e, "install PyQt4 or PySide"
 
 import pandasqt

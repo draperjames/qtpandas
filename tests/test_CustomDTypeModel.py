@@ -1,0 +1,178 @@
+# -*- coding: utf-8 -*-
+
+import sip
+try:
+    sip.setapi('QString', 2)
+    sip.setapi('QVariant', 2)
+except ValueError, e:
+    raise RuntimeError('Could not set API version (%s): did you import PyQt4 directly?' % e)
+
+from PyQt4 import QtGui
+from PyQt4 import QtCore
+from PyQt4.QtCore import Qt
+
+import pytest
+import pytestqt
+
+import decimal
+import numpy
+import pandas
+
+from pandasqt.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE, DtypeComboDelegate
+from pandasqt.translation import DTypeTranslator
+
+
+@pytest.fixture()
+def dataframe():
+    data = [
+        [0, 1, 2, 3, 4],
+        [5, 6, 7, 8, 9],
+        [10, 11, 12, 13, 14]
+    ]
+    columns = ['Foo', 'Bar', 'Spam', 'Eggs', 'Baz']
+    dataFrame = pandas.DataFrame(data, columns=columns)
+    return dataFrame
+
+@pytest.fixture()
+def language_values():
+    values = set()
+    translator = DTypeTranslator()
+    for key, value in translator._dtypes.iteritems():
+        for k, v in value.iteritems():
+            values.add((v, key))
+
+    return list(values)
+
+
+class TestColumnDType(object):
+    def test_customDTypeModel_check_init(self):
+        model = ColumnDtypeModel()
+
+        assert model.dataFrame().empty == True
+        assert model.autoApplyChanges() == True
+
+        model = ColumnDtypeModel(autoApplyChanges=False)
+        assert model.autoApplyChanges() == False
+
+
+    def test_headerData(self):
+        model = ColumnDtypeModel()
+
+        ret = model.headerData(0, Qt.Horizontal)
+        assert ret == 'column'
+        ret = model.headerData(1, Qt.Horizontal)
+        assert ret == 'data type'
+        ret = model.headerData(2, Qt.Horizontal)
+        assert ret == None
+        ret = model.headerData(0, Qt.Horizontal, Qt.EditRole)
+        assert ret == None
+        ret = model.headerData(0, Qt.Vertical)
+        assert ret == None
+
+    def test_data(self, dataframe):
+        model = ColumnDtypeModel(dataFrame=dataframe)
+        index = model.index(0, 0)
+
+        # get data for display role
+        ret = index.data()
+        assert ret == 'Foo'
+
+        # edit role does the same as display role
+        ret = index.data(Qt.EditRole)
+        assert ret == 'Foo'
+
+        # datatype only defined for column 1
+        ret = index.data(DTYPE_ROLE)
+        assert ret == None
+
+        # datatype column
+        index = index.sibling(0, 1)
+        ret = index.data(DTYPE_ROLE)
+        assert ret == numpy.dtype(int)
+        # check translation
+        assert index.data() == 'integer (64 bit)'
+
+        # column not defined
+        index = index.sibling(0, 2)
+        assert index.data(DTYPE_ROLE) == None
+
+        # invalid index
+        index = QtCore.QModelIndex()
+        assert model.data(index) == None
+
+        index = model.index(2, 0)
+
+        # get data for display role
+        ret = index.data()
+        assert ret == 'Spam'
+
+    def test_setData(self, dataframe, language_values):
+        model = ColumnDtypeModel(dataFrame=dataframe)
+        index = model.index(3, 1)
+
+        # change all values except datetime
+        datetime = ()
+        for (value, expected_type) in language_values:
+            if expected_type == numpy.dtype('<M8[ns]'):
+                datetime = (value, expected_type)
+                continue
+            else:
+                model.setData(index, value)
+                assert index.data(DTYPE_ROLE) == expected_type
+
+        assert model.setData(index, 'bool', Qt.DisplayRole) == False
+
+        # change datatype to datetime
+        assert model.setData(index, datetime[0]) == True
+        # convert datetime to anything else does not work and raises an error.
+        with pytest.raises(NotImplementedError) as err:
+            model.setData(index, 'bool')
+
+    def test_flags(self, dataframe):
+        model = ColumnDtypeModel(dataFrame=dataframe)
+        index = model.index(0, 0)
+        assert model.flags(index) == Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        index = index.sibling(0, 1)
+        assert model.flags(index) == Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
+
+        index = index.sibling(15, 1)
+        assert model.flags(index) == Qt.NoItemFlags
+
+    def test_columnCount(self):
+        model = ColumnDtypeModel()
+        assert model.columnCount() == 2
+
+    def test_rowCount(self, dataframe):
+        model = ColumnDtypeModel()
+        assert model.rowCount() == 0
+
+        model.setDataFrame(dataframe)
+        assert model.rowCount(5)
+
+
+class TestDtypeComboDelegate(object):
+    def test_editing(self, dataframe, qtbot):
+        model = ColumnDtypeModel(dataFrame=dataframe)
+
+        tableView = QtGui.QTableView()
+        qtbot.addWidget(tableView)
+
+        tableView.setModel(model)
+        delegate = DtypeComboDelegate(tableView)
+        tableView.setItemDelegateForColumn(1, delegate)
+        tableView.show()
+
+        index = model.index(0, 1)
+        preedit_data = index.data(DTYPE_ROLE)
+
+        tableView.edit(index)
+        editor = tableView.findChildren(QtGui.QComboBox)[0]
+        selectedIndex = editor.currentIndex()
+        editor.setCurrentIndex(selectedIndex+1)
+        postedit_data = index.data(DTYPE_ROLE)
+
+        assert preedit_data != postedit_data
+        qtbot.stopForInteraction()
+
+if __name__ == '__main__':
+    pytest.main()

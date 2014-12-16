@@ -26,17 +26,19 @@ import re
 from ColumnDtypeModel import ColumnDtypeModel
 from DataSearch import DataSearch
 
+DATAFRAME_ROLE = Qt.UserRole + 2
+
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
 
     Attributes:
-        timestampFormat (unicode): formatting string for conversion of timestamps to QtCore.QDateTime. 
+        timestampFormat (unicode): formatting string for conversion of timestamps to QtCore.QDateTime.
             Used in data method.
         sortingAboutToStart (QtCore.pyqtSignal): emitted directly before sorting starts.
         sortingFinished (QtCore.pyqtSignal): emitted, when sorting finished.
         dtypeChanged (QtCore.pyqtSignal(columnName)): passed from related ColumnDtypeModel
             if a columns dtype has changed.
-        changingDtypeFailed (QtCore.pyqtSignal(columnName, index, dtype)): 
+        changingDtypeFailed (QtCore.pyqtSignal(columnName, index, dtype)):
             passed from related ColumnDtypeModel.
             emitted after a column has changed it's data type.
     """
@@ -85,7 +87,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         """the __init__ method.
 
         Args:
-            dataFrame (pandas.core.frame.DataFrame, optional): initializes the model with given DataFrame. 
+            dataFrame (pandas.core.frame.DataFrame, optional): initializes the model with given DataFrame.
                 If none is given an empty DataFrame will be set. defaults to None.
             copyDataFrame (bool, optional): create a copy of dataFrame or use it as is. defaults to False.
                 If you use it as is, you can change it from outside otherwise you have to reset the dataFrame
@@ -148,7 +150,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     def timestampFormat(self):
         """getter to _timestampFormat"""
         return self._timestampFormat
-    
+
     @timestampFormat.setter
     def timestampFormat(self, timestampFormat):
         """setter to _timestampFormat. Formatting string for conversion of timestamps to QtCore.QDateTime
@@ -157,7 +159,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             AssertionError: if timestampFormat is not of type unicode.
 
         Args:
-            timestampFormat (unicode): assign timestampFormat to _timestampFormat. 
+            timestampFormat (unicode): assign timestampFormat to _timestampFormat.
                 Formatting string for conversion of timestamps to QtCore.QDateTime. Used in data method.
 
         """
@@ -168,7 +170,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         """return the header depending on section, orientation and Qt::ItemDataRole
 
         Args:
-            section (int): For horizontal headers, the section number corresponds to the column number. 
+            section (int): For horizontal headers, the section number corresponds to the column number.
                 Similarly, for vertical headers, the section number corresponds to the row number.
             orientation (Qt::Orientations):
             role (Qt::ItemDataRole):
@@ -202,7 +204,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         Returns:
             None if index is invalid
-            None if role is none of: DisplayRole, EditRole, CheckStateRole, UserRole
+            None if role is none of: DisplayRole, EditRole, CheckStateRole, DATAFRAME_ROLE
 
             if role DisplayRole:
                 unmodified _dataFrame value if column dtype is object (string or unicode).
@@ -221,7 +223,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             if role CheckStateRole:
                 Qt.Checked or Qt.Unchecked if dtype is numpy.bool_ otherwise None for all other dtypes.
 
-            if role UserRole:
+            if role DATAFRAME_ROLE:
                 unmodified _dataFrame value.
 
             raises TypeError if an unhandled dtype is found in column.
@@ -248,7 +250,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             return value
 
         row = self._dataFrame.index[index.row()]
-        col = self._dataFrame.columns[index.column()]        
+        col = self._dataFrame.columns[index.column()]
         columnDtype = self._dataFrame[col].dtype
 
         if role == Qt.DisplayRole:
@@ -267,7 +269,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                     result = Qt.Unchecked
             else:
                 result = None
-        elif role == Qt.UserRole:
+        elif role == DATAFRAME_ROLE:
             result = self._dataFrame.ix[row, col]
         else:
             result = None
@@ -414,7 +416,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         column = self._dataFrame.columns[columnId]
         self._dataFrame.sort(column, ascending=not bool(order), inplace=True)
         self.layoutChanged.emit()
-        self.sortingFinished.emit() 
+        self.sortingFinished.emit()
 
     def setFilter(self, search):
         """apply a filter and hide rows
@@ -442,7 +444,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             self.layoutChanged.emit()
             return pandas.Series([])
 
-        
+
 
     def clearFilter(self):
         """clear all filters"""

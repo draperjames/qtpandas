@@ -23,8 +23,8 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         """the __init__ method.
 
         Args:
-            parent (QObject): defaults to None. If parent is 0, the new widget becomes a window. 
-                If parent is another widget, this widget becomes a child window inside parent. 
+            parent (QObject): defaults to None. If parent is 0, the new widget becomes a window.
+                If parent is another widget, this widget becomes a child window inside parent.
                 The new widget is deleted when its parent is deleted.
 
         """
@@ -127,6 +127,6 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
 
         Args:
             maximum (int or long): new _maximum value
-        """        
+        """
         assert isinstance(maximum, int) or isinstance(maximum, long), "not of type int or long"
         self._maximum = maximum
