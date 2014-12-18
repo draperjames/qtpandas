@@ -19,6 +19,7 @@ import numpy
 import pandas
 
 from pandasqt.DataFrameModel import DataFrameModel, DATAFRAME_ROLE
+from pandasqt.DataSearch import DataSearch
 
 def test_initDataFrame():
     model = DataFrameModel()
@@ -393,7 +394,6 @@ class TestSetData(object):
 
     def test_date(self, model, index):
         numpyDate = numpy.datetime64("1990-10-08T10:15:45+0100")
-        qDate = QtCore.QDateTime.fromString(str(numpyDate), Qt.ISODate)
         dataFrame = pandas.DataFrame([numpyDate], columns=['A'])
         model.setDataFrame(dataFrame)
         assert not model.dataFrame().empty
@@ -408,6 +408,8 @@ class TestSetData(object):
         assert model.data(index, role=Qt.CheckStateRole) == None
         assert model.data(index, role=DATAFRAME_ROLE) == newDate
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), pandas.lib.Timestamp)
+
+        assert model.setData(index, 'foobar') == False
 
     @pytest.mark.parametrize(
         "value, dtype, precision", [
@@ -483,6 +485,67 @@ class TestSetData(object):
         assert index.isValid()
         assert model.setData(index, value)
         assert model.data(index) == getattr(ii, border)
+
+
+class TestFilter(object):
+
+    @pytest.fixture
+    def dataFrame(self):
+        data = [
+            [0, 1, 2, 3, 4],
+            [5, 6, 7, 8, 9],
+            [10, 11, 12, 13, 14]
+        ]
+        columns = ['Foo', 'Bar', 'Spam', 'Eggs', 'Baz']
+        dataFrame = pandas.DataFrame(data, columns=columns)
+        return dataFrame
+
+    @pytest.fixture
+    def model(self, dataFrame):
+        return DataFrameModel(dataFrame)
+
+    @pytest.fixture
+    def index(self, model):
+        return model.index(0, 0)
+
+    def test_filter_single_column(self, model, index):
+        filterString = 'Foo < 10'
+        search = DataSearch("Test", filterString)
+        preFilterRows = model.rowCount()
+        model.setFilter(search)
+        postFilterRows = model.rowCount()
+
+        assert preFilterRows > postFilterRows
+        assert preFilterRows == (postFilterRows + 1)
+
+    def test_filter_freeSearch(self, model, index):
+        filterString = 'freeSearch("10")'
+        search = DataSearch("Test", filterString)
+        preFilterRows = model.rowCount()
+        model.setFilter(search)
+        postFilterRows = model.rowCount()
+
+        assert preFilterRows > postFilterRows
+        assert preFilterRows == (postFilterRows + 2)
+
+    def test_filter_multiColumn(self, model, index):
+        filterString = '(Foo < 10) & (Bar > 1)'
+        search = DataSearch("Test", filterString)
+        preFilterRows = model.rowCount()
+        model.setFilter(search)
+        postFilterRows = model.rowCount()
+
+        assert preFilterRows > postFilterRows
+        assert preFilterRows == (postFilterRows + 2)
+
+    def test_filter_unknown_keyword(self, model, index):
+        filterString = '(Foo < 10) and (Bar > 1)'
+        search = DataSearch("Test", filterString)
+        preFilterRows = model.rowCount()
+        model.setFilter(search)
+        postFilterRows = model.rowCount()
+        assert preFilterRows == postFilterRows
+
 
 if __name__ == '__main__':
     pytest.main()
