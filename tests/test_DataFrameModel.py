@@ -188,9 +188,10 @@ class TestData(object):
         assert model.dataFrame() is dataFrame
 
         assert index.isValid()
-        with pytest.raises(TypeError) as excinfo:
-            assert model.data(index) == value
-        assert "unhandled data type" in unicode(excinfo.value)
+        assert model.data(index) == None
+        # with pytest.raises(TypeError) as excinfo:
+        #     model.data(index)
+        # assert "unhandled data type" in unicode(excinfo.value)
 
     @pytest.mark.parametrize(
         "value, dtype", [

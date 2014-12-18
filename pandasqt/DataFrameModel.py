@@ -245,8 +245,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             elif columnDtype in self._dateDtypes:
                 value = numpy.datetime64(self._dataFrame.ix[row, col])
                 value = QtCore.QDateTime.fromString(str(value), self.timestampFormat)
-            else:
-                raise TypeError, "returning unhandled data type"
+            # else:
+            #     raise TypeError, "returning unhandled data type"
             return value
 
         row = self._dataFrame.index[index.row()]
