@@ -26,17 +26,19 @@ import re
 from ColumnDtypeModel import ColumnDtypeModel
 from DataSearch import DataSearch
 
+DATAFRAME_ROLE = Qt.UserRole + 2
+
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
 
     Attributes:
-        timestampFormat (unicode): formatting string for conversion of timestamps to QtCore.QDateTime. 
+        timestampFormat (unicode): formatting string for conversion of timestamps to QtCore.QDateTime.
             Used in data method.
         sortingAboutToStart (QtCore.pyqtSignal): emitted directly before sorting starts.
         sortingFinished (QtCore.pyqtSignal): emitted, when sorting finished.
         dtypeChanged (QtCore.pyqtSignal(columnName)): passed from related ColumnDtypeModel
             if a columns dtype has changed.
-        changingDtypeFailed (QtCore.pyqtSignal(columnName, index, dtype)): 
+        changingDtypeFailed (QtCore.pyqtSignal(columnName, index, dtype)):
             passed from related ColumnDtypeModel.
             emitted after a column has changed it's data type.
     """
@@ -87,7 +89,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         """the __init__ method.
 
         Args:
-            dataFrame (pandas.core.frame.DataFrame, optional): initializes the model with given DataFrame. 
+            dataFrame (pandas.core.frame.DataFrame, optional): initializes the model with given DataFrame.
                 If none is given an empty DataFrame will be set. defaults to None.
             copyDataFrame (bool, optional): create a copy of dataFrame or use it as is. defaults to False.
                 If you use it as is, you can change it from outside otherwise you have to reset the dataFrame
@@ -119,7 +121,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             It's not implemented with python properties to keep Qt conventions.
 
         Raises:
-            AssertionError: if dataFrame is not of type pandas.core.frame.DataFrame.
+            TypeError: if dataFrame is not of type pandas.core.frame.DataFrame.
 
         Args:
             dataFrame (pandas.core.frame.DataFrame): assign dataFrame to _dataFrame. Holds all the data displayed.
@@ -128,7 +130,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 after external changes.
 
         """
-        assert isinstance(dataFrame, pandas.core.frame.DataFrame), "not of type pandas.core.frame.DataFrame"
+        if not isinstance(dataFrame, pandas.core.frame.DataFrame):
+            raise TypeError("not of type pandas.core.frame.DataFrame")
+
         self.layoutAboutToBeChanged.emit()
         if copyDataFrame:
             self._dataFrame = dataFrame.copy()
@@ -148,7 +152,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     def timestampFormat(self):
         """getter to _timestampFormat"""
         return self._timestampFormat
-    
+
     @timestampFormat.setter
     def timestampFormat(self, timestampFormat):
         """setter to _timestampFormat. Formatting string for conversion of timestamps to QtCore.QDateTime
@@ -157,18 +161,20 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             AssertionError: if timestampFormat is not of type unicode.
 
         Args:
-            timestampFormat (unicode): assign timestampFormat to _timestampFormat. 
+            timestampFormat (unicode): assign timestampFormat to _timestampFormat.
                 Formatting string for conversion of timestamps to QtCore.QDateTime. Used in data method.
 
         """
-        assert isinstance(timestampFormat, unicode) or timestampFormat.__class__.__name__ == "DateFormat", "not of type unicode"
+        if not isinstance(timestampFormat, (unicode, )):
+            raise TypeError('not of type unicode')
+        #assert isinstance(timestampFormat, unicode) or timestampFormat.__class__.__name__ == "DateFormat", "not of type unicode"
         self._timestampFormat = timestampFormat
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         """return the header depending on section, orientation and Qt::ItemDataRole
 
         Args:
-            section (int): For horizontal headers, the section number corresponds to the column number. 
+            section (int): For horizontal headers, the section number corresponds to the column number.
                 Similarly, for vertical headers, the section number corresponds to the row number.
             orientation (Qt::Orientations):
             role (Qt::ItemDataRole):
@@ -202,7 +208,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         Returns:
             None if index is invalid
-            None if role is none of: DisplayRole, EditRole, CheckStateRole, UserRole
+            None if role is none of: DisplayRole, EditRole, CheckStateRole, DATAFRAME_ROLE
 
             if role DisplayRole:
                 unmodified _dataFrame value if column dtype is object (string or unicode).
@@ -221,7 +227,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             if role CheckStateRole:
                 Qt.Checked or Qt.Unchecked if dtype is numpy.bool_ otherwise None for all other dtypes.
 
-            if role UserRole:
+            if role DATAFRAME_ROLE:
                 unmodified _dataFrame value.
 
             raises TypeError if an unhandled dtype is found in column.
@@ -243,12 +249,12 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             elif columnDtype in self._dateDtypes:
                 value = numpy.datetime64(self._dataFrame.ix[row, col])
                 value = QtCore.QDateTime.fromString(str(value), self.timestampFormat)
-            else:
-                raise TypeError, "returning unhandled data type"
+            # else:
+            #     raise TypeError, "returning unhandled data type"
             return value
 
         row = self._dataFrame.index[index.row()]
-        col = self._dataFrame.columns[index.column()]        
+        col = self._dataFrame.columns[index.column()]
         columnDtype = self._dataFrame[col].dtype
 
         if role == Qt.DisplayRole:
@@ -267,7 +273,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                     result = Qt.Unchecked
             else:
                 result = None
-        elif role == Qt.UserRole:
+        elif role == DATAFRAME_ROLE:
             result = self._dataFrame.ix[row, col]
         else:
             result = None
@@ -304,65 +310,59 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             value (object): new value.
             role (Qt::ItemDataRole): Use this role to specify what you want to do.
 
+        Raises:
+            TypeError: If the value could not be converted to a known datatype.
+
         Returns:
             True if value is changed. Calls layoutChanged after update.
             False if value is not different from original value.
+
         """
-        self.layoutAboutToBeChanged.emit()
-        if index.isValid():
-            if value != index.data(role):
+        if not index.isValid():
+            return False
 
-                row = self._dataFrame.index[index.row()]
-                col = self._dataFrame.columns[index.column()]
+        if value != index.data(role):
+            self.layoutAboutToBeChanged.emit()
 
-                columnDtype = self._dataFrame[col].dtype
-                if columnDtype == object:
-                    value = value
-                elif columnDtype in self._intDtypes:
-                    dtypeInfo = numpy.iinfo(columnDtype)
-                    if value < dtypeInfo.min:
-                        value = dtypeInfo.min
-                    elif value > dtypeInfo.max:
-                        value = dtypeInfo.max
+            row = self._dataFrame.index[index.row()]
+            col = self._dataFrame.columns[index.column()]
 
-                    #for dtype in [numpy.int8, numpy.int16, numpy.int32, numpy.int64, \
-                            #numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64]:
-                        #if columnDtype == dtype:
-                            #print dtype
+            columnDtype = self._dataFrame[col].dtype
+            if columnDtype == object:
+                pass
 
-                            #dtypeInfo = numpy.iinfo(dtype)
-                            #if value < dtypeInfo.min:
-                                #value = dtypeInfo.min
-                            #elif value > dtypeInfo.max:
-                                #value = dtypeInfo.max
-                            #break
-                elif columnDtype in self._floatDtypes:
-                    value = numpy.float64(value).astype(columnDtype)
-                    #value = value.astype(columnDtype)
-                    #for dtype in [numpy.float16, numpy.float32, numpy.float64]:
-                        #if columnDtype == dtype:
-                            #return dtype(value)
-                            #break
+            elif columnDtype in self._intDtypes:
+                dtypeInfo = numpy.iinfo(columnDtype)
+                if value < dtypeInfo.min:
+                    value = dtypeInfo.min
+                elif value > dtypeInfo.max:
+                    value = dtypeInfo.max
 
-                elif columnDtype in self._boolDtypes:
-                    value = numpy.bool_(value)
-                elif columnDtype in self._dateDtypes:
-                    try:
-                        value = numpy.datetime64(value.toString(self.timestampFormat))
-                    except AttributeError:
-                        value = value
-                    except:
-                        raise
-                else:
-                    raise TypeError, "try to set unhandled data type"
+            elif columnDtype in self._floatDtypes:
+                value = numpy.float64(value).astype(columnDtype)
 
-                self._dataFrame.set_value(row, col, value)
-                self.layoutChanged.emit()
-                return True
+            elif columnDtype in self._boolDtypes:
+                value = numpy.bool_(value)
+
+            elif columnDtype in self._dateDtypes:
+                # convert the given value to a compatible datetime object.
+                # if the conversation could not be done, keep the original
+                # value.
+                if isinstance(value, QtCore.QDateTime):
+                    value = value.toString(self.timestampFormat)
+                try:
+                    value = numpy.datetime64(value)
+                except ValueError, e:
+                    return False
             else:
-                return False
+                raise TypeError, "try to set unhandled data type"
+
+            self._dataFrame.set_value(row, col, value)
+            self.layoutChanged.emit()
+            return True
         else:
             return False
+
 
     def rowCount(self, index=QtCore.QModelIndex()):
         """returns number of rows
@@ -402,27 +402,40 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     def sort(self, columnId, order=Qt.AscendingOrder):
         """sort the model column
 
+        After sorting the data in ascending or descending order, a signal
+        `layoutChanged` is emitted.
+
         Args:
             columnId (int): columnIndex
             order (Qt::SortOrder, optional): descending(1) or ascending(0). defaults to Qt.AscendingOrder
 
-        Returns:
-            emits layoutChanged
         """
         self.layoutAboutToBeChanged.emit()
         self.sortingAboutToStart.emit()
         column = self._dataFrame.columns[columnId]
         self._dataFrame.sort(column, ascending=not bool(order), inplace=True)
         self.layoutChanged.emit()
-        self.sortingFinished.emit() 
+        self.sortingFinished.emit()
 
     def setFilter(self, search):
-        """apply a filter and hide rows
+        """apply a filter and hide rows.
+
+        The filter must be a `DataSearch` object, which evaluates a python
+        expression.
+        If there was an error while parsing the expression, the data will remain
+        unfiltered.
 
         Args:
             search(pandasqt.DataSearch): data search object to use.
+
+        Raises:
+            TypeError: An error is raised, if the given parameter is not a
+                `DataSearch` object.
+
         """
-        assert isinstance(search, DataSearch)
+        if not isinstance(search, DataSearch):
+            raise TypeError('The given parameter must an `pandasqt.DataSearch` object')
+
         self._search = search
 
         self.layoutAboutToBeChanged.emit()
@@ -432,18 +445,18 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._dataFrameOriginal = self._dataFrame.copy()
 
         self._search.setDataFrame(self._dataFrame)
-        if self._search.isValid():
-            searchIndex = self._search.search()
+        searchIndex, valid = self._search.search()
+        if valid:
             self._dataFrame = self._dataFrame[searchIndex]
             self.layoutChanged.emit()
-            return self._search.searchIndexList()
         else:
             self.clearFilter()
             self.layoutChanged.emit()
-            return pandas.core.index.Int64Index([])
 
     def clearFilter(self):
-        """clear all filters"""
+        """clear all filters.
+
+        """
         if self._dataFrameOriginal is not None:
             self.layoutAboutToBeChanged.emit()
             self._dataFrame = self._dataFrameOriginal
@@ -451,5 +464,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             self.layoutChanged.emit()
 
     def columnDtypeModel(self):
-        """returns a ColumnDtypeModel"""
+        """Getter for a ColumnDtypeModel.
+
+        Returns:
+            ColumnDtypeModel
+        """
         return self._columnDtypeModel

@@ -39,7 +39,7 @@ class TestClass(object):
         spinbox.setMinimum(long(1))
         spinbox.setMinimum(-1)
         spinbox.setMinimum(long(-1))
-        with pytest.raises(AssertionError) as excinfo:
+        with pytest.raises(TypeError) as excinfo:
             spinbox.setMinimum('')
         assert "int or long" in str(excinfo.value)
 
@@ -49,7 +49,7 @@ class TestClass(object):
         spinbox.setMaximum(long(1))
         spinbox.setMaximum(-1)
         spinbox.setMaximum(long(-1))
-        with pytest.raises(AssertionError) as excinfo:
+        with pytest.raises(TypeError) as excinfo:
             spinbox.setMaximum('')
         assert "int or long" in str(excinfo.value)
 
@@ -68,10 +68,12 @@ class TestClass(object):
 
         assert spinbox.setSingleStep(10) == 10
         assert spinbox.setSingleStep(-10) == 10
-        with pytest.raises(AssertionError) as excinfo:
+        with pytest.raises(TypeError) as excinfo:
             spinbox.setSingleStep('')
             spinbox.setSingleStep(0.1212)
         assert "int" in str(excinfo.value)
+
+        assert spinbox.setSingleStep(0) == 0
 
     def test_stepEnabled(self, spinbox):
         assert spinbox.StepUpEnabled

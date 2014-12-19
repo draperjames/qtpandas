@@ -14,7 +14,7 @@ import pytestqt
 import numpy
 import pandas
 
-from pandasqt.CustomDelegates import setDelegatesFromDtype, BigIntSpinboxDelegate, CustomDoubleSpinboxDelegate
+from pandasqt.CustomDelegates import setDelegatesFromDtype, BigIntSpinboxDelegate, CustomDoubleSpinboxDelegate, TextDelegate
 from pandasqt.DataFrameModel import DataFrameModel
 
 class DemoTableView(QtGui.QTableView):
@@ -53,9 +53,9 @@ class TestCustomDelegates(object):
 
     @pytest.mark.parametrize(
         "widgetClass, model, exception, exceptionContains", [
-            (QtGui.QWidget, None, AssertionError, "not of type QtGui.QTableView"),
+            (QtGui.QWidget, None, TypeError, "not of type QtGui.QTableView"),
             (DemoTableView, None, AttributeError, "no model set"),
-            (DemoTableView, QtGui.QStandardItemModel(), AssertionError, "model not of type DataFrameModel"),
+            (DemoTableView, QtGui.QStandardItemModel(), TypeError, 'model is not of type DataFrameModel'),
         ]
     )
     def test_tableViewMissing(self, widgetClass, qtbot, model, exception, exceptionContains):
@@ -127,3 +127,39 @@ class TestCustomDelegates(object):
         with qtbot.waitSignal(tableView.clicked) as blocker:
             qtbot.mouseClick(tableView.viewport(), QtCore.Qt.LeftButton, pos=QtCore.QPoint(10, 10))
         assert blocker.signal_triggered
+
+class TestTextDelegate(object):
+
+    @pytest.fixture
+    def dataFrame(self):
+        data = [
+            ['zero', 1, 2, 3, 4],
+            ['five', 6, 7, 8, 9],
+            ['ten', 11, 12, 13, 14]
+        ]
+        columns = ['Foo', 'Bar', 'Spam', 'Eggs', 'Baz']
+        dataFrame = pandas.DataFrame(data, columns=columns)
+        return dataFrame
+
+    def test_editing(self, dataFrame, qtbot):
+        model = DataFrameModel(dataFrame)
+
+        tableView = QtGui.QTableView()
+
+        qtbot.addWidget(tableView)
+        tableView.setModel(model)
+
+        delegate = TextDelegate(tableView)
+        tableView.setItemDelegateForColumn(0, delegate)
+        tableView.show()
+
+        index = model.index(0, 0)
+        preedit_data = index.data()
+
+        tableView.edit(index)
+        editor = tableView.findChildren(QtGui.QLineEdit)[0]
+        qtbot.keyPress(editor, QtCore.Qt.Key_F)
+        qtbot.keyPress(editor, QtCore.Qt.Key_Enter)
+        QtGui.QApplication.processEvents()
+        with qtbot.waitSignal(timeout=100):
+            assert index.data(QtCore.Qt.DisplayRole) == 'f'

@@ -74,9 +74,9 @@ class TestWidget(QtGui.QWidget):
         self.tableViewColumnDtypes = QtGui.QTableView(self)
         self.rightLayout.addWidget(QtGui.QLabel('dtypes'))
         self.rightLayout.addWidget(self.tableViewColumnDtypes)
-        self.buttonGotToColumn = QtGui.QPushButton("got to column")
-        self.rightLayout.addWidget(self.buttonGotToColumn)
-        self.buttonGotToColumn.clicked.connect(self.gotToColumn)
+        self.buttonGoToColumn = QtGui.QPushButton("go to column")
+        self.rightLayout.addWidget(self.buttonGoToColumn)
+        self.buttonGoToColumn.clicked.connect(self.goToColumn)
 
         self.buttonSetFilter = QtGui.QPushButton("set filter")
         self.rightLayout.addWidget(self.buttonSetFilter)
@@ -123,8 +123,8 @@ class TestWidget(QtGui.QWidget):
         print "update delegate for column", column
         self.delegates = setDelegatesFromDtype(self.dataTableView)
 
-    def gotToColumn(self):
-        print "go to column"
+    def goToColumn(self):
+        print "go to column 7"
         index = self.dataTableView.model().index(7, 0)
         self.dataTableView.setCurrentIndex(index)
 

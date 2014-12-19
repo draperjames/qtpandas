@@ -141,6 +141,7 @@ class DTypeTranslator(object):
     @property
     def language(self):
         return self._language
+
     @language.setter
     def language(self, language):
         if language in ['python', 'en', 'de']:

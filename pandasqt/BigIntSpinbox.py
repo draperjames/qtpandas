@@ -23,8 +23,8 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         """the __init__ method.
 
         Args:
-            parent (QObject): defaults to None. If parent is 0, the new widget becomes a window. 
-                If parent is another widget, this widget becomes a child window inside parent. 
+            parent (QObject): defaults to None. If parent is 0, the new widget becomes a window.
+                If parent is another widget, this widget becomes a child window inside parent.
                 The new widget is deleted when its parent is deleted.
 
         """
@@ -97,10 +97,14 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         Args:
             singleStep (int): new _singleStep value. converts negativ values to positiv ones.
 
+        Raises:
+            TypeError: If the given argument is not an integer.
+
         Returns:
-            True if all went fine.
+            int or long: the absolute value of the given argument.
         """
-        assert isinstance(singleStep, int), "not of type int"
+        if not isinstance(singleStep, int):
+            raise TypeError("Argument is not of type int")
         # don't use negative values
         self._singleStep = abs(singleStep)
         return self._singleStep
@@ -113,9 +117,13 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         """setter to _minimum.
 
         Args:
-            minimum (int or long): new _minimum value
+            minimum (int or long): new _minimum value.
+
+        Raises:
+            TypeError: If the given argument is not an integer.
         """
-        assert isinstance(minimum, int) or isinstance(minimum, long), "not of type int or long"
+        if not isinstance(minimum, (int, long)):
+            raise TypeError("Argument is not of type int or long")
         self._minimum = minimum
 
     def maximum(self):
@@ -127,6 +135,7 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
 
         Args:
             maximum (int or long): new _maximum value
-        """        
-        assert isinstance(maximum, int) or isinstance(maximum, long), "not of type int or long"
+        """
+        if not isinstance(maximum, (int, long)):
+            raise TypeError("Argument is not of type int or long")
         self._maximum = maximum
