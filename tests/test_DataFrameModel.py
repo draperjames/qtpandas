@@ -38,7 +38,7 @@ def test_setDataFrame():
     assert not model.dataFrame().empty
     assert model.dataFrame() is dataFrame
 
-    with pytest.raises(AssertionError) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         model.setDataFrame(None)
     assert "pandas.core.frame.DataFrame" in unicode(excinfo.value)
 
@@ -64,7 +64,7 @@ def test_TimestampFormat():
     model.timestampFormat = newFormat
     assert model.timestampFormat == newFormat
 
-    with pytest.raises(AssertionError) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         model.timestampFormat = "yy-MM-dd hh:mm"
     assert "unicode" in unicode(excinfo.value)
 

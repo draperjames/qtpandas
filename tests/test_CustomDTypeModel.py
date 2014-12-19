@@ -149,6 +149,16 @@ class TestColumnDType(object):
         model.setDataFrame(dataframe)
         assert model.rowCount(5)
 
+    def test_setDataFrame(self, dataframe):
+        model = ColumnDtypeModel()
+
+        model.setDataFrame(dataframe)
+        assert model.rowCount(5)
+
+        with pytest.raises(TypeError) as err:
+            model.setDataFrame(['some', 'neat', 'list', 'entries'])
+        assert 'not of type pandas.core.frame.DataFrame' in str(err.value)
+
 
 class TestDtypeComboDelegate(object):
     def test_editing(self, dataframe, qtbot):

@@ -121,7 +121,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             It's not implemented with python properties to keep Qt conventions.
 
         Raises:
-            AssertionError: if dataFrame is not of type pandas.core.frame.DataFrame.
+            TypeError: if dataFrame is not of type pandas.core.frame.DataFrame.
 
         Args:
             dataFrame (pandas.core.frame.DataFrame): assign dataFrame to _dataFrame. Holds all the data displayed.
@@ -130,7 +130,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 after external changes.
 
         """
-        assert isinstance(dataFrame, pandas.core.frame.DataFrame), "not of type pandas.core.frame.DataFrame"
+        if not isinstance(dataFrame, pandas.core.frame.DataFrame):
+            raise TypeError("not of type pandas.core.frame.DataFrame")
+
         self.layoutAboutToBeChanged.emit()
         if copyDataFrame:
             self._dataFrame = dataFrame.copy()
@@ -163,7 +165,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 Formatting string for conversion of timestamps to QtCore.QDateTime. Used in data method.
 
         """
-        assert isinstance(timestampFormat, unicode) or timestampFormat.__class__.__name__ == "DateFormat", "not of type unicode"
+        if not isinstance(timestampFormat, (unicode, )):
+            raise TypeError('not of type unicode')
+        #assert isinstance(timestampFormat, unicode) or timestampFormat.__class__.__name__ == "DateFormat", "not of type unicode"
         self._timestampFormat = timestampFormat
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):

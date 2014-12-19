@@ -53,9 +53,9 @@ class TestCustomDelegates(object):
 
     @pytest.mark.parametrize(
         "widgetClass, model, exception, exceptionContains", [
-            (QtGui.QWidget, None, AssertionError, "not of type QtGui.QTableView"),
+            (QtGui.QWidget, None, TypeError, "not of type QtGui.QTableView"),
             (DemoTableView, None, AttributeError, "no model set"),
-            (DemoTableView, QtGui.QStandardItemModel(), AssertionError, "model not of type DataFrameModel"),
+            (DemoTableView, QtGui.QStandardItemModel(), TypeError, 'model is not of type DataFrameModel'),
         ]
     )
     def test_tableViewMissing(self, widgetClass, qtbot, model, exception, exceptionContains):
@@ -145,6 +145,7 @@ class TestTextDelegate(object):
         model = DataFrameModel(dataFrame)
 
         tableView = QtGui.QTableView()
+
         qtbot.addWidget(tableView)
         tableView.setModel(model)
 

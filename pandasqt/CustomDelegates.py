@@ -23,18 +23,29 @@ def setDelegatesFromDtype(tableView):
     Args:
         tableView (QTableView): tableView to set delegates. Needs a DataFrameModel to be set.
 
+    Raises:
+        TypeError: If the given view/widget is not an instance/subclass of
+            QtGui.QTableView.
+        TypeError: If the model displayed by the given `tableView` is no
+            instance of a `DataFrameModel`.
+        AttributeError: If the model for the given `tableView` is not set.
+
     Returns:
         Dict of QItemDelegates with column name as key. The table view doen't take ownership of set delegates.
             To prevent them garbage collected they have to be saved somewhere else.
             Otherwise segmentation fault is very likely.
 
     """
-    assert isinstance(tableView, QtGui.QTableView), "not of type QtGui.QTableView"
+    if not isinstance(tableView, QtGui.QTableView):
+        raise TypeError('not of type QtGui.QTableView')
     if tableView.model():
         itemDelegates = {}
         model = tableView.model()
-        assert isinstance(model, DataFrameModel), "model not of type DataFrameModel"
-        dataFrame = model.dataFrame()
+        try:
+            dataFrame = model.dataFrame()
+        except AttributeError, err:
+            raise TypeError('model is not of type DataFrameModel')
+
         for i, columnName in enumerate(dataFrame.columns):
             columnDtype = dataFrame[columnName].dtype
             if columnDtype in model._intDtypes:
@@ -75,9 +86,6 @@ class BigIntSpinboxDelegate(QtGui.QItemDelegate):
             singleStep (int, optional): amount of steps to stepUp BigIntSpinbox. defaults to 1.
         """
         super(BigIntSpinboxDelegate, self).__init__()
-        assert isinstance(minimum, int) or isinstance(minimum, long)
-        assert isinstance(maximum, int) or isinstance(maximum, long)
-        assert isinstance(singleStep, int)
         self.minimum = minimum
         self.maximum = maximum
         self.singleStep = singleStep
@@ -91,9 +99,13 @@ class BigIntSpinboxDelegate(QtGui.QItemDelegate):
             index (QModelIndex): model data index.
         """
         editor = BigIntSpinbox(parent)
-        editor.setMinimum(self.minimum)
-        editor.setMaximum(self.maximum)
-        editor.setSingleStep(self.singleStep)
+        try:
+            editor.setMinimum(self.minimum)
+            editor.setMaximum(self.maximum)
+            editor.setSingleStep(self.singleStep)
+        except TypeError, err:
+            # initiate the editor with default values
+            pass
         return editor
 
     def setEditorData(self, spinBox, index):
@@ -132,12 +144,12 @@ class BigIntSpinboxDelegate(QtGui.QItemDelegate):
 
 
 class CustomDoubleSpinboxDelegate(QtGui.QItemDelegate):
-    """delegate for big integers.
+    """delegate for floats.
 
     Attributes:
-        maximum (int or long): minimum allowed number in BigIntSpinbox.
-        minimum (int or long): maximum allowed number in BigIntSpinbox.
-        singleStep (int): amount of steps to stepUp BigIntSpinbox
+        maximum (float): minimum allowed number in QDoubleSpinBox.
+        minimum (float): maximum allowed number in QDoubleSpinBox.
+        singleStep (int): amount of steps to stepUp QDoubleSpinBox
         decimals (int): decimals to use
 
     """
@@ -146,17 +158,14 @@ class CustomDoubleSpinboxDelegate(QtGui.QItemDelegate):
         """construct a new instance of a CustomDoubleSpinboxDelegate.
 
         Args:
-            maximum (int or long): minimum allowed number in BigIntSpinbox.
-            minimum (int or long): maximum allowed number in BigIntSpinbox.
-            singleStep (int, optional): amount of steps to stepUp BigIntSpinbox. defaults to 0.1.
+            maximum (float): minimum allowed number in QDoubleSpinBox.
+            minimum (float): maximum allowed number in QDoubleSpinBox.
+            singleStep (int, optional): amount of steps to stepUp QDoubleSpinBox. defaults to 0.1.
             decimals (int, optional): decimals to use.  defaults to 2.
 
         """
         super(CustomDoubleSpinboxDelegate, self).__init__()
-        assert numpy.issubdtype(minimum, float), "not of any float type"
-        assert numpy.issubdtype(maximum, float), "not of any float type"
-        assert isinstance(decimals, int), type(decimals)
-        assert isinstance(singleStep, float) or isinstance(singleStep, int), "not of any int type"
+
         self.minimum = minimum
         self.maximum = maximum
         self.decimals = decimals
@@ -171,10 +180,14 @@ class CustomDoubleSpinboxDelegate(QtGui.QItemDelegate):
             index (QModelIndex): model data index.
         """
         editor = QtGui.QDoubleSpinBox(parent)
-        editor.setMinimum(self.minimum)
-        editor.setMaximum(self.maximum)
-        editor.setSingleStep(self.singleStep)
-        editor.setDecimals(self.decimals)
+        try:
+            editor.setMinimum(self.minimum)
+            editor.setMaximum(self.maximum)
+            editor.setSingleStep(self.singleStep)
+            editor.setDecimals(self.decimals)
+        except TypeError, err:
+            # initiate the spinbox with default values.
+            pass
         return editor
 
     def setEditorData(self, spinBox, index):

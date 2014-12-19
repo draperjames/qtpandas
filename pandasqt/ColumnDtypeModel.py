@@ -82,14 +82,16 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
             It's not implemented with python properties to keep Qt conventions.
 
         Raises:
-            AssertionError: if dataFrame is not of type pandas.core.frame.DataFrame.
+            TypeError: if dataFrame is not of type pandas.core.frame.DataFrame.
 
         Args:
             dataFrame (pandas.core.frame.DataFrame): assign dataFrame to _dataFrame. Holds all the data displayed.
 
         """
+        if not isinstance(dataFrame, pandas.core.frame.DataFrame):
+            raise TypeError('Argument is not of type pandas.core.frame.DataFrame')
+
         self.layoutAboutToBeChanged.emit()
-        assert isinstance(dataFrame, pandas.core.frame.DataFrame), "not of type pandas.core.frame.DataFrame"
         self._dataFrame = dataFrame
         self.layoutChanged.emit()
 
@@ -101,13 +103,14 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
         """setter to _autoApplyChanges. apply changes while changing dtype.
 
         Raises:
-            AssertionError: if autoApplyChanges is not of type bool.
+            TypeError: if autoApplyChanges is not of type bool.
 
         Args:
             autoApplyChanges (bool): apply changes while changing dtype.
 
         """
-        assert isinstance(autoApplyChanges, bool), 'not of type bool'
+        if not isinstance(autoApplyChanges, bool):
+            raise TypeError('Argument is not of type bool')
         self._autoApplyChanges = autoApplyChanges
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):

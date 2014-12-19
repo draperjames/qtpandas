@@ -97,8 +97,11 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         Args:
             singleStep (int): new _singleStep value. converts negativ values to positiv ones.
 
+        Raises:
+            TypeError: If the given argument is not an integer.
+
         Returns:
-            True if all went fine.
+            int or long: the absolute value of the given argument.
         """
         if not isinstance(singleStep, int):
             raise TypeError("Argument is not of type int")
@@ -114,9 +117,13 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         """setter to _minimum.
 
         Args:
-            minimum (int or long): new _minimum value
+            minimum (int or long): new _minimum value.
+
+        Raises:
+            TypeError: If the given argument is not an integer.
         """
-        assert isinstance(minimum, int) or isinstance(minimum, long), "not of type int or long"
+        if not isinstance(minimum, (int, long)):
+            raise TypeError("Argument is not of type int or long")
         self._minimum = minimum
 
     def maximum(self):
@@ -129,5 +136,6 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         Args:
             maximum (int or long): new _maximum value
         """
-        assert isinstance(maximum, int) or isinstance(maximum, long), "not of type int or long"
+        if not isinstance(maximum, (int, long)):
+            raise TypeError("Argument is not of type int or long")
         self._maximum = maximum
