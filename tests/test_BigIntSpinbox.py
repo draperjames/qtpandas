@@ -68,7 +68,7 @@ class TestClass(object):
 
         assert spinbox.setSingleStep(10) == 10
         assert spinbox.setSingleStep(-10) == 10
-        with pytest.raises(AssertionError) as excinfo:
+        with pytest.raises(TypeError) as excinfo:
             spinbox.setSingleStep('')
             spinbox.setSingleStep(0.1212)
         assert "int" in str(excinfo.value)

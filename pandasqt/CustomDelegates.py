@@ -33,7 +33,7 @@ def setDelegatesFromDtype(tableView):
     if tableView.model():
         itemDelegates = {}
         model = tableView.model()
-        assert isinstance(model, DataFrameModel), "model not of type DataFrameModel" 
+        assert isinstance(model, DataFrameModel), "model not of type DataFrameModel"
         dataFrame = model.dataFrame()
         for i, columnName in enumerate(dataFrame.columns):
             columnDtype = dataFrame[columnName].dtype
@@ -212,13 +212,13 @@ class CustomDoubleSpinboxDelegate(QtGui.QItemDelegate):
 class TextDelegate(QtGui.QItemDelegate):
     """delegate for all kind of text."""
 
-    def __init__(self):
+    def __init__(self, parent=None):
         """construct a new instance of a BigIntSpinboxDelegate.
 
         Args:
 
         """
-        super(TextDelegate, self).__init__()
+        super(TextDelegate, self).__init__(parent)
 
     def createEditor(self, parent, option, index):
         """Returns the widget used to edit the item specified by index for editing. The parent widget and style option are used to control how the editor widget appears.

@@ -100,7 +100,8 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         Returns:
             True if all went fine.
         """
-        assert isinstance(singleStep, int), "not of type int"
+        if not isinstance(singleStep, int):
+            raise TypeError("Argument is not of type int")
         # don't use negative values
         self._singleStep = abs(singleStep)
         return self._singleStep
