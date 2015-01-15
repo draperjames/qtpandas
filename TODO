@@ -5,28 +5,3 @@ Features
 
 Bugs
 ====
-
-  File "examples/TestApp.py", line 17, in <module>
-    import pandas
-  File "/home/user/.virtualenvs/pandasqt/local/lib/python2.7/site-packages/pandas/__init__.py", line 7, in <module>
-    from . import hashtable, tslib, lib
-  File "pandas/tslib.pyx", line 39, in init pandas.tslib (pandas/tslib.c:77168)
-  File "/home/user/.virtualenvs/pandasqt/local/lib/python2.7/site-packages/pytz/__init__.py", line 29, in <module>
-    from pkg_resources import resource_stream
-  File "/home/user/.virtualenvs/pandasqt/local/lib/python2.7/site-packages/pkg_resources.py", line 2736, in <module>
-    add_activation_listener(lambda dist: dist.activate())
-  File "/home/user/.virtualenvs/pandasqt/local/lib/python2.7/site-packages/pkg_resources.py", line 698, in subscribe
-    callback(dist)
-  File "/home/user/.virtualenvs/pandasqt/local/lib/python2.7/site-packages/pkg_resources.py", line 2736, in <lambda>
-    add_activation_listener(lambda dist: dist.activate())
-  File "/home/user/.virtualenvs/pandasqt/local/lib/python2.7/site-packages/pkg_resources.py", line 2274, in activate
-    list(map(declare_namespace, self._get_metadata('namespace_packages.txt')))
-  File "/home/user/.virtualenvs/pandasqt/local/lib/python2.7/site-packages/pkg_resources.py", line 1882, in declare_namespace
-    _handle_ns(packageName, path_item)
-  File "/home/user/.virtualenvs/pandasqt/local/lib/python2.7/site-packages/pkg_resources.py", line 1849, in _handle_ns
-    loader.load_module(packageName)
-  File "build/bdist.linux-x86_64/egg/pandasqt/__init__.py", line 6, in <module>
-  File "build/bdist.linux-x86_64/egg/pandasqt/DataFrameModel.py", line 27, in <module>
-  File "build/bdist.linux-x86_64/egg/pandasqt/DataSearch.py", line 17, in <module>
-  File "build/bdist.linux-x86_64/egg/pandasqt/DataSearch.py", line 30, in DataSearch
-AttributeError: 'module' object has no attribute 'DataFrame'
