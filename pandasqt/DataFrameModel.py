@@ -143,9 +143,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._columnDtypeModel.dtypeChanged.connect(
             lambda columnName: self.dtypeChanged.emit(columnName)
         )
-        self._columnDtypeModel.changingDtypeFailed.connect(
-            lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
-        )
+        # self._columnDtypeModel.changingDtypeFailed.connect(
+        #     lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
+        # )
         self.layoutChanged.emit()
 
     @property
@@ -190,12 +190,18 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         if orientation == Qt.Horizontal:
             try:
-                return self._dataFrame.columns.tolist()[section]
+                label = self._dataFrame.columns.tolist()[section]
+                if label == section:
+                    label = section
+                return label
             except (IndexError, ):
                 return None
         elif orientation == Qt.Vertical:
             try:
-                return self._dataFrame.index.tolist()[section]
+                label = self._dataFrame.index.tolist()[section]
+                if label == section:
+                    label = section
+                return label
             except (IndexError, ):
                 return None
 
