@@ -30,10 +30,11 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
 
     Attributes:
         dtypeChanged (QtCore.pyqtSignal(columnName)): emitted after a column has changed it's data type.
-        changingDtypeFailed (QtCore.pyqtSignal(columnName, index, dtype)): emitted after a column has changed it's data type.
+        changeFailed (QtCore.pyqtSignal('QString')): emitted if a column
+            datatype could not be changed. An errormessage is provided.
     """
     dtypeChanged = QtCore.pyqtSignal(object)
-    changingDtypeFailed = QtCore.pyqtSignal(object, QtCore.QModelIndex, object)
+    changeFailed = QtCore.pyqtSignal('QString')
 
     def __init__(self, dataFrame=None, language='en', autoApplyChanges=True):
         """the __init__ method.
@@ -171,6 +172,8 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
 
         if role == Qt.DisplayRole or role == Qt.EditRole:
             if col == 0:
+                if columnName == index.row():
+                    return index.row()
                 return columnName
             elif col == 1:
                 return self._dtypeTranslator.tr(columnDtype)
@@ -212,9 +215,9 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
         self.layoutAboutToBeChanged.emit()
 
         dtype, language = self._dtypeTranslator.lookup(value)
-
+        currentDtype = np.dtype(index.data(role=DTYPE_ROLE))
         if dtype is not None:
-            if dtype != np.dtype(index.data(role=DTYPE_ROLE)):
+            if dtype != currentDtype:
                 col = index.column()
                 #row = self._dataFrame.columns[index.column()]
                 columnName = self._dataFrame.columns[index.row()]
@@ -226,7 +229,12 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                         self.dtypeChanged.emit(columnName)
                         return True
                     except Exception as e:
-                        raise NotImplementedError, "dtype changing not fully working, original error:\n{}".format(e)
+                        message = 'Could not change datatype %s of column %s to datatype %s' % (currentDtype, columnName, dtype)
+                        self.changeFailed.emit(message)
+                        # self._dataFrame[columnName] = self._dataFrame[columnName].astype(currentDtype)
+                        # self.layoutChanged.emit()
+                        # self.dtypeChanged.emit(columnName)
+                        #raise NotImplementedError, "dtype changing not fully working, original error:\n{}".format(e)
         return False
 
 
