@@ -106,7 +106,7 @@ class TestColumnDType(object):
         ret = index.data()
         assert ret == 'Spam'
 
-    def test_setData(self, dataframe, language_values):
+    def test_setData(self, dataframe, language_values, qtbot):
         model = ColumnDtypeModel(dataFrame=dataframe)
         index = model.index(3, 1)
 
@@ -124,8 +124,10 @@ class TestColumnDType(object):
 
         # change datatype to datetime
         assert model.setData(index, datetime[0]) == True
-        # convert datetime to anything else does not work and raises an error.
-        with pytest.raises(NotImplementedError) as err:
+        # convert datetime to anything else does not work and leave the
+        # datatype unchanged. An error message is emitted.
+
+        with qtbot.waitSignal(model.changeFailed):
             model.setData(index, 'bool')
 
     def test_flags(self, dataframe):
