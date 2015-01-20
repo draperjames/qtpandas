@@ -16,6 +16,7 @@ except ImportError:
 import sys
 import pandas
 from pandasqt import DataFrameModel, setDelegatesFromDtype, DtypeComboDelegate, DataSearch
+from pandasqt.csvwidget import CSVImportDialog
 from util import getCsvData, getRandomData
 
 class TestWidget(QtGui.QWidget):
@@ -45,7 +46,9 @@ class TestWidget(QtGui.QWidget):
 
         self.buttonCsvData = QtGui.QPushButton("load csv data")
         self.buttonRandomData = QtGui.QPushButton("load random data")
-        self.buttonCsvData.clicked.connect(lambda: self.setDataFrame( getCsvData() ))
+        importDialog = CSVImportDialog()
+        importDialog.load.connect(self.updateModel)
+        self.buttonCsvData.clicked.connect(lambda: importDialog.show())
         self.buttonRandomData.clicked.connect(lambda: self.setDataFrame( getRandomData(rows=100, columns=100) ))
 
         self.buttonLayout = QtGui.QHBoxLayout()
@@ -114,6 +117,14 @@ class TestWidget(QtGui.QWidget):
         self.tableViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.tableViewColumnDtypes))
         dataModel.dtypeChanged.connect(self.updateDelegates)
         dataModel.changingDtypeFailed.connect(self.changeColumnValue)
+
+    @QtCore.pyqtSlot('QAbstractItemModel')
+    def updateModel(self, model):
+        self.dataListView.setModel(model)
+        self.dataTableView.setModel(model)
+        self.dataComboBox.setModel(model)
+
+        self.tableViewColumnDtypes.setModel(model.columnDtypeModel())
 
     def setModelColumn(self, index):
         self.dataListView.setModelColumn(index)
