@@ -18,8 +18,6 @@ from pandasqt.DataFrameModel import DataFrameModel
 from pandasqt.ColumnDtypeModel import DtypeComboDelegate
 from pandasqt.ui import icons_rc
 
-from pandasqt.utils import parseDateTime
-
 class DelimiterValidator(QtGui.QRegExpValidator):
     """A Custom RegEx Validator.
 

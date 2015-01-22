@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import tempfile
 
 import sip
 sip.setapi('QString', 2)
@@ -9,6 +10,7 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4.QtCore import Qt
 
+import numpy
 import pytest
 import pytestqt
 
@@ -23,6 +25,16 @@ FIXTUREDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures'
 @pytest.fixture()
 def csv_file():
     return os.path.join(FIXTUREDIR, 'csv_file.csv')
+
+
+@pytest.fixture()
+def tmp(request):
+    handle, name = tempfile.mkstemp(suffix='.csv')
+    def _teardown():
+        os.close(handle)
+        os.remove(name)
+    request.addfinalizer(_teardown)
+    return name
 
 class TestValidator(object):
 
@@ -99,7 +111,7 @@ class TestCSVImportWidget(object):
         assert csvwidget._delimiter == u';'
         assert csvwidget._header is None
 
-    def test_encoding(self, qtbot):
+    def test_header(self, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -109,7 +121,7 @@ class TestCSVImportWidget(object):
         checkboxes[0].toggle()
         assert csvwidget._header == 0
 
-    def test_header(self, qtbot):
+    def test_encoding(self, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -249,5 +261,77 @@ class TestCSVExportWidget(object):
                 assert csvwidget.isVisible() == False
 
 class TestDateTimeConversion(object):
-    pass
 
+    def test_read_write(self, qtbot, csv_file, tmp):
+        importWidget = CSVImportDialog()
+
+        qtbot.addWidget(importWidget)
+        importWidget.show()
+
+        import_lineedits = importWidget.findChildren(QtGui.QLineEdit)
+        qtbot.keyClicks(import_lineedits[0], csv_file)
+
+        groupboxes = importWidget.findChildren(QtGui.QGroupBox)
+        radiobuttons = groupboxes[0].findChildren(QtGui.QRadioButton)
+
+        for button in radiobuttons:
+            if button.text() == 'Semicolon':
+                qtbot.mouseClick(button, QtCore.Qt.LeftButton)
+                break
+
+        checkboxes = importWidget.findChildren(QtGui.QCheckBox)
+        checkboxes[0].toggle()
+
+        model_in = importWidget._previewTableView.model()
+
+        # convert critical datetime column:
+        column_model = model_in.columnDtypeModel()
+        index = column_model.index(4, 1)
+        column_model.setData(index, 'datetime64')
+
+        ##
+        # now we export the data and load it again
+        ##
+        exportWidget = CSVExportDialog(model_in)
+
+        qtbot.addWidget(exportWidget)
+        exportWidget.show()
+
+        lineedits = exportWidget.findChildren(QtGui.QLineEdit)
+        qtbot.keyClicks(lineedits[0], tmp)
+
+        groupboxes = exportWidget.findChildren(QtGui.QGroupBox)
+        radiobuttons = groupboxes[0].findChildren(QtGui.QRadioButton)
+
+        for button in radiobuttons:
+            if button.text() == 'Semicolon':
+                qtbot.mouseClick(button, QtCore.Qt.LeftButton)
+                break
+
+        checkboxes = exportWidget.findChildren(QtGui.QCheckBox)
+        checkboxes[0].toggle()
+
+        buttons = exportWidget.findChildren(QtGui.QPushButton)
+
+        with qtbot.waitSignal(exportWidget.exported, timeout=3000):
+            for button in buttons:
+                if button.text() == 'Export Data':
+                    qtbot.mouseClick(button, QtCore.Qt.LeftButton)
+                    break
+
+        import_lineedits[0].clear()
+        qtbot.keyClicks(import_lineedits[0], tmp)
+        buttons = importWidget.findChildren(QtGui.QPushButton)
+        with qtbot.waitSignal(importWidget.load, timeout=3000):
+            for button in buttons:
+                if button.text() == 'Load Data':
+                    model_out_in = importWidget._previewTableView.model()
+                    qtbot.mouseClick(button, QtCore.Qt.LeftButton)
+                    break
+
+        column_model = model_out_in.columnDtypeModel()
+        index = column_model.index(4, 1)
+        column_model.setData(index, 'datetime64')
+
+        comparator = model_in.dataFrame() == model_out_in.dataFrame()
+        assert all(comparator)
