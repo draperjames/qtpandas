@@ -12,8 +12,10 @@ from PyQt4.QtCore import Qt
 import pytest
 import pytestqt
 
-from pandasqt.csvwidget import (DelimiterValidator, DelimiterSelectionWidget,
-    CSVImportDialog)
+from pandasqt.csvwidget import (
+    DelimiterValidator, DelimiterSelectionWidget,
+    CSVImportDialog, CSVExportDialog
+)
 from pandasqt.DataFrameModel import DataFrameModel
 
 FIXTUREDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures')
@@ -174,4 +176,78 @@ class TestCSVImportWidget(object):
         csvwidget.load.connect(_assert)
         with qtbot.waitSignal(csvwidget.load):
             csvwidget.accepted()
+
+
+class TestCSVExportWidget(object):
+    def test_init(self, qtbot):
+        csvwidget = CSVExportDialog()
+        qtbot.addWidget(csvwidget)
+        csvwidget.show()
+        assert csvwidget.isModal()
+        assert csvwidget.windowTitle() == u'Export to CSV'
+
+    def test_fileoutput(self, qtbot, csv_file):
+        csvwidget = CSVExportDialog()
+        qtbot.addWidget(csvwidget)
+        csvwidget.show()
+        labels = csvwidget.findChildren(QtGui.QLabel)
+        assert labels[0].text() == u'Output File'
+        lineedits = csvwidget.findChildren(QtGui.QLineEdit)
+        qtbot.keyClicks(lineedits[0], csv_file)
+        assert csvwidget._filenameLineEdit.text() == csv_file
+
+    def test_header(self, qtbot):
+        csvwidget = CSVExportDialog()
+        qtbot.addWidget(csvwidget)
+        csvwidget.show()
+
+        checkboxes = csvwidget.findChildren(QtGui.QCheckBox)
+        checkboxes[0].toggle()
+        assert csvwidget._headerCheckBox.isChecked()
+
+    def test_encoding(self, qtbot):
+        csvwidget = CSVExportDialog()
+        qtbot.addWidget(csvwidget)
+        csvwidget.show()
+
+        comboboxes = csvwidget.findChildren(QtGui.QComboBox)
+        comboboxes[0]
+        assert comboboxes[0].itemText(comboboxes[0].currentIndex()) == 'UTF_8'
+
+    def test_delimiter(self, qtbot):
+        csvwidget = CSVExportDialog()
+        qtbot.addWidget(csvwidget)
+        csvwidget.show()
+
+        groupboxes = csvwidget.findChildren(QtGui.QGroupBox)
+        radiobuttons = groupboxes[0].findChildren(QtGui.QRadioButton)
+        lineedits = groupboxes[0].findChildren(QtGui.QLineEdit)
+
+        delimiter = None
+        for button in radiobuttons:
+            qtbot.mouseClick(button, QtCore.Qt.LeftButton)
+            if lineedits[0].isEnabled():
+                qtbot.keyPress(lineedits[0], ' ')
+                assert lineedits[0].text() == ''
+                qtbot.keyPress(lineedits[0], 'a')
+                assert lineedits[0].text() == 'a'
+
+            assert delimiter != groupboxes[0].currentSelected()
+            delimiter = groupboxes[0].currentSelected()
+
+    def test_accept_reject(self, qtbot):
+        csvwidget = CSVExportDialog()
+        qtbot.addWidget(csvwidget)
+        csvwidget.show()
+
+        buttons = csvwidget.findChildren(QtGui.QPushButton)
+        for button in buttons:
+            qtbot.mouseClick(button, QtCore.Qt.LeftButton)
+            if button.text() == 'Export Data':
+                assert csvwidget.isVisible() == True
+            else:
+                assert csvwidget.isVisible() == False
+
+class TestDateTimeConversion(object):
+    pass
 

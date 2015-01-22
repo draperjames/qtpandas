@@ -18,6 +18,8 @@ from pandasqt.DataFrameModel import DataFrameModel
 from pandasqt.ColumnDtypeModel import DtypeComboDelegate
 from pandasqt.ui import icons_rc
 
+from pandasqt.utils import parseDateTime
+
 class DelimiterValidator(QtGui.QRegExpValidator):
     """A Custom RegEx Validator.
 
@@ -278,7 +280,7 @@ class CSVImportDialog(QtGui.QDialog):
         self._buttonBox.addButton(self._loadButton, QtGui.QDialogButtonBox.AcceptRole)
         self._buttonBox.addButton(self._cancelButton, QtGui.QDialogButtonBox.RejectRole)
         self._buttonBox.accepted.connect(self.accepted)
-        self._buttonBox.rejected.connect(self.reject)
+        self._buttonBox.rejected.connect(self.rejected)
         layout.addWidget(self._buttonBox, 9, 2, 1, 2)
         self._loadButton.setDefault(False)
         self._filenameLineEdit.setFocus()
@@ -450,6 +452,7 @@ class CSVImportDialog(QtGui.QDialog):
         self._encodingComboBox.setCurrentIndex(0)
         self._delimiterBox.reset()
         self._headerCheckBox.setChecked(False)
+        self._statusBar.showMessage('')
         self._previewTableView.setModel(None)
         self._datatypeTableView.setModel(None)
 
@@ -471,7 +474,7 @@ class CSVImportDialog(QtGui.QDialog):
         self.accept()
 
     @QtCore.pyqtSlot()
-    def rejected():
+    def rejected(self):
         """Close the widget and reset its inital state.
 
         This method is also a `SLOT`.
@@ -482,8 +485,165 @@ class CSVImportDialog(QtGui.QDialog):
         self._resetWidgets()
         self.reject()
 
-class CSVExportWidget(QtGui.QDialog):
-    pass
+class CSVExportDialog(QtGui.QDialog):
+    """An widget to serialize a `DataFrameModel` to a `CSV-File`.
+
+    """
+    exported = QtCore.pyqtSignal('QBool')
+
+    def __init__(self, model=None, parent=None):
+        super(CSVExportDialog, self).__init__(parent)
+        self._model = model
+        self._modal = True
+        self._windowTitle = u'Export to CSV'
+        self._idx = -1
+        self._initUI()
+
+    def _initUI(self):
+        """Initiates the user interface with a grid layout and several widgets.
+
+        """
+        self.setModal(self._modal)
+        self.setWindowTitle(self._windowTitle)
+
+        layout = QtGui.QGridLayout()
+
+        self._filenameLabel = QtGui.QLabel(u'Output File', self)
+        self._filenameLineEdit = QtGui.QLineEdit(self)
+        chooseFileButtonIcon = QtGui.QIcon(QtGui.QPixmap(':/icons/document-save-as.png'))
+        self._chooseFileAction = QtGui.QAction(self)
+        self._chooseFileAction.setIcon(chooseFileButtonIcon)
+        self._chooseFileAction.triggered.connect(self._createFile)
+
+        self._chooseFileButton = QtGui.QToolButton(self)
+        self._chooseFileButton.setDefaultAction(self._chooseFileAction)
+
+        layout.addWidget(self._filenameLabel, 0, 0)
+        layout.addWidget(self._filenameLineEdit, 0, 1, 1, 2)
+        layout.addWidget(self._chooseFileButton, 0, 3)
+
+        self._encodingLabel = QtGui.QLabel(u'File Encoding', self)
+
+        encoding_names = map(lambda x: x.upper(), sorted(list(set(_encodings.viewvalues()))))
+        self._encodingComboBox = QtGui.QComboBox(self)
+        self._encodingComboBox.addItems(encoding_names)
+        self._idx = encoding_names.index('UTF_8')
+        self._encodingComboBox.setCurrentIndex(self._idx)
+        #self._encodingComboBox.activated.connect(self._updateEncoding)
+
+        layout.addWidget(self._encodingLabel, 1, 0)
+        layout.addWidget(self._encodingComboBox, 1, 1, 1, 1)
+
+        self._hasHeaderLabel = QtGui.QLabel(u'Header Available?', self)
+        self._headerCheckBox = QtGui.QCheckBox(self)
+        #self._headerCheckBox.toggled.connect(self._updateHeader)
+
+        layout.addWidget(self._hasHeaderLabel, 2, 0)
+        layout.addWidget(self._headerCheckBox, 2, 1)
+
+        self._delimiterLabel = QtGui.QLabel(u'Column Delimiter', self)
+        self._delimiterBox = DelimiterSelectionWidget(self)
+
+        layout.addWidget(self._delimiterLabel, 3, 0)
+        layout.addWidget(self._delimiterBox, 3, 1, 1, 3)
+
+        self._exportButton = QtGui.QPushButton(u'Export Data', self)
+        self._cancelButton = QtGui.QPushButton(u'Cancel', self)
+
+        self._buttonBox = QtGui.QDialogButtonBox(self)
+        self._buttonBox.addButton(self._exportButton, QtGui.QDialogButtonBox.AcceptRole)
+        self._buttonBox.addButton(self._cancelButton, QtGui.QDialogButtonBox.RejectRole)
+
+        self._buttonBox.accepted.connect(self.accepted)
+        self._buttonBox.rejected.connect(self.rejected)
+
+        layout.addWidget(self._buttonBox, 5, 2, 1, 2)
+        self._exportButton.setDefault(False)
+        self._filenameLineEdit.setFocus()
+
+        self._statusBar = QtGui.QStatusBar(self)
+        self._statusBar.setSizeGripEnabled(False)
+        layout.addWidget(self._statusBar, 4, 0, 1, 4)
+        self.setLayout(layout)
+
+    def setExportModel(self, model):
+        if not isinstance(model, DataFrameModel):
+            return False
+
+        self._model = model
+        return True
+
+    @QtCore.pyqtSlot()
+    def _createFile(self):
+        ret = QtGui.QFileDialog.getSaveFileName(self, 'Save File', filter='Comma Separated Value (*.csv)')
+        self._filenameLineEdit.setText(ret)
+
+    def _saveModel(self):
+        delimiter = self._delimiterBox.currentSelected()
+        header = self._headerCheckBox.isChecked() # column labels
+        filename = self._filenameLineEdit.text()
+        index = False # row labels
+
+        encodingIndex = self._encodingComboBox.currentIndex()
+        encoding = self._encodingComboBox.itemText(encodingIndex)
+        encoding = _calculateEncodingKey(encoding.lower())
+
+        try:
+            dataFrame = self._model.dataFrame()
+        except AttributeError, err:
+            raise AttributeError('No data loaded to export.')
+        else:
+            try:
+                dataFrame.to_csv(filename, encoding=encoding, header=header, index=index, sep=delimiter)
+            except IOError, err:
+                raise IOError('No filename given')
+            except UnicodeError, err:
+                raise UnicodeError('Could not encode all data. Choose a different encoding')
+            except Exception:
+                raise
+
+    def _resetWidgets(self):
+        """Resets all widgets of this dialog to its inital state.
+
+        """
+        self._filenameLineEdit.setText('')
+        self._encodingComboBox.setCurrentIndex(self._idx)
+        self._delimiterBox.reset()
+        self._headerCheckBox.setChecked(False)
+        self._statusBar.showMessage('')
+
+    @QtCore.pyqtSlot()
+    def accepted(self):
+        """Successfully close the widget and emit an export signal.
+
+        This method is also a `SLOT`.
+        The dialog will be closed, when the `Export Data` button is
+        pressed. If errors occur during the export, the status bar
+        will show the error message and the dialog will not be closed.
+
+        """
+        try:
+            self._saveModel()
+        except Exception, err:
+            self._statusBar.showMessage(str(err))
+        else:
+            self._resetWidgets()
+            self.exported.emit(True)
+            self.accept()
+
+    @QtCore.pyqtSlot()
+    def rejected(self):
+        """Close the widget and reset its inital state.
+
+        This method is also a `SLOT`.
+        The dialog will be closed and all changes reverted, when the
+        `cancel` button is pressed.
+
+        """
+        self._resetWidgets()
+        self.exported.emit(False)
+        self.reject()
+
 
 
 def _calculateEncodingKey(comparator):
