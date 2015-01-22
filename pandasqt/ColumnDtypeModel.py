@@ -224,7 +224,10 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
 
                 if self.autoApplyChanges():
                     try:
-                        self._dataFrame[columnName] = self._dataFrame[columnName].astype(dtype)
+                        if dtype == np.dtype('<M8[ns]'):
+                            self._dataFrame[columnName] = self._dataFrame[columnName].apply(pandas.to_datetime)
+                        else:
+                            self._dataFrame[columnName] = self._dataFrame[columnName].astype(dtype)
                         self.layoutChanged.emit()
                         self.dtypeChanged.emit(columnName)
                         return True

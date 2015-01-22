@@ -4,6 +4,8 @@
 @author: Jev Kuznetsov, Matthias Ludwig - Datalyze Solutions
 """
 
+from datetime import datetime
+
 import sip
 sip.setapi('QString', 2)
 sip.setapi('QVariant', 2)
@@ -253,8 +255,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             elif columnDtype in self._boolDtypes:
                 value = bool(self._dataFrame.ix[row, col])
             elif columnDtype in self._dateDtypes:
-                value = numpy.datetime64(self._dataFrame.ix[row, col])
+                #print numpy.datetime64(self._dataFrame.ix[row, col])
+                value = pandas.Timestamp(self._dataFrame.ix[row, col])
                 value = QtCore.QDateTime.fromString(str(value), self.timestampFormat)
+                #print value
             # else:
             #     raise TypeError, "returning unhandled data type"
             return value
@@ -328,11 +332,12 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             return False
 
         if value != index.data(role):
+
             self.layoutAboutToBeChanged.emit()
 
             row = self._dataFrame.index[index.row()]
             col = self._dataFrame.columns[index.column()]
-
+            #print 'before change: ', index.data().toUTC(), self._dataFrame.iloc[row][col]
             columnDtype = self._dataFrame[col].dtype
             if columnDtype == object:
                 pass
@@ -357,13 +362,15 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 if isinstance(value, QtCore.QDateTime):
                     value = value.toString(self.timestampFormat)
                 try:
-                    value = numpy.datetime64(value)
+                    value = pandas.Timestamp(value)
                 except ValueError, e:
                     return False
             else:
                 raise TypeError, "try to set unhandled data type"
 
             self._dataFrame.set_value(row, col, value)
+
+            #print 'after change: ', value, self._dataFrame.iloc[row][col]
             self.layoutChanged.emit()
             return True
         else:
