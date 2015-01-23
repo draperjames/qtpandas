@@ -6,18 +6,8 @@
 
 from datetime import datetime
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+from pandasqt.compat import Qt, QtCore, QtGui
 
-try:
-    from PyQt4 import QtCore
-    from PyQt4 import QtGui
-    from PyQt4.QtCore import Qt
-except ImportError:
-    from PySide import QtCore
-    from PySide import QtGui
-    from PySide.QtCore import Qt
 
 import pandas
 import numpy

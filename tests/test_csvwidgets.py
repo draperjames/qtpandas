@@ -2,13 +2,8 @@
 import os
 import tempfile
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+from pandasqt.compat import Qt, QtCore, QtGui
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4.QtCore import Qt
 
 import numpy
 import pytest

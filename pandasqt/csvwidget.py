@@ -4,16 +4,9 @@ import os
 from encodings.aliases import aliases as _encodings
 
 import pandas
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
-
 from chardet.universaldetector import UniversalDetector
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4.QtCore import Qt
 
-
+from pandasqt.compat import Qt, QtCore, QtGui
 from pandasqt.DataFrameModel import DataFrameModel
 from pandasqt.ColumnDtypeModel import DtypeComboDelegate
 from pandasqt.ui import icons_rc

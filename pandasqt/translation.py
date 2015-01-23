@@ -1,13 +1,12 @@
             #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+from pandasqt.compat import Qt, QtCore, QtGui
+
 
 import os
 
-from PyQt4 import QtCore
+
 import numpy as np
 
 class DTypeTranslator(object):
