@@ -16,6 +16,7 @@ except ImportError:
 import sys
 import pandas
 from pandasqt import DataFrameModel, setDelegatesFromDtype, DtypeComboDelegate, DataSearch
+from pandasqt.csvwidget import CSVImportDialog, CSVExportDialog
 from util import getCsvData, getRandomData
 
 class TestWidget(QtGui.QWidget):
@@ -45,11 +46,18 @@ class TestWidget(QtGui.QWidget):
 
         self.buttonCsvData = QtGui.QPushButton("load csv data")
         self.buttonRandomData = QtGui.QPushButton("load random data")
-        self.buttonCsvData.clicked.connect(lambda: self.setDataFrame( getCsvData() ))
+        importDialog = CSVImportDialog(self)
+        importDialog.load.connect(self.updateModel)
+        self.buttonCsvData.clicked.connect(lambda: importDialog.show())
         self.buttonRandomData.clicked.connect(lambda: self.setDataFrame( getRandomData(rows=100, columns=100) ))
 
+        self.exportDialog = CSVExportDialog(self)
+
+        self.buttonCSVExport = QtGui.QPushButton("export to csv")
+        self.buttonCSVExport.clicked.connect(self._exportModel)
         self.buttonLayout = QtGui.QHBoxLayout()
         self.buttonLayout.addWidget(self.buttonCsvData)
+        self.buttonLayout.addWidget(self.buttonCSVExport)
         self.buttonLayout.addWidget(self.buttonRandomData)
 
         self.mainLayout = QtGui.QVBoxLayout()
@@ -114,6 +122,20 @@ class TestWidget(QtGui.QWidget):
         self.tableViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.tableViewColumnDtypes))
         dataModel.dtypeChanged.connect(self.updateDelegates)
         dataModel.changingDtypeFailed.connect(self.changeColumnValue)
+
+    @QtCore.pyqtSlot()
+    def _exportModel(self):
+        model = self.dataTableView.model()
+        self.exportDialog.setExportModel(model)
+        self.exportDialog.show()
+
+    @QtCore.pyqtSlot('QAbstractItemModel')
+    def updateModel(self, model):
+        self.dataListView.setModel(model)
+        self.dataTableView.setModel(model)
+        self.dataComboBox.setModel(model)
+
+        self.tableViewColumnDtypes.setModel(model.columnDtypeModel())
 
     def setModelColumn(self, index):
         self.dataListView.setModelColumn(index)

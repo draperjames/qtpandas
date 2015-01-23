@@ -1,13 +1,12 @@
             #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+from pandasqt.compat import Qt, QtCore, QtGui
+
 
 import os
 
-from PyQt4 import QtCore
+
 import numpy as np
 
 class DTypeTranslator(object):
@@ -85,11 +84,11 @@ class DTypeTranslator(object):
                 'de': 'Gleitkommazahl (14 Stelle genau)',
                 'en': 'floating point number (14 digits)'
             },
-            np.dtype(np.float128): {
-                'python': 'float128',
-                'de': 'Gleitkommazahl (17 Stelle genau)',
-                'en': 'floating point number (17 digits)'
-            },
+            # np.dtype(np.float128): {
+            #     'python': 'float128',
+            #     'de': 'Gleitkommazahl (17 Stelle genau)',
+            #     'en': 'floating point number (17 digits)'
+            # },
 
             # datetimes
             # np.datetime64

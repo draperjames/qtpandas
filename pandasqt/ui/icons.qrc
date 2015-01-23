@@ -4,5 +4,6 @@
     <file>icons/dialog-ok-apply.png</file>
     <file>icons/document-open.png</file>
     <file>icons/view-refresh.png</file>
+    <file>icons/document-save-as.png</file>
   </qresource>
 </RCC>

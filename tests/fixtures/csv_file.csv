@@ -1,0 +1,5 @@
+string;integer;boolean;float;datetime
+hallo;1;true;42.23;2014-08-07
+hallo;1;true;42.23;2014-08-07T09:00:00
+hallo;1;true;42.23;2014-08-07 09:00:00
+hallo;1;true;42.23;2014-08-07 09:00

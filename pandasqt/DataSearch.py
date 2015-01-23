@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+from pandasqt.compat import Qt, QtCore, QtGui
 
 import parser
 import re
@@ -10,9 +8,7 @@ import re
 import numpy as np
 import pandas as pd
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4.QtCore import Qt
+
 
 class DataSearch(object):
     """object which provides parsing functionality for a DataFrame.

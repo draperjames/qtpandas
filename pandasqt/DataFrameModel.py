@@ -4,18 +4,10 @@
 @author: Jev Kuznetsov, Matthias Ludwig - Datalyze Solutions
 """
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+from datetime import datetime
 
-try:
-    from PyQt4 import QtCore
-    from PyQt4 import QtGui
-    from PyQt4.QtCore import Qt
-except ImportError:
-    from PySide import QtCore
-    from PySide import QtGui
-    from PySide.QtCore import Qt
+from pandasqt.compat import Qt, QtCore, QtGui
+
 
 import pandas
 import numpy
@@ -46,8 +38,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     _float_precisions = {
         "float16": numpy.finfo(numpy.float16).precision - 2,
         "float32": numpy.finfo(numpy.float32).precision - 1,
-        "float64": numpy.finfo(numpy.float64).precision - 1,
-        "float128": numpy.finfo(numpy.float128).precision - 1,
+        "float64": numpy.finfo(numpy.float64).precision - 1
     }
 
     """list of int datatypes for easy checking in data() and setData()"""
@@ -65,8 +56,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     _floatDtypes = [
         numpy.float16,
         numpy.float32,
-        numpy.float64,
-        numpy.float128,
+        numpy.float64
     ]
     """list of bool datatypes for easy checking in data() and setData()"""
     _boolDtypes = [
@@ -143,9 +133,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._columnDtypeModel.dtypeChanged.connect(
             lambda columnName: self.dtypeChanged.emit(columnName)
         )
-        self._columnDtypeModel.changingDtypeFailed.connect(
-            lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
-        )
+        # self._columnDtypeModel.changingDtypeFailed.connect(
+        #     lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
+        # )
         self.layoutChanged.emit()
 
     @property
@@ -190,12 +180,18 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         if orientation == Qt.Horizontal:
             try:
-                return self._dataFrame.columns.tolist()[section]
+                label = self._dataFrame.columns.tolist()[section]
+                if label == section:
+                    label = section
+                return label
             except (IndexError, ):
                 return None
         elif orientation == Qt.Vertical:
             try:
-                return self._dataFrame.index.tolist()[section]
+                label = self._dataFrame.index.tolist()[section]
+                if label == section:
+                    label = section
+                return label
             except (IndexError, ):
                 return None
 
@@ -247,8 +243,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             elif columnDtype in self._boolDtypes:
                 value = bool(self._dataFrame.ix[row, col])
             elif columnDtype in self._dateDtypes:
-                value = numpy.datetime64(self._dataFrame.ix[row, col])
+                #print numpy.datetime64(self._dataFrame.ix[row, col])
+                value = pandas.Timestamp(self._dataFrame.ix[row, col])
                 value = QtCore.QDateTime.fromString(str(value), self.timestampFormat)
+                #print value
             # else:
             #     raise TypeError, "returning unhandled data type"
             return value
@@ -322,11 +320,12 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             return False
 
         if value != index.data(role):
+
             self.layoutAboutToBeChanged.emit()
 
             row = self._dataFrame.index[index.row()]
             col = self._dataFrame.columns[index.column()]
-
+            #print 'before change: ', index.data().toUTC(), self._dataFrame.iloc[row][col]
             columnDtype = self._dataFrame[col].dtype
             if columnDtype == object:
                 pass
@@ -351,13 +350,15 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 if isinstance(value, QtCore.QDateTime):
                     value = value.toString(self.timestampFormat)
                 try:
-                    value = numpy.datetime64(value)
+                    value = pandas.Timestamp(value)
                 except ValueError, e:
                     return False
             else:
                 raise TypeError, "try to set unhandled data type"
 
             self._dataFrame.set_value(row, col, value)
+
+            #print 'after change: ', value, self._dataFrame.iloc[row][col]
             self.layoutChanged.emit()
             return True
         else:
