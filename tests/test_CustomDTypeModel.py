@@ -80,7 +80,7 @@ class TestColumnDType(object):
         # datatype column
         index = index.sibling(0, 1)
         ret = index.data(DTYPE_ROLE)
-        assert ret == numpy.dtype(int)
+        assert ret == numpy.dtype(numpy.int64)
         # check translation
         assert index.data() == 'integer (64 bit)'
 
