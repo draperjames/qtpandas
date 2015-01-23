@@ -225,8 +225,7 @@ class TestData(object):
             (1, numpy.uint64, None),
             (1.11111, numpy.float16, DataFrameModel._float_precisions[str('float16')]),
             (1.11111111, numpy.float32, DataFrameModel._float_precisions[str('float32')]),
-            (1.1111111111111111, numpy.float64, DataFrameModel._float_precisions[str('float64')]),
-            (1.11111111111111111111, numpy.float128, DataFrameModel._float_precisions[str('float128')]),
+            (1.1111111111111111, numpy.float64, DataFrameModel._float_precisions[str('float64')])
         ]
     )
     def test_numericalValues(self, model, index, value, dtype, precision):
@@ -424,8 +423,7 @@ class TestSetData(object):
             (1, numpy.uint64, None),
             (1.11111, numpy.float16, DataFrameModel._float_precisions[str('float16')]),
             (1.11111111, numpy.float32, DataFrameModel._float_precisions[str('float32')]),
-            (1.11111111111111111, numpy.float64, DataFrameModel._float_precisions[str('float64')]),
-            (1.11111111111111111111, numpy.float128, DataFrameModel._float_precisions[str('float128')]),
+            (1.11111111111111111, numpy.float64, DataFrameModel._float_precisions[str('float64')])
         ]
     )
     def test_numericalValues(self, model, index, value, dtype, precision):

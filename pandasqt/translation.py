@@ -85,11 +85,11 @@ class DTypeTranslator(object):
                 'de': 'Gleitkommazahl (14 Stelle genau)',
                 'en': 'floating point number (14 digits)'
             },
-            np.dtype(np.float128): {
-                'python': 'float128',
-                'de': 'Gleitkommazahl (17 Stelle genau)',
-                'en': 'floating point number (17 digits)'
-            },
+            # np.dtype(np.float128): {
+            #     'python': 'float128',
+            #     'de': 'Gleitkommazahl (17 Stelle genau)',
+            #     'en': 'floating point number (17 digits)'
+            # },
 
             # datetimes
             # np.datetime64

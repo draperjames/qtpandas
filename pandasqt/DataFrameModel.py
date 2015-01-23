@@ -48,8 +48,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     _float_precisions = {
         "float16": numpy.finfo(numpy.float16).precision - 2,
         "float32": numpy.finfo(numpy.float32).precision - 1,
-        "float64": numpy.finfo(numpy.float64).precision - 1,
-        "float128": numpy.finfo(numpy.float128).precision - 1,
+        "float64": numpy.finfo(numpy.float64).precision - 1
     }
 
     """list of int datatypes for easy checking in data() and setData()"""
@@ -67,8 +66,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     _floatDtypes = [
         numpy.float16,
         numpy.float32,
-        numpy.float64,
-        numpy.float128,
+        numpy.float64
     ]
     """list of bool datatypes for easy checking in data() and setData()"""
     _boolDtypes = [

@@ -335,3 +335,6 @@ class TestDateTimeConversion(object):
 
         comparator = model_in.dataFrame() == model_out_in.dataFrame()
         assert all(comparator)
+
+        df = model_out_in.dataFrame()
+
