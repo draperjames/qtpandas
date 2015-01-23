@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+from pandasqt.compat import Qt, QtCore, QtGui
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4.QtCore import Qt
 
 import pytest
 import pytestqt

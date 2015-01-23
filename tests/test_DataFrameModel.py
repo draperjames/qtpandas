@@ -1,15 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import sip
-try:
-    sip.setapi('QString', 2)
-    sip.setapi('QVariant', 2)
-except ValueError, e:
-    raise RuntimeError('Could not set API version (%s): did you import PyQt4 directly?' % e)
+from pandasqt.compat import Qt, QtCore, QtGui
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4.QtCore import Qt
 
 import pytest
 import pytestqt
@@ -225,8 +217,7 @@ class TestData(object):
             (1, numpy.uint64, None),
             (1.11111, numpy.float16, DataFrameModel._float_precisions[str('float16')]),
             (1.11111111, numpy.float32, DataFrameModel._float_precisions[str('float32')]),
-            (1.1111111111111111, numpy.float64, DataFrameModel._float_precisions[str('float64')]),
-            (1.11111111111111111111, numpy.float128, DataFrameModel._float_precisions[str('float128')]),
+            (1.1111111111111111, numpy.float64, DataFrameModel._float_precisions[str('float64')])
         ]
     )
     def test_numericalValues(self, model, index, value, dtype, precision):
@@ -306,9 +297,9 @@ class TestData(object):
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), numpy.bool_)
 
     def test_date(self, model, index):
-        numpyDate = numpy.datetime64("1990-10-08T10:15:45+0100")
-        qDate = QtCore.QDateTime.fromString(str(numpyDate), Qt.ISODate)
-        dataFrame = pandas.DataFrame([numpyDate], columns=['A'])
+        pandasDate = pandas.Timestamp("1990-10-08T10:15:45")
+        qDate = QtCore.QDateTime.fromString(str(pandasDate), Qt.ISODate)
+        dataFrame = pandas.DataFrame([pandasDate], columns=['A'])
         model.setDataFrame(dataFrame)
         assert not model.dataFrame().empty
         assert model.dataFrame() is dataFrame
@@ -317,8 +308,8 @@ class TestData(object):
         assert model.data(index, role=Qt.DisplayRole) == qDate
         assert model.data(index, role=Qt.EditRole) == qDate
         assert model.data(index, role=Qt.CheckStateRole) == None
-        assert model.data(index, role=DATAFRAME_ROLE) == numpyDate
-        assert isinstance(model.data(index, role=DATAFRAME_ROLE), pandas.lib.Timestamp)
+        assert model.data(index, role=DATAFRAME_ROLE) == pandasDate
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), pandas.Timestamp)
 
 class TestSetData(object):
 
@@ -401,14 +392,14 @@ class TestSetData(object):
         assert model.dataFrame() is dataFrame
 
         assert index.isValid()
-        newDate = numpy.datetime64("2000-12-08T10:15:45+0100")
+        newDate = pandas.Timestamp("2000-12-08T10:15:45")
         newQDate = QtCore.QDateTime.fromString(str(newDate), Qt.ISODate)
         assert model.setData(index, newQDate)
         assert model.data(index, role=Qt.DisplayRole) == newQDate
         assert model.data(index, role=Qt.EditRole) == newQDate
         assert model.data(index, role=Qt.CheckStateRole) == None
         assert model.data(index, role=DATAFRAME_ROLE) == newDate
-        assert isinstance(model.data(index, role=DATAFRAME_ROLE), pandas.lib.Timestamp)
+        assert isinstance(model.data(index, role=DATAFRAME_ROLE), pandas.Timestamp)
 
         assert model.setData(index, 'foobar') == False
 
@@ -424,8 +415,7 @@ class TestSetData(object):
             (1, numpy.uint64, None),
             (1.11111, numpy.float16, DataFrameModel._float_precisions[str('float16')]),
             (1.11111111, numpy.float32, DataFrameModel._float_precisions[str('float32')]),
-            (1.11111111111111111, numpy.float64, DataFrameModel._float_precisions[str('float64')]),
-            (1.11111111111111111111, numpy.float128, DataFrameModel._float_precisions[str('float128')]),
+            (1.11111111111111111, numpy.float64, DataFrameModel._float_precisions[str('float64')])
         ]
     )
     def test_numericalValues(self, model, index, value, dtype, precision):

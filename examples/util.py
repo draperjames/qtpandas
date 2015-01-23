@@ -18,8 +18,8 @@ def getCsvData():
         "float16_value": numpy.float16,
         "float32_value": numpy.float32,
         "float64_value": numpy.float64,
-        "float128_value": numpy.float128,
-        "bool_value": numpy.bool_,
+        # "float128_value": numpy.float128,
+        "bool_value": numpy.bool_
     }
     delimiter = ","
     encoding = "utf-8"
@@ -50,4 +50,4 @@ def getRandomData(rows=100, columns=5):
     data = {}
     for column in columns:
         data[column] = numpy.random.rand(rows)
-    return pandas.DataFrame(data, columns=columns) 
+    return pandas.DataFrame(data, columns=columns)

@@ -1,17 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
 
-try:
-    from PyQt4 import QtCore
-    from PyQt4 import QtGui
-    from PyQt4.QtCore import Qt
-except ImportError:
-    from PySide import QtCore
-    from PySide import QtGui
-    from PySide.QtCore import Qt
+from pandasqt.compat import Qt, QtCore, QtGui
 
 import numpy
 from BigIntSpinbox import BigIntSpinbox

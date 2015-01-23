@@ -4,13 +4,7 @@
 @author: Matthias Ludwig - Datalyze Solutions
 """
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
-
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4.QtCore import Qt
+from pandasqt.compat import Qt, QtCore, QtGui
 
 class BigIntSpinbox(QtGui.QAbstractSpinBox):
     """Custom spinbox for very big integers (like numpy.int64 and uint64)

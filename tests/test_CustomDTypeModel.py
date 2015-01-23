@@ -1,15 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import sip
-try:
-    sip.setapi('QString', 2)
-    sip.setapi('QVariant', 2)
-except ValueError, e:
-    raise RuntimeError('Could not set API version (%s): did you import PyQt4 directly?' % e)
+from pandasqt.compat import Qt, QtCore, QtGui
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4.QtCore import Qt
 
 import pytest
 import pytestqt
@@ -88,7 +80,7 @@ class TestColumnDType(object):
         # datatype column
         index = index.sibling(0, 1)
         ret = index.data(DTYPE_ROLE)
-        assert ret == numpy.dtype(int)
+        assert ret == numpy.dtype(numpy.int64)
         # check translation
         assert index.data() == 'integer (64 bit)'
 
@@ -106,7 +98,7 @@ class TestColumnDType(object):
         ret = index.data()
         assert ret == 'Spam'
 
-    def test_setData(self, dataframe, language_values):
+    def test_setData(self, dataframe, language_values, qtbot):
         model = ColumnDtypeModel(dataFrame=dataframe)
         index = model.index(3, 1)
 
@@ -124,8 +116,10 @@ class TestColumnDType(object):
 
         # change datatype to datetime
         assert model.setData(index, datetime[0]) == True
-        # convert datetime to anything else does not work and raises an error.
-        with pytest.raises(NotImplementedError) as err:
+        # convert datetime to anything else does not work and leave the
+        # datatype unchanged. An error message is emitted.
+
+        with qtbot.waitSignal(model.changeFailed):
             model.setData(index, 'bool')
 
     def test_flags(self, dataframe):
