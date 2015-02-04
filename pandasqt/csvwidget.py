@@ -11,6 +11,8 @@ from pandasqt.DataFrameModel import DataFrameModel
 from pandasqt.ColumnDtypeModel import DtypeComboDelegate
 from pandasqt.ui import icons_rc
 
+from pandasqt.utils import fillNoneValues, convertTimestamps
+
 class DelimiterValidator(QtGui.QRegExpValidator):
     """A Custom RegEx Validator.
 
@@ -427,6 +429,8 @@ class CSVImportDialog(QtGui.QDialog):
                 dataFrame = pandas.read_csv(self._filename,
                     sep=self._delimiter, encoding=encoding,
                     header=self._header)
+                dataFrame = dataFrame.apply(fillNoneValues)
+                dataFrame = dataFrame.apply(convertTimestamps)
             except Exception, err:
                 self.updateStatusBar(str(err))
                 return pandas.DataFrame()
