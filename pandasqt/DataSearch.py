@@ -186,6 +186,9 @@ class DataSearch(object):
 
     def indexSearch(self, indexes):
         """Filters the data by a list of indexes.
+        
+        Args:
+            indexes (list of int): List of index numbers to return.
 
         Returns:
             list: A list containing all indexes with filtered data. Matches will
@@ -202,26 +205,3 @@ class DataSearch(object):
             return filter0
         else:
             return []
-
-    #def applySearch(self):
-        #filterCondition = self.search()
-        #resultingIndexes = self.table.dataFrame[filterCondition].index
-        #resultingIndexesString = str(list(resultingIndexes)).replace('[', '(').replace(']', ')')
-        #subsetString = u'"index" IN {0}'.format(resultingIndexesString)
-        ##print subsetString
-
-        ### apply filter if we have an active sql model
-        ##print self.table.sqlDataFrameModel
-        #if self.table.sqlDataFrameModel:
-            #self.table.sqlDataFrameModel.setFilter(subsetString)
-
-        ### apply filter to qgis vector layer, even if this is empty
-        #if list(resultingIndexes) == []:
-            #subsetString = u'"index" >= 0'
-        #else:
-            #subsetString = u'"index" IN {0}'.format(resultingIndexesString)
-        #self.table.pointLayer.setSubsetString(subsetString)
-        ##print "set filter to point layer", self.table.pointLayer, self.table.pointLayer.featureCount()
-        ##print self.table.pointLayer.subsetString()
-
-        #return filterCondition

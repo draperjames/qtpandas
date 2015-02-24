@@ -176,9 +176,11 @@ class TestCSVImportWidget(object):
 
         assert csvwidget._previewTableView.model() is not None
 
-        def _assert(x):
+        def _assert(x, path):
             assert x
             assert isinstance(x, DataFrameModel)
+            assert path
+            assert isinstance(path, basestring)
 
         csvwidget.load.connect(_assert)
         with qtbot.waitSignal(csvwidget.load):
