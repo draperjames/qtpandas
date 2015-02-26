@@ -5,6 +5,7 @@ from setuptools.command.test import test as TestCommand
 import io
 import codecs
 import os
+import re
 import sys
 
 # TODO: sip is only needed for PyQt4, they should be imported together.
@@ -19,9 +20,16 @@ except ImportError as e:
     # TODO: try to import PySide.
     raise e, "install PyQt4 or PySide"
 
-import pandasqt
 
 here = os.path.abspath(os.path.dirname(__file__))
+
+version_file = open(os.path.join(here, 'pandasqt', '__init__.py'), 'rU')
+__version__ = re.sub(
+    r".*\b__version__\s+=\s+'([^']+)'.*",
+    r'\1',
+    [ line.strip() for line in version_file if '__version__' in line ].pop(0)
+)
+version_file.close()
 
 def read(*filenames, **kwargs):
     encoding = kwargs.get('encoding', 'utf-8')
@@ -48,7 +56,7 @@ class PyTest(TestCommand):
 tests_require = ['pandas >= 0.15.2', 'pyside', 'pytest', 'pytest-cov', 'pytest-qt']
 setup(
     name='pandas-qt',
-    version=pandasqt.__version__,
+    version=__version__,
     url='https://github.com/datalyze-solutions/pandas-qt',
     license='MIT License',
     namespace_packages = ['pandasqt'],
