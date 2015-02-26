@@ -180,10 +180,10 @@ class CSVImportDialog(QtGui.QDialog):
     Attributes:
         load (QtCore.pyqtSignal): This signal is emitted, whenever the
             dialog is successfully closed, e.g. when the ok button is
-            pressed.
+            pressed. Returns DataFrameModel and path of chosen csv file.
     """
 
-    load = QtCore.pyqtSignal('QAbstractItemModel')
+    load = QtCore.pyqtSignal('QAbstractItemModel', str)
 
     def __init__(self, parent=None):
         """Constructs the object with the given parent.
@@ -412,7 +412,7 @@ class CSVImportDialog(QtGui.QDialog):
         """Loads the given csv file with pandas and generate a new dataframe.
 
         The file will be loaded with the configured encoding, delimiter
-        and header.
+        and header.git 
         If any execptions will occur, an empty Dataframe is generated
         and a message will appear in the status bar.
 
@@ -464,7 +464,7 @@ class CSVImportDialog(QtGui.QDialog):
         if model is not None:
             df = model.dataFrame().copy()
             dfModel = DataFrameModel(df)
-            self.load.emit(dfModel)
+            self.load.emit(dfModel, self._filename)
         self._resetWidgets()
         self.accept()
 
