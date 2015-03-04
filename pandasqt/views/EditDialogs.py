@@ -1,5 +1,5 @@
 from pandasqt.compat import QtCore, QtGui, Qt
-from pandasqt.ui import AddAttrDialog
+from pandasqt.views._ui import AddAttrDialog
 from pandasqt.translation import DTypeTranslator
 
 
