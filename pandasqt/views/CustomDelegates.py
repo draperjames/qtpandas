@@ -4,8 +4,8 @@
 from pandasqt.compat import Qt, QtCore, QtGui
 
 import numpy
-from BigIntSpinbox import BigIntSpinbox
-from DataFrameModel import DataFrameModel
+from pandasqt.views.BigIntSpinbox import BigIntSpinbox
+from pandasqt.models.DataFrameModel import DataFrameModel
 
 def setDelegatesFromDtype(tableView):
     """set delegates depending on columns dtype into passed tableView

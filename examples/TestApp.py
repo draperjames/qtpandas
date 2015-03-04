@@ -16,8 +16,8 @@ except ImportError:
 import sys
 import pandas
 from pandasqt import DataFrameModel, setDelegatesFromDtype, DtypeComboDelegate, DataSearch
-from pandasqt.csvwidget import CSVImportDialog, CSVExportDialog
-from pandasqt.ui import icons_rc
+from pandasqt.views.CSVDialogs import CSVImportDialog, CSVExportDialog
+from pandasqt.views._ui import icons_rc
 from util import getCsvData, getRandomData
 
 class TestWidget(QtGui.QWidget):

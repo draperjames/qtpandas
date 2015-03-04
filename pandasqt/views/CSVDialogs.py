@@ -7,9 +7,9 @@ import pandas
 from chardet.universaldetector import UniversalDetector
 
 from pandasqt.compat import Qt, QtCore, QtGui
-from pandasqt.DataFrameModel import DataFrameModel
-from pandasqt.ColumnDtypeModel import DtypeComboDelegate
-from pandasqt.ui import icons_rc
+from pandasqt.models.DataFrameModel import DataFrameModel
+from pandasqt.models.ColumnDtypeModel import DtypeComboDelegate
+from pandasqt.views._ui import icons_rc
 
 from pandasqt.utils import fillNoneValues, convertTimestamps
 
@@ -412,7 +412,7 @@ class CSVImportDialog(QtGui.QDialog):
         """Loads the given csv file with pandas and generate a new dataframe.
 
         The file will be loaded with the configured encoding, delimiter
-        and header.git 
+        and header.git
         If any execptions will occur, an empty Dataframe is generated
         and a message will appear in the status bar.
 

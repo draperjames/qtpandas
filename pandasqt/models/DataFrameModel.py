@@ -15,8 +15,8 @@ import numpy
 import parser
 import re
 
-from ColumnDtypeModel import ColumnDtypeModel
-from DataSearch import DataSearch
+from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel
+from pandasqt.models.DataSearch import DataSearch
 
 DATAFRAME_ROLE = Qt.UserRole + 2
 

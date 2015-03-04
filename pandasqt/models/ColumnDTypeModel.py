@@ -10,7 +10,7 @@ from pandasqt.compat import Qt, QtCore, QtGui
 import pandas
 import numpy as np
 
-import translation
+from pandasqt import translation
 
 DTYPE_ROLE = Qt.UserRole + 1
 DTYPE_CHANGE_ROLE = Qt.UserRole + 3
