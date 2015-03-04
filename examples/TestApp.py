@@ -17,6 +17,7 @@ import sys
 import pandas
 from pandasqt import DataFrameModel, setDelegatesFromDtype, DtypeComboDelegate, DataSearch
 from pandasqt.csvwidget import CSVImportDialog, CSVExportDialog
+from pandasqt.ui import icons_rc
 from util import getCsvData, getRandomData
 
 class TestWidget(QtGui.QWidget):
@@ -63,6 +64,31 @@ class TestWidget(QtGui.QWidget):
         self.mainLayout = QtGui.QVBoxLayout()
         self.setLayout(self.mainLayout)
         self.mainLayout.addLayout(self.buttonLayout)
+
+        self.toolBar = QtGui.QToolBar(self)
+        self.editAction = QtGui.QAction(QtGui.QIcon(':/icons/document-edit.png'), self.tr('Edit Data'), self.toolBar)
+
+        self.addColumnAction = QtGui.QAction(QtGui.QIcon(':/icons/edit-table-insert-column-right.png'), self.tr('Add Column'), self.toolBar)
+        self.removeColumnAction = QtGui.QAction(QtGui.QIcon(':/icons/edit-table-delete-column.png'), self.tr('Delete Column'), self.toolBar)
+        self.addRowAction = QtGui.QAction(QtGui.QIcon(':/icons/edit-table-insert-row-below.png'), self.tr('Add Row'), self.toolBar)
+        self.removeRowAction = QtGui.QAction(QtGui.QIcon(':/icons/edit-table-delete-row.png'), self.tr('Delete Row'), self.toolBar)
+
+        self.dataEditable = False
+        self.addColumnAction.setEnabled(self.dataEditable)
+        self.removeColumnAction.setEnabled(self.dataEditable)
+        self.addRowAction.setEnabled(self.dataEditable)
+        self.removeRowAction.setEnabled(self.dataEditable)
+
+        self.editAction.triggered.connect(self._toggleEditing)
+
+        self.toolBar.addAction(self.editAction)
+        self.toolBar.addAction(self.addColumnAction)
+        self.toolBar.addAction(self.removeColumnAction)
+        self.toolBar.addAction(self.addRowAction)
+        self.toolBar.addAction(self.removeRowAction)
+
+        self.mainLayout.addWidget(self.toolBar)
+
         self.mainLayout.addWidget(self.dataTableView)
 
         self.spinbox = QtGui.QSpinBox()
@@ -98,6 +124,39 @@ class TestWidget(QtGui.QWidget):
         self.chooseColumnComboBox.currentIndexChanged.connect(self.setModelColumn)
 
         self.dataListView.mouseReleaseEvent = self.mouseReleaseEvent
+
+    @QtCore.pyqtSlot('bool')
+    def _toggleEditing(self):
+        self.dataEditable = not self.dataEditable
+
+        # maybe use a button to change the style to indicate the editing state
+        self.addColumnAction.setEnabled(self.dataEditable)
+        self.removeColumnAction.setEnabled(self.dataEditable)
+        self.addRowAction.setEnabled(self.dataEditable)
+        self.removeRowAction.setEnabled(self.dataEditable)
+
+
+    @QtCore.pyqtSlot()
+    def _addColumn(self):
+        pass
+
+
+    @QtCore.pyqtSlot()
+    def _removeColumn(self):
+        pass
+
+
+    @QtCore.pyqtSlot()
+    def _addRow(self):
+        pass
+
+
+    @QtCore.pyqtSlot()
+    def _removeRow(self):
+        pass
+
+
+
 
     def setDataFrame(self, dataFrame):
         self.df = dataFrame

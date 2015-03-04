@@ -471,3 +471,32 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             ColumnDtypeModel
         """
         return self._columnDtypeModel
+
+
+    def insertRow(self, position, count, parent=QtCore.QModelIndex()):
+
+        # don't allow any gaps in the data rows.
+        if position > self.rowCount(parent):
+            position = self.rowCount(parent)
+
+        if position < 0:
+            position = 0
+
+        if count < 1:
+            return False
+
+        # Note: This function emits the rowsAboutToBeInserted() signal which
+        # connected views (or proxies) must handle before the data is
+        # inserted. Otherwise, the views may end up in an invalid state.
+        self.beginInsertRows(parent, position, position + count - 1)
+
+        # for each row
+        for row in xrange(count):
+            pass
+        self._dataFrame # insert row here
+        # emit a signal afterwards to enable editing of the dataframe
+
+
+        self.endInsertRows()
+
+        return True

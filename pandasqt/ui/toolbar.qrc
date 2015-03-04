@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="data">
+    <file>edit-table-insert-column-right.png</file>
+    <file>document-edit.png</file>
+  </qresource>
+</RCC>

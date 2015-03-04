@@ -5,5 +5,10 @@
     <file>icons/document-open.png</file>
     <file>icons/view-refresh.png</file>
     <file>icons/document-save-as.png</file>
+    <file>icons/document-edit.png</file>
+    <file>icons/edit-table-delete-column.png</file>
+    <file>icons/edit-table-delete-row.png</file>
+    <file>icons/edit-table-insert-column-right.png</file>
+    <file>icons/edit-table-insert-row-below.png</file>
   </qresource>
 </RCC>
