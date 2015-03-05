@@ -5,7 +5,7 @@ from pandasqt.compat import Qt, QtCore, QtGui
 
 import pytest
 
-from pandasqt.BigIntSpinbox import BigIntSpinbox
+from pandasqt.views.BigIntSpinbox import BigIntSpinbox
 
 class TestClass(object):
 

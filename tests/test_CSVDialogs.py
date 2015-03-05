@@ -9,11 +9,11 @@ import numpy
 import pytest
 import pytestqt
 
-from pandasqt.csvwidget import (
+from pandasqt.views.CSVDialogs import (
     DelimiterValidator, DelimiterSelectionWidget,
     CSVImportDialog, CSVExportDialog
 )
-from pandasqt.DataFrameModel import DataFrameModel
+from pandasqt.models.DataFrameModel import DataFrameModel
 
 FIXTUREDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures')
 

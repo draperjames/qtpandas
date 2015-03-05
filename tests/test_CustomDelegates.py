@@ -9,8 +9,8 @@ import pytestqt
 import numpy
 import pandas
 
-from pandasqt.CustomDelegates import setDelegatesFromDtype, BigIntSpinboxDelegate, CustomDoubleSpinboxDelegate, TextDelegate
-from pandasqt.DataFrameModel import DataFrameModel
+from pandasqt.views.CustomDelegates import setDelegatesFromDtype, BigIntSpinboxDelegate, CustomDoubleSpinboxDelegate, TextDelegate
+from pandasqt.models.DataFrameModel import DataFrameModel
 
 class DemoTableView(QtGui.QTableView):
 

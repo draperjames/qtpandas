@@ -7,3 +7,4 @@ class AddAttributesDialog(QtGui.QDialog, AddAttrDialog.Ui_Dialog):
     def __init__(self, parent=None):
         super(AddAttrDialog, self).__init__(parent)
         self.setupUi(self)
+

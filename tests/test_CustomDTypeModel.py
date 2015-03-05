@@ -10,7 +10,7 @@ import decimal
 import numpy
 import pandas
 
-from pandasqt.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE, DtypeComboDelegate
+from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE, DtypeComboDelegate
 from pandasqt.translation import DTypeTranslator
 
 

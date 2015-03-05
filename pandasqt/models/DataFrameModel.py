@@ -17,8 +17,10 @@ import re
 
 from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel
 from pandasqt.models.DataSearch import DataSearch
+from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 DATAFRAME_ROLE = Qt.UserRole + 2
+
 
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
@@ -42,31 +44,13 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     }
 
     """list of int datatypes for easy checking in data() and setData()"""
-    _intDtypes = [
-        numpy.int8,
-        numpy.int16,
-        numpy.int32,
-        numpy.int64,
-        numpy.uint8,
-        numpy.uint16,
-        numpy.uint32,
-        numpy.uint64
-    ]
+    _intDtypes = SupportedDtypes.intTypes() + SupportedDtypes.uintTypes()
     """list of float datatypes for easy checking in data() and setData()"""
-    _floatDtypes = [
-        numpy.float16,
-        numpy.float32,
-        numpy.float64
-    ]
+    _floatDtypes = SupportedDtypes.floatTypes()
     """list of bool datatypes for easy checking in data() and setData()"""
-    _boolDtypes = [
-        numpy.bool,
-        numpy.bool_
-    ]
+    _boolDtypes = SupportedDtypes.boolTypes()
     """list of datetime datatypes for easy checking in data() and setData()"""
-    _dateDtypes = [
-        numpy.dtype('<M8[ns]')
-    ]
+    _dateDtypes = SupportedDtypes.datetimeTypes()
 
     _timestampFormat = Qt.ISODate
 

@@ -10,8 +10,8 @@ import decimal
 import numpy
 import pandas
 
-from pandasqt.DataFrameModel import DataFrameModel, DATAFRAME_ROLE
-from pandasqt.DataSearch import DataSearch
+from pandasqt.models.DataFrameModel import DataFrameModel, DATAFRAME_ROLE
+from pandasqt.models.DataSearch import DataSearch
 
 def test_initDataFrame():
     model = DataFrameModel()

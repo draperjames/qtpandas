@@ -1,12 +1,8 @@
-            #!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from pandasqt.compat import Qt, QtCore, QtGui
-
-
 import os
-
-
 import numpy as np
 
 class DTypeTranslator(object):
