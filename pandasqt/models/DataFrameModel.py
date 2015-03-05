@@ -225,7 +225,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             elif columnDtype in self._intDtypes:
                 value = int(self._dataFrame.ix[row, col])
             elif columnDtype in self._boolDtypes:
+                print value
                 value = bool(self._dataFrame.ix[row, col])
+
             elif columnDtype in self._dateDtypes:
                 #print numpy.datetime64(self._dataFrame.ix[row, col])
                 value = pandas.Timestamp(self._dataFrame.ix[row, col])
@@ -242,6 +244,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole:
             # return the value if you wanne show True/False as text
             if columnDtype == numpy.bool:
+                print 'fooo'
                 result = None
             else:
                 result = convertValue(row, col, columnDtype)
@@ -249,6 +252,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             result = convertValue(row, col, columnDtype)
         elif role  == Qt.CheckStateRole:
             if columnDtype == numpy.bool_:
+                print 'baaarr'
                 if convertValue(row, col, columnDtype):
                     result = Qt.Checked
                 else:

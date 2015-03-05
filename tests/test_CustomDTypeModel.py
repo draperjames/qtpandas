@@ -12,6 +12,7 @@ import pandas
 
 from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE, DtypeComboDelegate
 from pandasqt.translation import DTypeTranslator
+from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 
 @pytest.fixture()
@@ -27,13 +28,8 @@ def dataframe():
 
 @pytest.fixture()
 def language_values():
-    values = set()
-    translator = DTypeTranslator()
-    for key, value in translator._dtypes.iteritems():
-        for k, v in value.iteritems():
-            values.add((v, key))
 
-    return list(values)
+    return SupportedDtypes._all
 
 
 class TestColumnDType(object):
@@ -104,12 +100,12 @@ class TestColumnDType(object):
 
         # change all values except datetime
         datetime = ()
-        for (value, expected_type) in language_values:
+        for (expected_type, string) in language_values:
             if expected_type == numpy.dtype('<M8[ns]'):
-                datetime = (value, expected_type)
+                datetime = (string, expected_type)
                 continue
             else:
-                model.setData(index, value)
+                model.setData(index, string)
                 assert index.data(DTYPE_ROLE) == expected_type
 
         assert model.setData(index, 'bool', Qt.DisplayRole) == False

@@ -11,6 +11,7 @@ import pandas
 import numpy as np
 
 from pandasqt import translation
+from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 DTYPE_ROLE = Qt.UserRole + 1
 DTYPE_CHANGE_ROLE = Qt.UserRole + 3
@@ -166,7 +167,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                     return index.row()
                 return columnName
             elif col == 1:
-                return self._dtypeTranslator.tr(columnDtype)
+                return SupportedDtypes.description(columnDtype)
         elif role == DTYPE_ROLE:
             if col == 1:
                 return columnDtype
@@ -204,7 +205,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
 
         self.layoutAboutToBeChanged.emit()
 
-        dtype, language = self._dtypeTranslator.lookup(value)
+        dtype = SupportedDtypes.dtype(value)
         currentDtype = np.dtype(index.data(role=DTYPE_ROLE))
         if dtype is not None:
             if dtype != currentDtype:
@@ -313,7 +314,7 @@ class DtypeComboDelegate(QtGui.QStyledItemDelegate):
         """
         translator = index.model().translator()
         combo = QtGui.QComboBox(parent)
-        combo.addItems(translator.translationTuple())
+        combo.addItems(SupportedDtypes.names())
         combo.currentIndexChanged.connect(self.currentIndexChanged)
         return combo
 

@@ -284,7 +284,7 @@ class TestDateTimeConversion(object):
         # convert critical datetime column:
         column_model = model_in.columnDtypeModel()
         index = column_model.index(4, 1)
-        column_model.setData(index, 'datetime64')
+        column_model.setData(index, 'date and time')
 
         ##
         # now we export the data and load it again
@@ -328,7 +328,7 @@ class TestDateTimeConversion(object):
 
         column_model = model_out_in.columnDtypeModel()
         index = column_model.index(4, 1)
-        column_model.setData(index, 'datetime64')
+        column_model.setData(index, 'date and time')
 
         comparator = model_in.dataFrame() == model_out_in.dataFrame()
         assert all(comparator)
