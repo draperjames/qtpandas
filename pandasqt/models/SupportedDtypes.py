@@ -6,6 +6,8 @@ class SupportedDtypesTranslator(QtCore.QObject):
     def __init__(self, parent=None):
         super(SupportedDtypesTranslator, self).__init__(parent)
 
+        self._strs = [(np.dtype(object), self.tr('text'))]
+
         self._ints = [(np.int8, self.tr('small integer (8 bit)')),
                       (np.int16, self.tr('small integer (16 bit)')),
                       (np.int32, self.tr('integer (32 bit)')),
@@ -24,7 +26,10 @@ class SupportedDtypesTranslator(QtCore.QObject):
 
         self._bools = [(np.dtype(bool), self.tr('true/false value'))]
 
-        self._all = self._ints + self._uints + self._floats + self._bools
+        self._all = self._strs + self._ints + self._uints + self._floats + self._bools + self._datetime
+
+    def strTypes(self):
+        return [dtype for (dtype, _) in self._strs]
 
     def intTypes(self):
         return [dtype for (dtype, _) in self._ints]
@@ -57,5 +62,8 @@ class SupportedDtypesTranslator(QtCore.QObject):
                 return dtype
 
         return None
+
+    def names(self):
+        return [string for (_, string) in self._all]
 
 SupportedDtypes = SupportedDtypesTranslator()
