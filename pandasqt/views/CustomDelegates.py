@@ -7,7 +7,7 @@ import numpy
 from pandasqt.views.BigIntSpinbox import BigIntSpinbox
 from pandasqt.models.DataFrameModel import DataFrameModel
 
-def setDelegatesFromDtype(tableView):
+def setDelegatesFromDtype(tableView, dlgs={}):
     """set delegates depending on columns dtype into passed tableView
 
     Args:
@@ -29,7 +29,7 @@ def setDelegatesFromDtype(tableView):
     if not isinstance(tableView, QtGui.QTableView):
         raise TypeError('not of type QtGui.QTableView')
     if tableView.model():
-        itemDelegates = {}
+        itemDelegates = dlgs
         model = tableView.model()
         try:
             dataFrame = model.dataFrame()
