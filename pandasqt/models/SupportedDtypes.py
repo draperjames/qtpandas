@@ -18,9 +18,9 @@ class SupportedDtypesTranslator(QtCore.QObject):
                        (np.uint32, self.tr('unsigned integer (32 bit)')),
                        (np.uint64, self.tr('unsigned integer (64 bit)'))]
 
-        self._floats = [(np.float16, self.tr('floating point number (1 digit)')),
-                      (np.float32, self.tr('floating point number (5 digits)')),
-                      (np.float64, self.tr('floating point number (14 digits)'))]
+        self._floats = [(np.float16, self.tr('floating point number (16 bit)')),
+                      (np.float32, self.tr('floating point number (32 bit)')),
+                      (np.float64, self.tr('floating point number (64 bit)'))]
 
         self._datetime = [(np.dtype('<M8[ns]'), self.tr('date and time'))]
 
@@ -65,5 +65,12 @@ class SupportedDtypesTranslator(QtCore.QObject):
 
     def names(self):
         return [string for (_, string) in self._all]
+
+    def tupleAt(self, index):
+        try:
+            return self._all[index]
+        except IndexError, e:
+            return ()
+
 
 SupportedDtypes = SupportedDtypesTranslator()

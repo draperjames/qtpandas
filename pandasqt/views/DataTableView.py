@@ -81,14 +81,15 @@ class DataTableWidget(QtGui.QWidget):
 
 
     @QtCore.pyqtSlot(tuple)
-    def _foobar(self, data=None):
+    def addColumn(self, data=None):
         print data
 
     @QtCore.pyqtSlot(bool)
     def showAddColumnDialog(self, triggered):
         if triggered:
             dialog = AddAttributesDialog(self)
-            dialog.accepted.connect(self._foobar)
+            dialog.accepted.connect(self.addColumn)
             dialog.show()
+
 
 

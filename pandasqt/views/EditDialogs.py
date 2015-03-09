@@ -1,37 +1,100 @@
+import re
+
 from pandasqt.compat import QtCore, QtGui, Qt
 
 from pandasqt.translation import DTypeTranslator
 from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 import numpy
+from pandas import Timestamp
 
 class DefaultValueValidator(QtGui.QValidator):
     def __init__(self, parent=None):
         super(DefaultValueValidator, self).__init__(parent)
         self.dtype = None
 
+        self.intPattern = re.compile('[-+]?\d+')
+        self.uintPattern = re.compile('\d+')
+        self.floatPattern = re.compile('[+-]? *(?:\d+(?:\.\d*)?|\.\d+)')
+        self.boolPattern = re.compile('(1|t|0|f){1}$')
+
     @QtCore.pyqtSlot(numpy.dtype)
     def validateType(self, dtype):
         self.dtype = dtype
 
-    def validate(self, string, position):
-        if self.dtype in SupportedDtypes.intTypes():
-            pass
 
-        if self.dtype in SupportedDtypes.uintTypes():
-            pass
+    def fixup(self, string):
+        if self.dtype in SupportedDtypes.datetimeTypes():
+            string =  string.replace('\w', '')
 
-        if self.dtype in SupportedDtypes.floatTypes():
-            pass
+    def validate(self, s, pos):
+        # TODO Check for PySide compability
+
+        if not s:
+            # s is emtpy
+            return (QtGui.QValidator.Acceptable, s, pos)
 
         if self.dtype in SupportedDtypes.strTypes():
-            pass
+            return (QtGui.QValidator.Acceptable, s, pos)
 
-        if self.dtype in SupportedDtypes.boolTypes():
-            pass
+        elif self.dtype in SupportedDtypes.boolTypes():
+            match = re.match(self.boolPattern, s)
+            if match:
+                return (QtGui.QValidator.Acceptable, s, pos)
+            else:
+                return (QtGui.QValidator.Invalid, s, pos)
 
-        if self.dtype in SupportedDtypes.datetimeTypes():
-            pass
+        elif self.dtype in SupportedDtypes.datetimeTypes():
+            try:
+                ts = Timestamp(s)
+            except ValueError, e:
+                return (QtGui.QValidator.Intermediate, s, pos)
+            return (QtGui.QValidator.Acceptable, s, pos)
+
+        else:
+            dtypeInfo = None
+            if self.dtype in SupportedDtypes.intTypes():
+                match = re.search(self.intPattern, s)
+                if match:
+                    try:
+                        value = int(match.string)
+                    except ValueError, e:
+                        return (QtGui.QValidator.Invalid, s, pos)
+
+                    dtypeInfo = numpy.iinfo(self.dtype)
+
+            elif self.dtype in SupportedDtypes.uintTypes():
+                match = re.search(self.uintPattern, s)
+                if match:
+                    try:
+                        value = int(match.string)
+                    except ValueError, e:
+                        return (QtGui.QValidator.Invalid, s, pos)
+
+                    dtypeInfo = numpy.iinfo(self.dtype)
+
+            elif self.dtype in SupportedDtypes.floatTypes():
+                match = re.search(self.floatPattern, s)
+                print match
+                if match:
+                    try:
+                        value = float(match.string)
+                    except ValueError, e:
+                        return (QtGui.QValidator.Invalid, s, pos)
+
+                    dtypeInfo = numpy.finfo(self.dtype)
+
+
+            if dtypeInfo is not None:
+                if value >= dtypeInfo.min and value <= dtypeInfo.max:
+                    return (QtGui.QValidator.Acceptable, s, pos)
+                else:
+                    return (QtGui.QValidator.Invalid, s, pos)
+            else:
+                return (QtGui.QValidator.Invalid, s, pos)
+
+        return (QtGui.QValidator.Invalid, s, pos)
+
 
 class AddAttributesDialog(QtGui.QDialog):
 
@@ -62,6 +125,8 @@ class AddAttributesDialog(QtGui.QDialog):
 
         self.columnTypeLabel = QtGui.QLabel(self.tr('Type'), self)
         self.defaultValueLineEdit = QtGui.QLineEdit(self)
+        self.lineEditValidator = DefaultValueValidator(self)
+        self.defaultValueLineEdit.setValidator(self.lineEditValidator)
         self.defaultValueLabel = QtGui.QLabel(self.tr('Inital Value(s)'), self)
 
         self.gridLayout.addWidget(self.columnNameLabel, 0, 0, 1, 1)
@@ -84,10 +149,21 @@ class AddAttributesDialog(QtGui.QDialog):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-
+        self.dataTypeComboBox.currentIndexChanged.connect(self.updateValidatorDtype)
+        self.updateValidatorDtype(self.dataTypeComboBox.currentIndex())
 
     def accept(self):
         super(AddAttributesDialog, self).accept()
-        self.accepted.emit(())
+        self.accepted.emit((self.columnNameLineEdit.text(),
+                            self.dataTypeComboBox.currentText(),
+                            self.defaultValueLineEdit.text()))
+
+    @QtCore.pyqtSlot(int)
+    def updateValidatorDtype(self, index):
+        (dtype, name) = SupportedDtypes.tupleAt(index)
+        self.lineEditValidator.clear()
+        self.lineEditValidator.validateType(dtype)
+
+
 
 
