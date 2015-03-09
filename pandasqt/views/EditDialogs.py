@@ -161,7 +161,7 @@ class AddAttributesDialog(QtGui.QDialog):
     @QtCore.pyqtSlot(int)
     def updateValidatorDtype(self, index):
         (dtype, name) = SupportedDtypes.tupleAt(index)
-        self.lineEditValidator.clear()
+        self.defaultValueLineEdit.clear()
         self.lineEditValidator.validateType(dtype)
 
 

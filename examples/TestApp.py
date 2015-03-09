@@ -163,25 +163,25 @@ class TestWidget(QtGui.QWidget):
         self.df = dataFrame
         dataModel = DataFrameModel()
         dataModel.setDataFrame(self.df)
-        self.dataListView.setModel(dataModel)
-        self.dataTableView.setModel(dataModel)
-        self.dataComboBox.setModel(dataModel)
+        self.dataTableView.setViewModel(dataModel)
+        # self.dataTableView.setModel(dataModel)
+        # self.dataComboBox.setModel(dataModel)
 
-        self.updateDelegates()
+        # self.updateDelegates()
 
-        self.dataTableView.resizeColumnsToContents()
+        # self.dataTableView.resizeColumnsToContents()
 
-        # create a simple item model for our choosing combobox
-        columnModel = QtGui.QStandardItemModel()
-        for column in self.df.columns:
-            columnModel.appendRow(QtGui.QStandardItem(column))
-        self.chooseColumnComboBox.setModel(columnModel)
+        # # create a simple item model for our choosing combobox
+        # columnModel = QtGui.QStandardItemModel()
+        # for column in self.df.columns:
+        #     columnModel.appendRow(QtGui.QStandardItem(column))
+        # self.chooseColumnComboBox.setModel(columnModel)
 
-        self.tableViewColumnDtypes.setModel(dataModel.columnDtypeModel())
-        self.tableViewColumnDtypes.horizontalHeader().setDefaultSectionSize(200)
-        self.tableViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.tableViewColumnDtypes))
-        dataModel.dtypeChanged.connect(self.updateDelegates)
-        dataModel.changingDtypeFailed.connect(self.changeColumnValue)
+        # self.tableViewColumnDtypes.setModel(dataModel.columnDtypeModel())
+        # self.tableViewColumnDtypes.horizontalHeader().setDefaultSectionSize(200)
+        # self.tableViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.tableViewColumnDtypes))
+        # dataModel.dtypeChanged.connect(self.updateDelegates)
+        # dataModel.changingDtypeFailed.connect(self.changeColumnValue)
 
     @QtCore.pyqtSlot()
     def _exportModel(self):
@@ -236,7 +236,7 @@ if __name__ == '__main__':
     widget = TestWidget()
     widget.show()
 
-    #widget.setDataFrame( getCsvData() )
+    widget.setDataFrame( getCsvData() )
     #widget.setDataFrame( getRandomData(2, 2) )
 
     app.exec_()

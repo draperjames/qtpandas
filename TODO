@@ -1,5 +1,9 @@
-Features
-========
-- Import/Export
-- CSV Import GUI
+- Check for PySide Compat
+- Add Tests for new view items (Edit dialog, custom table view)
+- Review the flags of the DataFrameModel (How to handle bools)
+- Rework setDelegatesFromDtype to not parse the whole table while changing only
+  one column
+- once a delegate is set and its underlying data type change, the delegate does
+  not upgrade
+- check descriptions of dtypes
 

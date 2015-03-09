@@ -1,5 +1,6 @@
 from pandasqt.compat import QtCore, QtGui, Qt
 
+from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.EditDialogs import AddAttributesDialog
 
 try:
@@ -9,6 +10,7 @@ except AttributeError:
         return s
 
 class DataTableWidget(QtGui.QWidget):
+
     def __init__(self, parent=None):
         super(DataTableWidget, self).__init__(parent)
         self.initUi()
@@ -79,6 +81,11 @@ class DataTableWidget(QtGui.QWidget):
             if button.isChecked():
                 button.setChecked(False)
 
+        model = self.tableView.model()
+
+        if model is not None:
+            model.enableEditing(enabled)
+
 
     @QtCore.pyqtSlot(tuple)
     def addColumn(self, data=None):
@@ -91,5 +98,8 @@ class DataTableWidget(QtGui.QWidget):
             dialog.accepted.connect(self.addColumn)
             dialog.show()
 
+    def setViewModel(self, model):
+        if isinstance(model, DataFrameModel):
+            self.tableView.setModel(model)
 
 
