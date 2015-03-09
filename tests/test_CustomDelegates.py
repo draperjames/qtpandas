@@ -151,6 +151,8 @@ class TestTextDelegate(object):
         index = model.index(0, 0)
         preedit_data = index.data()
 
+        assert not model.editable
+        model.enableEditing(True)
         tableView.edit(index)
         editor = tableView.findChildren(QtGui.QLineEdit)[0]
         qtbot.keyPress(editor, QtCore.Qt.Key_F)

@@ -89,10 +89,14 @@ def test_flags():
     model = DataFrameModel(pandas.DataFrame([0], columns=['A']))
     index = model.index(0, 0)
     assert index.isValid()
+    assert model.flags(index) == Qt.ItemIsSelectable | Qt.ItemIsEnabled
+
+    model.enableEditing(True)
     assert model.flags(index) == Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
 
     model.setDataFrame(pandas.DataFrame([True], columns=['A']))
     index = model.index(0, 0)
+    model.enableEditing(True)
     assert model.flags(index) != Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
     assert model.flags(index) == Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
 

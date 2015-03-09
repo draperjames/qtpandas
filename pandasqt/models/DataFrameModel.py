@@ -78,6 +78,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self._dataFrameOriginal = None
         self._search = DataSearch("nothing", "")
+        self.editable = False
 
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
@@ -275,6 +276,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             if column dtype is boolean Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
         """
         flags = super(DataFrameModel, self).flags(index)
+
+        if not self.editable:
+            return flags
 
         col = self._dataFrame.columns[index.column()]
         if self._dataFrame[col].dtype == numpy.bool:
@@ -485,3 +489,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self.endInsertRows()
 
         return True
+
+
+    def enableEditing(self, editable):
+        self.editable = editable
