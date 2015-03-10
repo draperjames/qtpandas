@@ -493,3 +493,103 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
     def enableEditing(self, editable):
         self.editable = editable
+
+
+    def addDataFrameColumn(self, columnName, dtype, defaultValue):
+        if not self.editable:
+            return False
+
+        elements = self.rowCount()
+        columnPosition = self.columnCount()
+
+        newColumn = pandas.Series([defaultValue]*elements, index=self._dataFrame.index, dtype=dtype)
+
+        self.beginInsertColumns(QtCore.QModelIndex(), columnPosition - 1, columnPosition - 1)
+        try:
+            self._dataFrame.insert(columnPosition, columnName, newColumn, allow_duplicates=False)
+        except ValueError, e:
+            # columnName does already exist
+            return False
+
+        self.endInsertColumns()
+
+        return True
+
+    def addDataFrameRows(self, position=-1, count=1):
+        # don't allow any gaps in the data rows.
+        if position == -1 or position > self.rowCount():
+            position = self.rowCount()
+
+        if count < 1:
+            return False
+
+        # Note: This function emits the rowsAboutToBeInserted() signal which
+        # connected views (or proxies) must handle before the data is
+        # inserted. Otherwise, the views may end up in an invalid state.
+        self.beginInsertRows(QtCore.QModelIndex(), position, position + count - 1)
+
+        defaultValues = []
+        for dtype in self._dataFrame.dtypes:
+            if dtype.type == numpy.dtype('<M8[ns]'):
+                val = pandas.Timestamp('2000-01-01')
+            elif dtype.type == numpy.dtype(object):
+                val = ''
+            else:
+                val = dtype.type()
+            defaultValues.append(val)
+
+        self._dataFrame.loc[position] = defaultValues
+        self._dataFrame.reset_index()
+        self.endInsertRows()
+
+    def removeDataFrameColumn(self, columnName):
+        pass
+
+    def removeDataFrameRows(self, rows):
+        if rows:
+            position = min(rows)
+            count = len(rows)
+            self.beginRemoveRows(QtCore.QModelIndex(), position, position + count - 1)
+
+            for idx, line in self._dataFrame.iterrows():
+                if idx in rows:
+                    self._dataFrame.drop(idx, inplace=True)
+
+            self._dataFrame.reset_index(inplace=True, drop=True)
+
+
+            self.endRemoveRows()
+            return True
+        return False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

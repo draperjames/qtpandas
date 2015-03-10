@@ -24,8 +24,7 @@ class DefaultValueValidator(QtGui.QValidator):
 
 
     def fixup(self, string):
-        if self.dtype in SupportedDtypes.datetimeTypes():
-            string =  string.replace('\w', '')
+        pass
 
     def validate(self, s, pos):
         # TODO Check for PySide compability
@@ -154,8 +153,9 @@ class AddAttributesDialog(QtGui.QDialog):
 
     def accept(self):
         super(AddAttributesDialog, self).accept()
+
         self.accepted.emit((self.columnNameLineEdit.text(),
-                            self.dataTypeComboBox.currentText(),
+                            SupportedDtypes.dtype(self.dataTypeComboBox.currentText()),
                             self.defaultValueLineEdit.text()))
 
     @QtCore.pyqtSlot(int)

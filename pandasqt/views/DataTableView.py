@@ -73,6 +73,8 @@ class DataTableWidget(QtGui.QWidget):
 
         self.editButton.toggled.connect(self.enableEditing)
         self.addColumnButton.toggled.connect(self.showAddColumnDialog)
+        self.addRowButton.toggled.connect(self.addRow)
+        self.removeRowButton.toggled.connect(self.removeRow)
 
     @QtCore.pyqtSlot(bool)
     def enableEditing(self, enabled):
@@ -89,7 +91,14 @@ class DataTableWidget(QtGui.QWidget):
 
     @QtCore.pyqtSlot(tuple)
     def addColumn(self, data=None):
-        print data
+        model = self.tableView.model()
+
+        if model is not None:
+            columnName, dtype, defaultValue = data
+            model.addDataFrameColumn(columnName, dtype, defaultValue)
+
+        self.addColumnButton.setChecked(False)
+
 
     @QtCore.pyqtSlot(bool)
     def showAddColumnDialog(self, triggered):
@@ -97,6 +106,25 @@ class DataTableWidget(QtGui.QWidget):
             dialog = AddAttributesDialog(self)
             dialog.accepted.connect(self.addColumn)
             dialog.show()
+
+
+
+    @QtCore.pyqtSlot(bool)
+    def addRow(self, triggered):
+        if triggered:
+            model = self.tableView.model()
+            model.addDataFrameRows()
+            self.sender().setChecked(False)
+
+
+    @QtCore.pyqtSlot(bool)
+    def removeRow(self, triggered):
+        if triggered:
+            model = self.tableView.model()
+            selection = self.tableView.selectedIndexes()
+
+            rows = [index.row() for index in selection]
+            model.removeDataFrameRows(set(rows))
 
     def setViewModel(self, model):
         if isinstance(model, DataFrameModel):

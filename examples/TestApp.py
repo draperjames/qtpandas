@@ -208,7 +208,7 @@ class TestWidget(QtGui.QWidget):
         # type A -> type B -> type A
         # would cause a segfault if not stored.
         dlg = self.delegates or {}
-        self.delegates = setDelegatesFromDtype(self.dataTableView, dlg)
+        self.delegates = setDelegatesFromDtype(self.dataTableView.tableView, dlg)
         print dlg
 
     def goToColumn(self):
@@ -237,6 +237,7 @@ if __name__ == '__main__':
     widget.show()
 
     widget.setDataFrame( getCsvData() )
+
     #widget.setDataFrame( getRandomData(2, 2) )
 
     app.exec_()
