@@ -165,5 +165,64 @@ class AddAttributesDialog(QtGui.QDialog):
         self.lineEditValidator.validateType(dtype)
 
 
+class RemoveAttributesDialog(QtGui.QDialog):
+
+    accepted = QtCore.pyqtSignal(list)
+
+    def __init__(self, columns, parent=None):
+        super(RemoveAttributesDialog, self).__init__(parent)
+        self.columns = columns
+        self.initUi()
+
+    def initUi(self):
+        self.setWindowTitle(self.tr('Remove Attributes'))
+        self.setModal(True)
+        self.resize(366, 274)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(sizePolicy)
+
+        self.gridLayout = QtGui.QGridLayout(self)
+
+        self.dialogHeading = QtGui.QLabel(self.tr('Select the attribute column(s) which shall be removed'), self)
+
+        self.listView = QtGui.QListView(self)
+
+        model = QtGui.QStandardItemModel()
+        for column in self.columns:
+            item = QtGui.QStandardItem(column)
+            model.appendRow(item)
+
+        self.listView.setModel(model)
+        self.listView.setSelectionMode(QtGui.QListView.MultiSelection)
+
+        self.buttonBox = QtGui.QDialogButtonBox(self)
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel | QtGui.QDialogButtonBox.Ok)
+
+        self.gridLayout.addWidget(self.dialogHeading, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.listView, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.buttonBox, 2, 0, 1, 1)
+
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+
+
+    def accept(self):
+        selection = self.listView.selectedIndexes()
+        names = []
+        for index in selection:
+            position = index.row()
+            names.append((position, index.data(QtCore.Qt.DisplayRole)))
+
+        super(RemoveAttributesDialog, self).accept()
+        self.accepted.emit(names)
+
+        # self.accepted.emit((self.columnNameLineEdit.text(),
+        #                     SupportedDtypes.dtype(self.dataTypeComboBox.currentText()),
+        #                     self.defaultValueLineEdit.text()))
+
+
+
 
 

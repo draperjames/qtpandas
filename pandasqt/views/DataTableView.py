@@ -1,7 +1,7 @@
 from pandasqt.compat import QtCore, QtGui, Qt
 
 from pandasqt.models.DataFrameModel import DataFrameModel
-from pandasqt.views.EditDialogs import AddAttributesDialog
+from pandasqt.views.EditDialogs import AddAttributesDialog, RemoveAttributesDialog
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -75,6 +75,7 @@ class DataTableWidget(QtGui.QWidget):
         self.addColumnButton.toggled.connect(self.showAddColumnDialog)
         self.addRowButton.toggled.connect(self.addRow)
         self.removeRowButton.toggled.connect(self.removeRow)
+        self.removeColumnButton.toggled.connect(self.showRemoveColumnDialog)
 
     @QtCore.pyqtSlot(bool)
     def enableEditing(self, enabled):
@@ -88,6 +89,11 @@ class DataTableWidget(QtGui.QWidget):
         if model is not None:
             model.enableEditing(enabled)
 
+    @QtCore.pyqtSlot()
+    def uncheckButton(self):
+        for button in self.buttons[1:]:
+            if button.isChecked:
+                button.setChecked(False)
 
     @QtCore.pyqtSlot(tuple)
     def addColumn(self, data=None):
@@ -105,6 +111,7 @@ class DataTableWidget(QtGui.QWidget):
         if triggered:
             dialog = AddAttributesDialog(self)
             dialog.accepted.connect(self.addColumn)
+            dialog.rejected.connect(self.uncheckButton)
             dialog.show()
 
 
@@ -125,6 +132,27 @@ class DataTableWidget(QtGui.QWidget):
 
             rows = [index.row() for index in selection]
             model.removeDataFrameRows(set(rows))
+            self.sender().setChecked(False)
+
+    @QtCore.pyqtSlot(list)
+    def removeColumns(self, columnNames):
+        model = self.tableView.model()
+
+        if model is not None:
+            model.removeDataFrameColumns(columnNames)
+
+        self.removeColumnButton.setChecked(False)
+
+    @QtCore.pyqtSlot(bool)
+    def showRemoveColumnDialog(self, triggered):
+        if triggered:
+            model = self.tableView.model()
+            if model is not None:
+                columns = model.dataFrameColumns()
+                dialog = RemoveAttributesDialog(columns, self)
+                dialog.accepted.connect(self.removeColumns)
+                dialog.rejected.connect(self.uncheckButton)
+                dialog.show()
 
     def setViewModel(self, model):
         if isinstance(model, DataFrameModel):

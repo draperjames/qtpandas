@@ -494,6 +494,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     def enableEditing(self, editable):
         self.editable = editable
 
+    def dataFrameColumns(self):
+        return self._dataFrame.columns.tolist()
 
     def addDataFrameColumn(self, columnName, dtype, defaultValue):
         if not self.editable:
@@ -542,8 +544,22 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._dataFrame.reset_index()
         self.endInsertRows()
 
-    def removeDataFrameColumn(self, columnName):
-        pass
+    def removeDataFrameColumns(self, columnNames):
+        if columnNames:
+            deleted = 0
+            for (position, name) in columnNames:
+                position = position - deleted
+                if position < 0:
+                    position = 0
+                print position, position + deleted, name
+                self.beginRemoveColumns(QtCore.QModelIndex(), position, position)
+
+                self._dataFrame.drop(name, axis=1, inplace=True)
+                self.endRemoveColumns()
+                deleted += 1
+
+            return True
+        return False
 
     def removeDataFrameRows(self, rows):
         if rows:
