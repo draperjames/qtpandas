@@ -24,7 +24,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
         changeFailed (QtCore.pyqtSignal('QString')): emitted if a column
             datatype could not be changed. An errormessage is provided.
     """
-    dtypeChanged = QtCore.pyqtSignal(object)
+    dtypeChanged = QtCore.pyqtSignal(int, object)
     changeFailed = QtCore.pyqtSignal('QString')
 
     def __init__(self, dataFrame=None, language='en', autoApplyChanges=True):
@@ -207,6 +207,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
 
         dtype = SupportedDtypes.dtype(value)
         currentDtype = np.dtype(index.data(role=DTYPE_ROLE))
+
         if dtype is not None:
             if dtype != currentDtype:
                 col = index.column()
@@ -219,8 +220,9 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                             self._dataFrame[columnName] = self._dataFrame[columnName].apply(pandas.to_datetime)
                         else:
                             self._dataFrame[columnName] = self._dataFrame[columnName].astype(dtype)
+                        self.dtypeChanged.emit(index.row(), dtype)
                         self.layoutChanged.emit()
-                        self.dtypeChanged.emit(columnName)
+
                         return True
                     except Exception as e:
                         message = 'Could not change datatype %s of column %s to datatype %s' % (currentDtype, columnName, dtype)

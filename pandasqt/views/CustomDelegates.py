@@ -6,6 +6,7 @@ from pandasqt.compat import Qt, QtCore, QtGui
 import numpy
 from pandasqt.views.BigIntSpinbox import BigIntSpinbox
 from pandasqt.models.DataFrameModel import DataFrameModel
+from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 def setDelegatesFromDtype(tableView, dlgs={}):
     """set delegates depending on columns dtype into passed tableView
@@ -57,6 +58,33 @@ def setDelegatesFromDtype(tableView, dlgs={}):
     else:
         raise AttributeError, "no model set"
 
+def createDelegate(dtype, column, view):
+    model = view.model()
+
+    if model is None:
+        return None
+
+    if not isinstance(model, DataFrameModel):
+        return None
+
+    if dtype in model._intDtypes:
+        intInfo = numpy.iinfo(dtype)
+        delegate = BigIntSpinboxDelegate(intInfo.min, intInfo.max, parent=view)
+    elif dtype in model._floatDtypes:
+        floatInfo = numpy.finfo(dtype)
+        delegate = CustomDoubleSpinboxDelegate(floatInfo.min, floatInfo.max, decimals=model._float_precisions[str(dtype)], parent=view)
+    elif dtype == object:
+        delegate = TextDelegate(parent=view)
+    else:
+        delegate = None
+
+    # get old delegate
+    oldDelegate = view.itemDelegateForColumn(column)
+    if oldDelegate is not None:
+        del oldDelegate
+    # update the view
+    view.setItemDelegateForColumn(column, delegate)
+
 class BigIntSpinboxDelegate(QtGui.QItemDelegate):
     """delegate for very big integers.
 
@@ -67,7 +95,7 @@ class BigIntSpinboxDelegate(QtGui.QItemDelegate):
 
     """
 
-    def __init__(self, minimum=-18446744073709551616, maximum=18446744073709551615, singleStep=1):
+    def __init__(self, minimum=-18446744073709551616, maximum=18446744073709551615, singleStep=1, parent=None):
         """construct a new instance of a BigIntSpinboxDelegate.
 
         Args:
@@ -75,7 +103,7 @@ class BigIntSpinboxDelegate(QtGui.QItemDelegate):
             minimum (int or long, optional): maximum allowed number in BigIntSpinbox. defaults to 18446744073709551615.
             singleStep (int, optional): amount of steps to stepUp BigIntSpinbox. defaults to 1.
         """
-        super(BigIntSpinboxDelegate, self).__init__()
+        super(BigIntSpinboxDelegate, self).__init__(parent)
         self.minimum = minimum
         self.maximum = maximum
         self.singleStep = singleStep
@@ -144,7 +172,7 @@ class CustomDoubleSpinboxDelegate(QtGui.QItemDelegate):
 
     """
 
-    def __init__(self, minimum, maximum, decimals=2, singleStep=0.1):
+    def __init__(self, minimum, maximum, decimals=2, singleStep=0.1, parent=None):
         """construct a new instance of a CustomDoubleSpinboxDelegate.
 
         Args:
@@ -154,7 +182,7 @@ class CustomDoubleSpinboxDelegate(QtGui.QItemDelegate):
             decimals (int, optional): decimals to use.  defaults to 2.
 
         """
-        super(CustomDoubleSpinboxDelegate, self).__init__()
+        super(CustomDoubleSpinboxDelegate, self).__init__(parent)
 
         self.minimum = minimum
         self.maximum = maximum

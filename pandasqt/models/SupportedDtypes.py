@@ -8,19 +8,19 @@ class SupportedDtypesTranslator(QtCore.QObject):
 
         self._strs = [(np.dtype(object), self.tr('text'))]
 
-        self._ints = [(np.int8, self.tr('small integer (8 bit)')),
-                      (np.int16, self.tr('small integer (16 bit)')),
-                      (np.int32, self.tr('integer (32 bit)')),
-                      (np.int64, self.tr('integer (64 bit)'))]
+        self._ints = [(np.dtype(np.int8), self.tr('small integer (8 bit)')),
+                      (np.dtype(np.int16), self.tr('small integer (16 bit)')),
+                      (np.dtype(np.int32), self.tr('integer (32 bit)')),
+                      (np.dtype(np.int64), self.tr('integer (64 bit)'))]
 
-        self._uints = [(np.uint8, self.tr('unsigned small integer (8 bit)')),
-                       (np.uint16, self.tr('unsigned small integer (16 bit)')),
-                       (np.uint32, self.tr('unsigned integer (32 bit)')),
-                       (np.uint64, self.tr('unsigned integer (64 bit)'))]
+        self._uints = [(np.dtype(np.uint8), self.tr('unsigned small integer (8 bit)')),
+                       (np.dtype(np.uint16), self.tr('unsigned small integer (16 bit)')),
+                       (np.dtype(np.uint32), self.tr('unsigned integer (32 bit)')),
+                       (np.dtype(np.uint64), self.tr('unsigned integer (64 bit)'))]
 
-        self._floats = [(np.float16, self.tr('floating point number (16 bit)')),
-                      (np.float32, self.tr('floating point number (32 bit)')),
-                      (np.float64, self.tr('floating point number (64 bit)'))]
+        self._floats = [(np.dtype(np.float16), self.tr('floating point number (16 bit)')),
+                      (np.dtype(np.float32), self.tr('floating point number (32 bit)')),
+                      (np.dtype(np.float64), self.tr('floating point number (64 bit)'))]
 
         self._datetime = [(np.dtype('<M8[ns]'), self.tr('date and time'))]
 

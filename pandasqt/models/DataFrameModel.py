@@ -56,7 +56,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
     sortingAboutToStart = QtCore.pyqtSignal()
     sortingFinished = QtCore.pyqtSignal()
-    dtypeChanged = QtCore.pyqtSignal(object)
+    dtypeChanged = QtCore.pyqtSignal(int, object)
     changingDtypeFailed = QtCore.pyqtSignal(object, QtCore.QModelIndex, object)
 
     def __init__(self, dataFrame=None, copyDataFrame=False):
@@ -115,13 +115,16 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             self._dataFrame = dataFrame
 
         self._columnDtypeModel = ColumnDtypeModel(dataFrame)
-        self._columnDtypeModel.dtypeChanged.connect(
-            lambda columnName: self.dtypeChanged.emit(columnName)
-        )
+        self._columnDtypeModel.dtypeChanged.connect(self.propagateDtypeChanges)
         # self._columnDtypeModel.changingDtypeFailed.connect(
         #     lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
         # )
         self.layoutChanged.emit()
+
+
+    @QtCore.pyqtSlot(int, object)
+    def propagateDtypeChanges(self, column, dtype):
+        self.dtypeChanged.emit(column, dtype)
 
     @property
     def timestampFormat(self):

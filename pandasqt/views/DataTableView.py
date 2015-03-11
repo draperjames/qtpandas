@@ -105,7 +105,6 @@ class DataTableWidget(QtGui.QWidget):
 
         self.addColumnButton.setChecked(False)
 
-
     @QtCore.pyqtSlot(bool)
     def showAddColumnDialog(self, triggered):
         if triggered:
@@ -113,8 +112,6 @@ class DataTableWidget(QtGui.QWidget):
             dialog.accepted.connect(self.addColumn)
             dialog.rejected.connect(self.uncheckButton)
             dialog.show()
-
-
 
     @QtCore.pyqtSlot(bool)
     def addRow(self, triggered):

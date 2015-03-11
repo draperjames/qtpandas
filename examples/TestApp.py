@@ -15,10 +15,13 @@ except ImportError:
 
 import sys
 import pandas
+import numpy
+
 from pandasqt import DataFrameModel, setDelegatesFromDtype, DtypeComboDelegate, DataSearch
 from pandasqt.views.CSVDialogs import CSVImportDialog, CSVExportDialog
 from pandasqt.views._ui import icons_rc
 from pandasqt.views.DataTableView import DataTableWidget
+from pandasqt.views.CustomDelegates import createDelegate
 from util import getCsvData, getRandomData
 
 class TestWidget(QtGui.QWidget):
@@ -106,9 +109,9 @@ class TestWidget(QtGui.QWidget):
         # self.rightLayout.addWidget(self.dataListView)
         # self.rightLayout.addWidget(self.dataComboBox)
 
-        # self.tableViewColumnDtypes = QtGui.QTableView(self)
-        # self.rightLayout.addWidget(QtGui.QLabel('dtypes'))
-        # self.rightLayout.addWidget(self.tableViewColumnDtypes)
+        self.tableViewColumnDtypes = QtGui.QTableView(self)
+        self.mainLayout.addWidget(QtGui.QLabel('dtypes'))
+        self.mainLayout.addWidget(self.tableViewColumnDtypes)
         # self.buttonGoToColumn = QtGui.QPushButton("go to column")
         # self.rightLayout.addWidget(self.buttonGoToColumn)
         # self.buttonGoToColumn.clicked.connect(self.goToColumn)
@@ -177,10 +180,10 @@ class TestWidget(QtGui.QWidget):
         #     columnModel.appendRow(QtGui.QStandardItem(column))
         # self.chooseColumnComboBox.setModel(columnModel)
 
-        # self.tableViewColumnDtypes.setModel(dataModel.columnDtypeModel())
-        # self.tableViewColumnDtypes.horizontalHeader().setDefaultSectionSize(200)
-        # self.tableViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.tableViewColumnDtypes))
-        # dataModel.dtypeChanged.connect(self.updateDelegates)
+        self.tableViewColumnDtypes.setModel(dataModel.columnDtypeModel())
+        self.tableViewColumnDtypes.horizontalHeader().setDefaultSectionSize(200)
+        self.tableViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.tableViewColumnDtypes))
+        dataModel.dtypeChanged.connect(self.updateDelegates)
         # dataModel.changingDtypeFailed.connect(self.changeColumnValue)
 
     @QtCore.pyqtSlot()
@@ -201,15 +204,18 @@ class TestWidget(QtGui.QWidget):
         self.dataListView.setModelColumn(index)
         self.dataComboBox.setModelColumn(index)
 
-    def updateDelegates(self, column=None):
-        print "update delegate for column", column
+    @QtCore.pyqtSlot(int, object)
+    def updateDelegates(self, column, dtype):
+        print "update delegate for column", column, dtype
         # as documented in the setDelegatesFromDtype function
         # we need to store all delegates, so going from
         # type A -> type B -> type A
         # would cause a segfault if not stored.
-        dlg = self.delegates or {}
-        self.delegates = setDelegatesFromDtype(self.dataTableView.tableView, dlg)
-        print dlg
+        view = self.dataTableView.tableView
+        createDelegate(dtype, column, view)
+        # dlg = self.delegates or {}
+        # self.delegates = setDelegatesFromDtype(self.dataTableView.tableView, dlg)
+        # print dlg
 
     def goToColumn(self):
         print "go to column 7"
