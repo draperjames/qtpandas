@@ -1,4 +1,4 @@
-from pandasqt.compat import QtCore, QtGui, Qt
+from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
 
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.EditDialogs import AddAttributesDialog, RemoveAttributesDialog
@@ -77,7 +77,7 @@ class DataTableWidget(QtGui.QWidget):
         self.removeRowButton.toggled.connect(self.removeRow)
         self.removeColumnButton.toggled.connect(self.showRemoveColumnDialog)
 
-    @QtCore.pyqtSlot(bool)
+    @Slot(bool)
     def enableEditing(self, enabled):
         for button in self.buttons[1:]:
             button.setEnabled(enabled)
@@ -89,13 +89,13 @@ class DataTableWidget(QtGui.QWidget):
         if model is not None:
             model.enableEditing(enabled)
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def uncheckButton(self):
         for button in self.buttons[1:]:
             if button.isChecked:
                 button.setChecked(False)
 
-    @QtCore.pyqtSlot(tuple)
+    @Slot(tuple)
     def addColumn(self, data=None):
         model = self.tableView.model()
 
@@ -105,7 +105,7 @@ class DataTableWidget(QtGui.QWidget):
 
         self.addColumnButton.setChecked(False)
 
-    @QtCore.pyqtSlot(bool)
+    @Slot(bool)
     def showAddColumnDialog(self, triggered):
         if triggered:
             dialog = AddAttributesDialog(self)
@@ -113,7 +113,7 @@ class DataTableWidget(QtGui.QWidget):
             dialog.rejected.connect(self.uncheckButton)
             dialog.show()
 
-    @QtCore.pyqtSlot(bool)
+    @Slot(bool)
     def addRow(self, triggered):
         if triggered:
             model = self.tableView.model()
@@ -121,7 +121,7 @@ class DataTableWidget(QtGui.QWidget):
             self.sender().setChecked(False)
 
 
-    @QtCore.pyqtSlot(bool)
+    @Slot(bool)
     def removeRow(self, triggered):
         if triggered:
             model = self.tableView.model()
@@ -131,7 +131,7 @@ class DataTableWidget(QtGui.QWidget):
             model.removeDataFrameRows(set(rows))
             self.sender().setChecked(False)
 
-    @QtCore.pyqtSlot(list)
+    @Slot(list)
     def removeColumns(self, columnNames):
         model = self.tableView.model()
 
@@ -140,7 +140,7 @@ class DataTableWidget(QtGui.QWidget):
 
         self.removeColumnButton.setChecked(False)
 
-    @QtCore.pyqtSlot(bool)
+    @Slot(bool)
     def showRemoveColumnDialog(self, triggered):
         if triggered:
             model = self.tableView.model()

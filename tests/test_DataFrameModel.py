@@ -343,6 +343,7 @@ class TestSetData(object):
         assert model.dataFrame() is dataFrame
 
         assert index.isValid()
+        model.enableEditing(True)
         with pytest.raises(TypeError) as excinfo:
             model.setData(index, numpy.complex64(92+151j))
         assert "unhandled data type" in unicode(excinfo.value)
@@ -358,6 +359,7 @@ class TestSetData(object):
         dataFrame['A'] = dataFrame['A'].astype(dtype)
         model.setDataFrame(dataFrame)
         newValue = u"{}123".format(value)
+        model.enableEditing(True)
         assert model.setData(index, newValue)
         assert model.data(index) == newValue
         assert model.data(index, role=Qt.DisplayRole) == newValue
@@ -381,6 +383,7 @@ class TestSetData(object):
         assert model.dataFrame() is dataFrame
 
         assert index.isValid()
+        model.enableEditing(True)
         assert model.setData(index, qtbool)
         assert model.data(index, role=Qt.DisplayRole) == None
         assert model.data(index, role=Qt.EditRole) == value
@@ -398,6 +401,7 @@ class TestSetData(object):
         assert index.isValid()
         newDate = pandas.Timestamp("2000-12-08T10:15:45")
         newQDate = QtCore.QDateTime.fromString(str(newDate), Qt.ISODate)
+        model.enableEditing(True)
         assert model.setData(index, newQDate)
         assert model.data(index, role=Qt.DisplayRole) == newQDate
         assert model.data(index, role=Qt.EditRole) == newQDate
@@ -432,6 +436,7 @@ class TestSetData(object):
         assert index.isValid()
 
         newValue = value + 1
+        model.enableEditing(True)
         assert model.setData(index, newValue)
 
         if precision:
@@ -478,6 +483,7 @@ class TestSetData(object):
         assert model.dataFrame() is dataFrame
 
         assert index.isValid()
+        model.enableEditing(True)
         assert model.setData(index, value)
         assert model.data(index) == getattr(ii, border)
 
@@ -540,6 +546,34 @@ class TestFilter(object):
         model.setFilter(search)
         postFilterRows = model.rowCount()
         assert preFilterRows == postFilterRows
+
+
+class TestEditMode(object):
+
+    @pytest.fixture
+    def dataFrame(self):
+        data = [
+            [0, 1, 2, 3, 4],
+            [5, 6, 7, 8, 9],
+            [10, 11, 12, 13, 14]
+        ]
+        columns = ['Foo', 'Bar', 'Spam', 'Eggs', 'Baz']
+        dataFrame = pandas.DataFrame(data, columns=columns)
+        return dataFrame
+
+    @pytest.fixture
+    def model(self, dataFrame):
+        return DataFrameModel(dataFrame)
+
+    # def test_edit_data(self, model):
+    #     index = model.index(0, 0)
+
+    #     currentData = index.data()
+
+    #     model.setData()
+
+
+
 
 
 if __name__ == '__main__':

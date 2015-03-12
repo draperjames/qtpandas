@@ -4,7 +4,7 @@
 @author: Matthias Ludwig - Datalyze Solutions
 """
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from pandasqt.compat import Qt, QtCore, QtGui, Slot, Signal
 
 
 import pandas
@@ -20,12 +20,12 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
     """data model returning datatypes per column
 
     Attributes:
-        dtypeChanged (QtCore.pyqtSignal(columnName)): emitted after a column has changed it's data type.
-        changeFailed (QtCore.pyqtSignal('QString')): emitted if a column
+        dtypeChanged (Signal(columnName)): emitted after a column has changed it's data type.
+        changeFailed (Signal('QString')): emitted if a column
             datatype could not be changed. An errormessage is provided.
     """
-    dtypeChanged = QtCore.pyqtSignal(int, object)
-    changeFailed = QtCore.pyqtSignal('QString')
+    dtypeChanged = Signal(int, object)
+    changeFailed = Signal('QString')
 
     def __init__(self, dataFrame=None, language='en', autoApplyChanges=True):
         """the __init__ method.
@@ -354,7 +354,7 @@ class DtypeComboDelegate(QtGui.QStyledItemDelegate):
         """
         model.setData(index, editor.itemText(editor.currentIndex()))
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def currentIndexChanged(self):
         """Emits a signal after changing the selection for a `QComboBox`.
 

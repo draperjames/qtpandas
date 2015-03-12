@@ -6,7 +6,7 @@
 
 from datetime import datetime
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from pandasqt.compat import Qt, QtCore, QtGui, Slot, Signal
 
 
 import pandas
@@ -30,9 +30,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             Used in data method.
         sortingAboutToStart (QtCore.pyqtSignal): emitted directly before sorting starts.
         sortingFinished (QtCore.pyqtSignal): emitted, when sorting finished.
-        dtypeChanged (QtCore.pyqtSignal(columnName)): passed from related ColumnDtypeModel
+        dtypeChanged (Signal(columnName)): passed from related ColumnDtypeModel
             if a columns dtype has changed.
-        changingDtypeFailed (QtCore.pyqtSignal(columnName, index, dtype)):
+        changingDtypeFailed (Signal(columnName, index, dtype)):
             passed from related ColumnDtypeModel.
             emitted after a column has changed it's data type.
     """
@@ -54,10 +54,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
     _timestampFormat = Qt.ISODate
 
-    sortingAboutToStart = QtCore.pyqtSignal()
-    sortingFinished = QtCore.pyqtSignal()
-    dtypeChanged = QtCore.pyqtSignal(int, object)
-    changingDtypeFailed = QtCore.pyqtSignal(object, QtCore.QModelIndex, object)
+    sortingAboutToStart = Signal()
+    sortingFinished = Signal()
+    dtypeChanged = Signal(int, object)
+    changingDtypeFailed = Signal(object, QtCore.QModelIndex, object)
 
     def __init__(self, dataFrame=None, copyDataFrame=False):
         """the __init__ method.
@@ -122,7 +122,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self.layoutChanged.emit()
 
 
-    @QtCore.pyqtSlot(int, object)
+    @Slot(int, object)
     def propagateDtypeChanges(self, column, dtype):
         self.dtypeChanged.emit(column, dtype)
 
@@ -308,7 +308,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             False if value is not different from original value.
 
         """
-        if not index.isValid():
+        if not index.isValid() or not self.editable:
             return False
 
         if value != index.data(role):

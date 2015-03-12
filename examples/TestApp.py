@@ -4,14 +4,7 @@ import sip
 sip.setapi('QString', 2)
 sip.setapi('QVariant', 2)
 
-try:
-    from PyQt4 import QtCore
-    from PyQt4 import QtGui
-    from PyQt4.QtCore import Qt
-except ImportError:
-    from PySide import QtCore
-    from PySide import QtGui
-    from PySide.QtCore import Qt
+from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
 
 import sys
 import pandas
@@ -129,7 +122,7 @@ class TestWidget(QtGui.QWidget):
 
         # self.dataListView.mouseReleaseEvent = self.mouseReleaseEvent
 
-    @QtCore.pyqtSlot('bool')
+    @Slot('bool')
     def _toggleEditing(self):
         self.dataEditable = not self.dataEditable
 
@@ -140,22 +133,22 @@ class TestWidget(QtGui.QWidget):
         self.removeRowAction.setEnabled(self.dataEditable)
 
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def _addColumn(self):
         pass
 
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def _removeColumn(self):
         pass
 
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def _addRow(self):
         pass
 
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def _removeRow(self):
         pass
 
@@ -186,13 +179,13 @@ class TestWidget(QtGui.QWidget):
         dataModel.dtypeChanged.connect(self.updateDelegates)
         # dataModel.changingDtypeFailed.connect(self.changeColumnValue)
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def _exportModel(self):
         model = self.dataTableView.model()
         self.exportDialog.setExportModel(model)
         self.exportDialog.show()
 
-    @QtCore.pyqtSlot('QAbstractItemModel')
+    @Slot('QAbstractItemModel')
     def updateModel(self, model):
         self.dataListView.setModel(model)
         self.dataTableView.setModel(model)
@@ -204,7 +197,7 @@ class TestWidget(QtGui.QWidget):
         self.dataListView.setModelColumn(index)
         self.dataComboBox.setModelColumn(index)
 
-    @QtCore.pyqtSlot(int, object)
+    @Slot(int, object)
     def updateDelegates(self, column, dtype):
         print "update delegate for column", column, dtype
         # as documented in the setDelegatesFromDtype function
