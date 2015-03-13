@@ -10,7 +10,6 @@ from pandasqt.compat import Qt, QtCore, QtGui, Slot, Signal
 import pandas
 import numpy as np
 
-from pandasqt import translation
 from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 DTYPE_ROLE = Qt.UserRole + 1
@@ -27,20 +26,17 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
     dtypeChanged = Signal(int, object)
     changeFailed = Signal('QString')
 
-    def __init__(self, dataFrame=None, language='en', autoApplyChanges=True):
+    def __init__(self, dataFrame=None, autoApplyChanges=True):
         """the __init__ method.
 
         Args:
             dataFrame (pandas.core.frame.DataFrame, optional): initializes the model with given DataFrame.
                 If none is given an empty DataFrame will be set. defaults to None.
-            language (str, optional): one of available languages provided by translation.DTypeTranslator: 'python', 'en', 'de'.
-                defaults to 'en'.
             autoApplyChanges (bool, optional): apply changes while changing dtype. defaults to True.
 
         """
         super(ColumnDtypeModel, self).__init__()
         self.headers = ['column', 'data type']
-        self._dtypeTranslator = translation.DTypeTranslator(language)
 
         self._autoApplyChanges = True
         self.setAutoApplyChanges(autoApplyChanges)
@@ -48,15 +44,6 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
         self._dataFrame = pandas.DataFrame()
         if dataFrame is not None:
             self.setDataFrame(dataFrame)
-
-    def translator(self):
-        """getter function to `_dtypeTranslator`. Holds all data.
-
-        Note:
-            It's not implemented with python properties to keep Qt conventions.
-
-        """
-        return self._dtypeTranslator
 
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
@@ -314,7 +301,6 @@ class DtypeComboDelegate(QtGui.QStyledItemDelegate):
                 for editing.
 
         """
-        translator = index.model().translator()
         combo = QtGui.QComboBox(parent)
         combo.addItems(SupportedDtypes.names())
         combo.currentIndexChanged.connect(self.currentIndexChanged)

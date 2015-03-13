@@ -11,7 +11,6 @@ import numpy
 import pandas
 
 from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE, DtypeComboDelegate
-from pandasqt.translation import DTypeTranslator
 from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 
@@ -77,8 +76,8 @@ class TestColumnDType(object):
         index = index.sibling(0, 1)
         ret = index.data(DTYPE_ROLE)
         assert ret == numpy.dtype(numpy.int64)
-        # check translation
-        assert index.data() == 'integer (64 bit)'
+        # check translation / display text
+        assert index.data() == 'integer (64 bit)' == SupportedDtypes.description(ret)
 
         # column not defined
         index = index.sibling(0, 2)

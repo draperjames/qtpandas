@@ -2,7 +2,6 @@ import re
 
 from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
 
-from pandasqt.translation import DTypeTranslator
 from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 import numpy
