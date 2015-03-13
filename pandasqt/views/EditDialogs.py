@@ -7,6 +7,7 @@ from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 import numpy
 from pandas import Timestamp
+from pandas.tslib import NaTType
 
 class DefaultValueValidator(QtGui.QValidator):
     def __init__(self, parent=None):
@@ -97,7 +98,7 @@ class DefaultValueValidator(QtGui.QValidator):
 
 class AddAttributesDialog(QtGui.QDialog):
 
-    accepted = Signal(tuple)
+    accepted = Signal(str, object, object)
 
     def __init__(self, parent=None):
         super(AddAttributesDialog, self).__init__(parent)
@@ -154,9 +155,27 @@ class AddAttributesDialog(QtGui.QDialog):
     def accept(self):
         super(AddAttributesDialog, self).accept()
 
-        self.accepted.emit((self.columnNameLineEdit.text(),
-                            SupportedDtypes.dtype(self.dataTypeComboBox.currentText()),
-                            self.defaultValueLineEdit.text()))
+        newColumn = self.columnNameLineEdit.text()
+        dtype = SupportedDtypes.dtype(self.dataTypeComboBox.currentText())
+
+        defaultValue = self.defaultValueLineEdit.text()
+        try:
+            if dtype in SupportedDtypes.intTypes() + SupportedDtypes.uintTypes():
+                defaultValue = int(defaultValue)
+            elif dtype in SupportedDtypes.floatTypes():
+                defaultValue = float(defaultValue)
+            elif dtype in SupportedDtypes.boolTypes():
+                defaultValue = defaultValue.lower() in ['t', '1']
+            elif dtype in SupportedDtypes.datetimeTypes():
+                defaultValue = Timestamp(defaultValue)
+                if isinstance(defaultValue, NaTType):
+                    defaultValue = Timestamp('')
+            else:
+                defaultValue = dtype.type()
+        except ValueError, e:
+            defaultValue = dtype.type()
+
+        self.accepted.emit(newColumn, dtype, defaultValue)
 
     @Slot(int)
     def updateValidatorDtype(self, index):

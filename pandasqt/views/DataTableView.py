@@ -95,12 +95,11 @@ class DataTableWidget(QtGui.QWidget):
             if button.isChecked:
                 button.setChecked(False)
 
-    @Slot(tuple)
-    def addColumn(self, data=None):
+    @Slot(str, object, object)
+    def addColumn(self, columnName, dtype, defaultValue):
         model = self.tableView.model()
 
         if model is not None:
-            columnName, dtype, defaultValue = data
             model.addDataFrameColumn(columnName, dtype, defaultValue)
 
         self.addColumnButton.setChecked(False)

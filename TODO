@@ -7,3 +7,4 @@
   not upgrade
 - check descriptions of dtypes
 - UNDO / REDO ?
+- numpy.dtype('S') --> str / currently numpy.dtype('O') will be used to display text.

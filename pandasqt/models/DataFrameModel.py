@@ -229,6 +229,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             elif columnDtype in self._intDtypes:
                 value = int(self._dataFrame.ix[row, col])
             elif columnDtype in self._boolDtypes:
+                # TODO this will most likely always be true
+                # See: http://stackoverflow.com/a/715455
+                # well no: I am mistaken here, the data is already in the dataframe
+                # so its already converted to a bool
                 value = bool(self._dataFrame.ix[row, col])
 
             elif columnDtype in self._dateDtypes:
@@ -247,7 +251,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole:
             # return the value if you wanne show True/False as text
             if columnDtype == numpy.bool:
-                result = None
+                result = self._dataFrame.ix[row, col]
             else:
                 result = convertValue(row, col, columnDtype)
         elif role  == Qt.EditRole:
@@ -465,35 +469,6 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         return self._columnDtypeModel
 
 
-    def insertRow(self, position, count, parent=QtCore.QModelIndex()):
-
-        # don't allow any gaps in the data rows.
-        if position > self.rowCount(parent):
-            position = self.rowCount(parent)
-
-        if position < 0:
-            position = 0
-
-        if count < 1:
-            return False
-
-        # Note: This function emits the rowsAboutToBeInserted() signal which
-        # connected views (or proxies) must handle before the data is
-        # inserted. Otherwise, the views may end up in an invalid state.
-        self.beginInsertRows(parent, position, position + count - 1)
-
-        # for each row
-        for row in xrange(count):
-            pass
-        self._dataFrame # insert row here
-        # emit a signal afterwards to enable editing of the dataframe
-
-
-        self.endInsertRows()
-
-        return True
-
-
     def enableEditing(self, editable):
         self.editable = editable
 
@@ -501,7 +476,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         return self._dataFrame.columns.tolist()
 
     def addDataFrameColumn(self, columnName, dtype, defaultValue):
-        if not self.editable:
+        if not self.editable or dtype not in SupportedDtypes.allTypes():
             return False
 
         elements = self.rowCount()
@@ -520,12 +495,20 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         return True
 
-    def addDataFrameRows(self, position=-1, count=1):
+    def addDataFrameRows(self, count=1):
         # don't allow any gaps in the data rows.
-        if position == -1 or position > self.rowCount():
-            position = self.rowCount()
+        # and always append at the end
+
+        if not self.editable:
+            return False
+
+        position = self.rowCount()
 
         if count < 1:
+            return False
+
+        if self.dataFrame().empty:
+            # log an error message or warning
             return False
 
         # Note: This function emits the rowsAboutToBeInserted() signal which
@@ -536,46 +519,64 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         defaultValues = []
         for dtype in self._dataFrame.dtypes:
             if dtype.type == numpy.dtype('<M8[ns]'):
-                val = pandas.Timestamp('2000-01-01')
+                val = pandas.Timestamp('')
             elif dtype.type == numpy.dtype(object):
                 val = ''
             else:
                 val = dtype.type()
             defaultValues.append(val)
 
-        self._dataFrame.loc[position] = defaultValues
+        for i in xrange(count):
+            self._dataFrame.loc[position + i] = defaultValues
         self._dataFrame.reset_index()
         self.endInsertRows()
+        return True
 
-    def removeDataFrameColumns(self, columnNames):
-        if columnNames:
+    def removeDataFrameColumns(self, columns):
+        if not self.editable:
+            return False
+
+        if columns:
             deleted = 0
-            for (position, name) in columnNames:
+            errorOccured = False
+            for (position, name) in columns:
                 position = position - deleted
                 if position < 0:
                     position = 0
-                print position, position + deleted, name
                 self.beginRemoveColumns(QtCore.QModelIndex(), position, position)
-
-                self._dataFrame.drop(name, axis=1, inplace=True)
+                try:
+                    self._dataFrame.drop(name, axis=1, inplace=True)
+                except ValueError, e:
+                    errorOccured = True
+                    continue
                 self.endRemoveColumns()
                 deleted += 1
 
-            return True
+            if errorOccured:
+                return False
+            else:
+                return True
         return False
 
     def removeDataFrameRows(self, rows):
+        if not self.editable:
+            return False
+
         if rows:
             position = min(rows)
             count = len(rows)
             self.beginRemoveRows(QtCore.QModelIndex(), position, position + count - 1)
 
+            removedAny = False
             for idx, line in self._dataFrame.iterrows():
                 if idx in rows:
+                    removedAny = True
                     self._dataFrame.drop(idx, inplace=True)
 
-            self._dataFrame.reset_index(inplace=True, drop=True)
+            if not removedAny:
+                return False
 
+            self._dataFrame.reset_index(inplace=True, drop=True)
 
             self.endRemoveRows()
             return True

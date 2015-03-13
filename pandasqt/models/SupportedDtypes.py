@@ -6,6 +6,7 @@ class SupportedDtypesTranslator(QtCore.QObject):
     def __init__(self, parent=None):
         super(SupportedDtypesTranslator, self).__init__(parent)
 
+        # we are not supposed to use str objects (str/ dtype('S'))
         self._strs = [(np.dtype(object), self.tr('text'))]
 
         self._ints = [(np.dtype(np.int8), self.tr('small integer (8 bit)')),
@@ -45,6 +46,9 @@ class SupportedDtypesTranslator(QtCore.QObject):
 
     def datetimeTypes(self):
         return [dtype for (dtype, _) in self._datetime]
+
+    def allTypes(self):
+        return [dtype for (dtype, _) in self._all]
 
 
     def description(self, value):

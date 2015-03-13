@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 
 from pandasqt.compat import Qt, QtCore, QtGui
 
@@ -12,6 +13,7 @@ import pandas
 
 from pandasqt.models.DataFrameModel import DataFrameModel, DATAFRAME_ROLE
 from pandasqt.models.DataSearch import DataSearch
+from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 def test_initDataFrame():
     model = DataFrameModel()
@@ -294,7 +296,7 @@ class TestData(object):
         assert model.dataFrame() is dataFrame
 
         assert index.isValid()
-        assert model.data(index, role=Qt.DisplayRole) == None
+        assert model.data(index, role=Qt.DisplayRole) == value
         assert model.data(index, role=Qt.EditRole) == value
         assert model.data(index, role=Qt.CheckStateRole) == qtbool
         assert model.data(index, role=DATAFRAME_ROLE) == value
@@ -384,8 +386,11 @@ class TestSetData(object):
 
         assert index.isValid()
         model.enableEditing(True)
-        assert model.setData(index, qtbool)
-        assert model.data(index, role=Qt.DisplayRole) == None
+        # pytest.set_trace()
+        # everything is already set as false and since Qt.Unchecked = 0, 0 == False
+        # therefore the assert will fail without further constraints
+        assert model.setData(index, qtbool) == value
+        assert model.data(index, role=Qt.DisplayRole) == value
         assert model.data(index, role=Qt.EditRole) == value
         assert model.data(index, role=Qt.CheckStateRole) == qtbool
         assert model.data(index, role=DATAFRAME_ROLE) == value
@@ -565,16 +570,130 @@ class TestEditMode(object):
     def model(self, dataFrame):
         return DataFrameModel(dataFrame)
 
-    # def test_edit_data(self, model):
-    #     index = model.index(0, 0)
+    @pytest.fixture
+    def newColumns(self):
+        columns = []
+        for dtype, description in SupportedDtypes._all:
+            columns.append((description, dtype))
 
-    #     currentData = index.data()
+        for _type in [int, float, bool, object]:
+            desc = 'default_%s' % (str(_type),)
+            columns.append((desc, _type))
 
-    #     model.setData()
+        return columns
 
+    def test_edit_data(self, model):
+        index = model.index(0, 0)
+        currentData = index.data()
 
+        assert not model.setData(index, 42)
+        assert index.data() == currentData
 
+        model.enableEditing(True)
+        assert model.setData(index, 42)
+        assert index.data() != currentData
+        assert index.data() == 42
 
+    def test_add_column(self, model, newColumns):
+        model.enableEditing(True)
+
+        columnCount = model.columnCount()
+        rowCount = model.rowCount()
+        for index, data in enumerate(newColumns):
+            desc, _type = data
+            if isinstance(_type, numpy.dtype):
+                defaultVal = _type.type()
+                if _type.type == numpy.datetime64:
+                    defaultVal = pandas.Timestamp('')
+            else:
+                defaultVal = _type()
+
+            assert model.addDataFrameColumn(desc, _type, defaultVal)
+            for row in xrange(rowCount):
+                idx = model.index(row, columnCount + index)
+                newVal = idx.data(DATAFRAME_ROLE)
+                assert newVal == defaultVal
+
+    def test_remove_columns(self, model):
+        model.enableEditing(True)
+        df = model.dataFrame().copy()
+        columnNames = model.dataFrame().columns.tolist()
+
+        #remove a column which doesn't exist
+        assert not model.removeDataFrameColumns([(3, 'monty')])
+
+        assert model.columnCount() == len(columnNames)
+        #remove one column at a time
+        for index, column in enumerate(columnNames):
+            assert model.removeDataFrameColumns([(index, column)])
+
+        assert model.columnCount() == 0
+        model.setDataFrame(df, copyDataFrame=True)
+        assert model.columnCount() == len(columnNames)
+        # remove all columns
+        columnNames = [(i, n) for i, n in enumerate(columnNames)]
+        assert model.removeDataFrameColumns(columnNames)
+        assert model.columnCount() == 0
+
+    def test_remove_columns_random(self, dataFrame):
+
+        columnNames = dataFrame.columns.tolist()
+        columnNames = [(i, n) for i, n in enumerate(columnNames)]
+
+        for cycle in xrange(1000):
+            elements = random.randint(1, len(columnNames))
+            names = random.sample(columnNames, elements)
+            df = dataFrame.copy()
+            model = DataFrameModel(df)
+            assert not model.removeDataFrameColumns(names)
+            model.enableEditing(True)
+            model.removeDataFrameColumns(names)
+
+            _columnSet = set(columnNames)
+            _removedSet = set(names)
+            remainingColumns = _columnSet - _removedSet
+            for idx, col in remainingColumns:
+                assert col in model.dataFrame().columns.tolist()
+
+    def test_add_rows(self, model):
+        assert not model.addDataFrameRows()
+        model.enableEditing(True)
+
+        rows = model.rowCount()
+        assert not model.addDataFrameRows(count=0)
+        assert model.rowCount() == rows
+
+        assert model.addDataFrameRows()
+        assert model.rowCount() == rows + 1
+
+        assert model.addDataFrameRows(count=5)
+        assert model.rowCount() ==  rows + 1 + 5
+
+        idx = model.index(rows+4, 0)
+        assert idx.data() == 0
+
+    def test_remove_rows(self, model):
+        assert not model.removeDataFrameRows([0])
+        model.enableEditing(True)
+        df = model.dataFrame().copy()
+        rows = model.rowCount()
+
+        model.removeDataFrameRows([0])
+        assert model.rowCount() < rows
+        assert model.rowCount() == rows - 1
+
+        assert numpy.all(df.loc[1:].values == model.dataFrame().values)
+
+        model.removeDataFrameRows([0, 1])
+        assert model.dataFrame().empty
+
+        model.setDataFrame(df, copyDataFrame=True)
+        assert not model.removeDataFrameRows([5, 6, 7])
+
+        rows = model.rowCount()
+        assert model.removeDataFrameRows([0, 1, 7, 10])
+        assert model.rowCount() < rows
+        assert model.rowCount() == 1
 
 if __name__ == '__main__':
     pytest.main()
