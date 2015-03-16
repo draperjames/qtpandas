@@ -28,26 +28,31 @@ class DataTableWidget(QtGui.QWidget):
         self.buttonFrameLayout.setContentsMargins(0, 6, 0, 6)
 
         self.editButton = QtGui.QToolButton(self.buttonFrame)
+        self.editButton.setObjectName('editbutton')
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/document-edit.png')))
 
         self.editButton.setIcon(icon)
 
         self.addColumnButton = QtGui.QToolButton(self.buttonFrame)
+        self.addColumnButton.setObjectName('addcolumnbutton')
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-insert-column-right.png')))
 
         self.addColumnButton.setIcon(icon)
 
         self.addRowButton = QtGui.QToolButton(self.buttonFrame)
+        self.addRowButton.setObjectName('addrowbutton')
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-insert-row-below.png')))
 
         self.addRowButton.setIcon(icon)
 
         self.removeColumnButton = QtGui.QToolButton(self.buttonFrame)
+        self.removeColumnButton.setObjectName('removecolumnbutton')
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-delete-column.png')))
 
         self.removeColumnButton.setIcon(icon)
 
         self.removeRowButton = QtGui.QToolButton(self.buttonFrame)
+        self.removeRowButton.setObjectName('removerowbutton')
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-delete-row.png')))
 
         self.removeRowButton.setIcon(icon)
@@ -152,6 +157,11 @@ class DataTableWidget(QtGui.QWidget):
 
     def setViewModel(self, model):
         if isinstance(model, DataFrameModel):
+            selectionModel = self.tableView.selectionModel()
             self.tableView.setModel(model)
+            del selectionModel
+
+    def view(self):
+        return self.tableView
 
 
