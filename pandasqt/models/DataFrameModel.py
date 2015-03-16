@@ -581,35 +581,3 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             self.endRemoveRows()
             return True
         return False
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

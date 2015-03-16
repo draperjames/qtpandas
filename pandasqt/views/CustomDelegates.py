@@ -8,64 +8,17 @@ from pandasqt.views.BigIntSpinbox import BigIntSpinbox
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.models.SupportedDtypes import SupportedDtypes
 
-def setDelegatesFromDtype(tableView, dlgs={}):
-    """set delegates depending on columns dtype into passed tableView
-
-    Args:
-        tableView (QTableView): tableView to set delegates. Needs a DataFrameModel to be set.
-
-    Raises:
-        TypeError: If the given view/widget is not an instance/subclass of
-            QtGui.QTableView.
-        TypeError: If the model displayed by the given `tableView` is no
-            instance of a `DataFrameModel`.
-        AttributeError: If the model for the given `tableView` is not set.
-
-    Returns:
-        Dict of QItemDelegates with column name as key. The table view doen't take ownership of set delegates.
-            To prevent them garbage collected they have to be saved somewhere else.
-            Otherwise segmentation fault is very likely.
-
-    """
-    if not isinstance(tableView, QtGui.QTableView):
-        raise TypeError('not of type QtGui.QTableView')
-    if tableView.model():
-        itemDelegates = dlgs
-        model = tableView.model()
-        try:
-            dataFrame = model.dataFrame()
-        except AttributeError, err:
-            raise TypeError('model is not of type DataFrameModel')
-
-        for i, columnName in enumerate(dataFrame.columns):
-            columnDtype = dataFrame[columnName].dtype
-            if columnDtype in model._intDtypes:
-                intInfo = numpy.iinfo(columnDtype)
-                delegate = BigIntSpinboxDelegate(intInfo.min, intInfo.max)
-                itemDelegates[columnName] = delegate
-                tableView.setItemDelegateForColumn(i, delegate)
-            elif columnDtype in model._floatDtypes:
-                floatInfo = numpy.finfo(columnDtype)
-                delegate = CustomDoubleSpinboxDelegate(floatInfo.min, floatInfo.max, decimals=model._float_precisions[str(columnDtype)])
-                itemDelegates[columnName] = delegate
-                tableView.setItemDelegateForColumn(i, delegate)
-            elif columnDtype == object:
-                delegate = TextDelegate()
-                itemDelegates[columnName] = delegate
-                tableView.setItemDelegateForColumn(i, delegate)
-
-        return itemDelegates
-    else:
-        raise AttributeError, "no model set"
-
 def createDelegate(dtype, column, view):
-    model = view.model()
+    try:
+        model = view.model()
+    except AttributeError:
+        raise
 
     if model is None:
-        return None
+        raise ValueError('no model set for the current view')
 
     if not isinstance(model, DataFrameModel):
-        return None
+        raise TypeError('model is not of type DataFrameModel')
 
     if dtype in model._intDtypes:
         intInfo = numpy.iinfo(dtype)
@@ -84,6 +37,7 @@ def createDelegate(dtype, column, view):
         del oldDelegate
     # update the view
     view.setItemDelegateForColumn(column, delegate)
+    return delegate
 
 class BigIntSpinboxDelegate(QtGui.QItemDelegate):
     """delegate for very big integers.
