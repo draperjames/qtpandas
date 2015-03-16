@@ -235,12 +235,3 @@ class RemoveAttributesDialog(QtGui.QDialog):
 
         super(RemoveAttributesDialog, self).accept()
         self.accepted.emit(names)
-
-        # self.accepted.emit((self.columnNameLineEdit.text(),
-        #                     SupportedDtypes.dtype(self.dataTypeComboBox.currentText()),
-        #                     self.defaultValueLineEdit.text()))
-
-
-
-
-
