@@ -37,10 +37,10 @@ class TestColumnDType(object):
         model = ColumnDtypeModel()
 
         assert model.dataFrame().empty == True
-        assert model.autoApplyChanges() == True
+        assert model.editable() == False
 
-        model = ColumnDtypeModel(autoApplyChanges=False)
-        assert model.autoApplyChanges() == False
+        model = ColumnDtypeModel(editable=True)
+        assert model.editable() == True
 
 
     def test_headerData(self):
@@ -97,6 +97,7 @@ class TestColumnDType(object):
     def test_setData(self, dataframe, language_values, qtbot):
         model = ColumnDtypeModel(dataFrame=dataframe)
         index = model.index(3, 1)
+        model.setEditable(True)
 
         # change all values except datetime
         datetime = ()
@@ -120,6 +121,8 @@ class TestColumnDType(object):
 
     def test_flags(self, dataframe):
         model = ColumnDtypeModel(dataFrame=dataframe)
+        model.setEditable(True)
+
         index = model.index(0, 0)
         assert model.flags(index) == Qt.ItemIsEnabled | Qt.ItemIsSelectable
         index = index.sibling(0, 1)
@@ -153,6 +156,8 @@ class TestColumnDType(object):
 class TestDtypeComboDelegate(object):
     def test_editing(self, dataframe, qtbot):
         model = ColumnDtypeModel(dataFrame=dataframe)
+
+        model.setEditable(True)
 
         tableView = QtGui.QTableView()
         qtbot.addWidget(tableView)
