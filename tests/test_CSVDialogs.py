@@ -9,11 +9,11 @@ import numpy
 import pytest
 import pytestqt
 
-from pandasqt.csvwidget import (
+from pandasqt.views.CSVDialogs import (
     DelimiterValidator, DelimiterSelectionWidget,
     CSVImportDialog, CSVExportDialog
 )
-from pandasqt.DataFrameModel import DataFrameModel
+from pandasqt.models.DataFrameModel import DataFrameModel
 
 FIXTUREDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures')
 
@@ -284,7 +284,7 @@ class TestDateTimeConversion(object):
         # convert critical datetime column:
         column_model = model_in.columnDtypeModel()
         index = column_model.index(4, 1)
-        column_model.setData(index, 'datetime64')
+        column_model.setData(index, 'date and time')
 
         ##
         # now we export the data and load it again
@@ -328,7 +328,7 @@ class TestDateTimeConversion(object):
 
         column_model = model_out_in.columnDtypeModel()
         index = column_model.index(4, 1)
-        column_model.setData(index, 'datetime64')
+        column_model.setData(index, 'date and time')
 
         comparator = model_in.dataFrame() == model_out_in.dataFrame()
         assert all(comparator)

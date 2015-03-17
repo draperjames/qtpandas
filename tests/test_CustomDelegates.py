@@ -9,8 +9,8 @@ import pytestqt
 import numpy
 import pandas
 
-from pandasqt.CustomDelegates import setDelegatesFromDtype, BigIntSpinboxDelegate, CustomDoubleSpinboxDelegate, TextDelegate
-from pandasqt.DataFrameModel import DataFrameModel
+from pandasqt.views.CustomDelegates import BigIntSpinboxDelegate, CustomDoubleSpinboxDelegate, TextDelegate, createDelegate
+from pandasqt.models.DataFrameModel import DataFrameModel
 
 class DemoTableView(QtGui.QTableView):
 
@@ -48,8 +48,8 @@ class TestCustomDelegates(object):
 
     @pytest.mark.parametrize(
         "widgetClass, model, exception, exceptionContains", [
-            (QtGui.QWidget, None, TypeError, "not of type QtGui.QTableView"),
-            (DemoTableView, None, AttributeError, "no model set"),
+            (QtGui.QWidget, None, AttributeError, "has no attribute 'model'"),
+            (DemoTableView, None, ValueError, "no model set for the current view"),
             (DemoTableView, QtGui.QStandardItemModel(), TypeError, 'model is not of type DataFrameModel'),
         ]
     )
@@ -59,7 +59,7 @@ class TestCustomDelegates(object):
         with pytest.raises(exception) as excinfo:
             if model:
                 widget.setModel(QtGui.QStandardItemModel())
-            setDelegatesFromDtype(widget)
+            createDelegate('foo', 'bar', widget)
         assert exceptionContains in str(excinfo.value)
 
     @pytest.mark.parametrize(
@@ -79,15 +79,14 @@ class TestCustomDelegates(object):
         ]
     )
     def test_setDelegates(self, qtbot, tableView, index, value, singleStep):
-        assert isinstance(setDelegatesFromDtype(tableView), dict)
+        dlg = createDelegate(numpy.dtype(value), 0, tableView)
+        assert dlg is not None
 
         data = pandas.DataFrame([value], columns=['A'])
         data['A'] = data['A'].astype(value.dtype)
         model = tableView.model()
         model.setDataFrame(data)
-        delegates = setDelegatesFromDtype(tableView)
-        assert len(delegates) == 1
-        for i, delegate in enumerate(delegates.values()):
+        for i, delegate in enumerate([dlg]):
             assert tableView.itemDelegateForColumn(i) == delegate
 
             option = QtGui.QStyleOptionViewItem()
@@ -145,12 +144,14 @@ class TestTextDelegate(object):
         tableView.setModel(model)
 
         delegate = TextDelegate(tableView)
-        tableView.setItemDelegateForColumn(0, delegate)
+        createDelegate(numpy.dtype('O'), 0, tableView)
         tableView.show()
 
         index = model.index(0, 0)
         preedit_data = index.data()
 
+        assert not model.editable
+        model.enableEditing(True)
         tableView.edit(index)
         editor = tableView.findChildren(QtGui.QLineEdit)[0]
         qtbot.keyPress(editor, QtCore.Qt.Key_F)

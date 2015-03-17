@@ -4,19 +4,19 @@ import sip
 sip.setapi('QString', 2)
 sip.setapi('QVariant', 2)
 
-try:
-    from PyQt4 import QtCore
-    from PyQt4 import QtGui
-    from PyQt4.QtCore import Qt
-except ImportError:
-    from PySide import QtCore
-    from PySide import QtGui
-    from PySide.QtCore import Qt
+from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
 
 import sys
 import pandas
-from pandasqt import DataFrameModel, setDelegatesFromDtype, DtypeComboDelegate, DataSearch
-from pandasqt.csvwidget import CSVImportDialog, CSVExportDialog
+import numpy
+
+
+from pandasqt.models.DataFrameModel import DataFrameModel
+from pandasqt.models.DataSearch import DataSearch
+from pandasqt.views.CSVDialogs import CSVImportDialog, CSVExportDialog
+from pandasqt.views._ui import icons_rc
+from pandasqt.views.DataTableView import DataTableWidget
+from pandasqt.views.CustomDelegates import createDelegate, DtypeComboDelegate
 from util import getCsvData, getRandomData
 
 class TestWidget(QtGui.QWidget):
@@ -26,15 +26,12 @@ class TestWidget(QtGui.QWidget):
         self.resize(1680, 756)
         self.move(0, 0)
 
-        self.language = 'en'
-        self.delegates = None
 
         self.df = pandas.DataFrame()
-
         #  init the data view's
-        self.dataTableView = QtGui.QTableView(self)
-        self.dataTableView.setSortingEnabled(True)
-        self.dataTableView.setAlternatingRowColors(True)
+        self.dataTableView = DataTableWidget(self)
+        # self.dataTableView.setSortingEnabled(True)
+        # self.dataTableView.setAlternatingRowColors(True)
 
         self.dataListView = QtGui.QListView(self)
         self.dataListView.setAlternatingRowColors(True)
@@ -63,6 +60,7 @@ class TestWidget(QtGui.QWidget):
         self.mainLayout = QtGui.QVBoxLayout()
         self.setLayout(self.mainLayout)
         self.mainLayout.addLayout(self.buttonLayout)
+
         self.mainLayout.addWidget(self.dataTableView)
 
         self.spinbox = QtGui.QSpinBox()
@@ -99,17 +97,21 @@ class TestWidget(QtGui.QWidget):
 
         self.dataListView.mouseReleaseEvent = self.mouseReleaseEvent
 
+
     def setDataFrame(self, dataFrame):
         self.df = dataFrame
         dataModel = DataFrameModel()
         dataModel.setDataFrame(self.df)
         self.dataListView.setModel(dataModel)
-        self.dataTableView.setModel(dataModel)
+        self.dataTableView.setViewModel(dataModel)
         self.dataComboBox.setModel(dataModel)
 
-        self.updateDelegates()
+        for index, column in enumerate(dataModel.dataFrame().columns):
+            dtype = dataModel.dataFrame()[column].dtype
+            self.updateDelegates(index, dtype)
+        #self.updateDelegates()
 
-        self.dataTableView.resizeColumnsToContents()
+        # self.dataTableView.resizeColumnsToContents()
 
         # create a simple item model for our choosing combobox
         columnModel = QtGui.QStandardItemModel()
@@ -123,16 +125,16 @@ class TestWidget(QtGui.QWidget):
         dataModel.dtypeChanged.connect(self.updateDelegates)
         dataModel.changingDtypeFailed.connect(self.changeColumnValue)
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def _exportModel(self):
-        model = self.dataTableView.model()
+        model = self.dataTableView.view().model()
         self.exportDialog.setExportModel(model)
         self.exportDialog.show()
 
-    @QtCore.pyqtSlot('QAbstractItemModel')
+    @Slot('QAbstractItemModel')
     def updateModel(self, model):
         self.dataListView.setModel(model)
-        self.dataTableView.setModel(model)
+        self.dataTableView.setViewModel(model)
         self.dataComboBox.setModel(model)
 
         self.tableViewColumnDtypes.setModel(model.columnDtypeModel())
@@ -141,28 +143,37 @@ class TestWidget(QtGui.QWidget):
         self.dataListView.setModelColumn(index)
         self.dataComboBox.setModelColumn(index)
 
-    def updateDelegates(self, column=None):
-        print "update delegate for column", column
-        self.delegates = setDelegatesFromDtype(self.dataTableView)
+    @Slot(int, object)
+    def updateDelegates(self, column, dtype):
+        print "update delegate for column", column, dtype
+        # as documented in the setDelegatesFromDtype function
+        # we need to store all delegates, so going from
+        # type A -> type B -> type A
+        # would cause a segfault if not stored.
+        view = self.dataTableView.tableView
+        createDelegate(dtype, column, view)
+        # dlg = self.delegates or {}
+        # self.delegates = setDelegatesFromDtype(self.dataTableView.tableView, dlg)
+        # print dlg
 
     def goToColumn(self):
         print "go to column 7"
-        index = self.dataTableView.model().index(7, 0)
-        self.dataTableView.setCurrentIndex(index)
+        index = self.dataTableView.view().model().index(7, 0)
+        self.dataTableView.view().setCurrentIndex(index)
 
     def changeColumnValue(self, columnName, index, dtype):
         print "failed to change", columnName, "to", dtype
         print index.data(), index.isValid()
-        self.dataTableView.setCurrentIndex(index)
+        self.dataTableView.view().setCurrentIndex(index)
 
     def setFilter(self):
         #filterIndex = eval(self.lineEditFilterCondition.text())
         search = DataSearch("Test", self.lineEditFilterCondition.text())
-        self.dataTableView.model().setFilter(search)
+        self.dataTableView.view().model().setFilter(search)
         #raise NotImplementedError
 
     def clearFilter(self):
-        self.dataTableView.model().clearFilter()
+        self.dataTableView.view().model().clearFilter()
 
 if __name__ == '__main__':
 
@@ -171,6 +182,7 @@ if __name__ == '__main__':
     widget.show()
 
     widget.setDataFrame( getCsvData() )
+
     #widget.setDataFrame( getRandomData(2, 2) )
 
     app.exec_()

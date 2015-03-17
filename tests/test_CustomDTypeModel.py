@@ -10,8 +10,9 @@ import decimal
 import numpy
 import pandas
 
-from pandasqt.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE, DtypeComboDelegate
-from pandasqt.translation import DTypeTranslator
+from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE
+from pandasqt.models.SupportedDtypes import SupportedDtypes
+from pandasqt.views.CustomDelegates import DtypeComboDelegate
 
 
 @pytest.fixture()
@@ -27,13 +28,8 @@ def dataframe():
 
 @pytest.fixture()
 def language_values():
-    values = set()
-    translator = DTypeTranslator()
-    for key, value in translator._dtypes.iteritems():
-        for k, v in value.iteritems():
-            values.add((v, key))
 
-    return list(values)
+    return SupportedDtypes._all
 
 
 class TestColumnDType(object):
@@ -41,10 +37,10 @@ class TestColumnDType(object):
         model = ColumnDtypeModel()
 
         assert model.dataFrame().empty == True
-        assert model.autoApplyChanges() == True
+        assert model.editable() == False
 
-        model = ColumnDtypeModel(autoApplyChanges=False)
-        assert model.autoApplyChanges() == False
+        model = ColumnDtypeModel(editable=True)
+        assert model.editable() == True
 
 
     def test_headerData(self):
@@ -81,8 +77,8 @@ class TestColumnDType(object):
         index = index.sibling(0, 1)
         ret = index.data(DTYPE_ROLE)
         assert ret == numpy.dtype(numpy.int64)
-        # check translation
-        assert index.data() == 'integer (64 bit)'
+        # check translation / display text
+        assert index.data() == 'integer (64 bit)' == SupportedDtypes.description(ret)
 
         # column not defined
         index = index.sibling(0, 2)
@@ -101,15 +97,16 @@ class TestColumnDType(object):
     def test_setData(self, dataframe, language_values, qtbot):
         model = ColumnDtypeModel(dataFrame=dataframe)
         index = model.index(3, 1)
+        model.setEditable(True)
 
         # change all values except datetime
         datetime = ()
-        for (value, expected_type) in language_values:
+        for (expected_type, string) in language_values:
             if expected_type == numpy.dtype('<M8[ns]'):
-                datetime = (value, expected_type)
+                datetime = (string, expected_type)
                 continue
             else:
-                model.setData(index, value)
+                model.setData(index, string)
                 assert index.data(DTYPE_ROLE) == expected_type
 
         assert model.setData(index, 'bool', Qt.DisplayRole) == False
@@ -124,6 +121,8 @@ class TestColumnDType(object):
 
     def test_flags(self, dataframe):
         model = ColumnDtypeModel(dataFrame=dataframe)
+        model.setEditable(True)
+
         index = model.index(0, 0)
         assert model.flags(index) == Qt.ItemIsEnabled | Qt.ItemIsSelectable
         index = index.sibling(0, 1)
@@ -157,6 +156,8 @@ class TestColumnDType(object):
 class TestDtypeComboDelegate(object):
     def test_editing(self, dataframe, qtbot):
         model = ColumnDtypeModel(dataFrame=dataframe)
+
+        model.setEditable(True)
 
         tableView = QtGui.QTableView()
         qtbot.addWidget(tableView)

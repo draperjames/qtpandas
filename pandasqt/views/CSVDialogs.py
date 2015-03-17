@@ -6,10 +6,10 @@ from encodings.aliases import aliases as _encodings
 import pandas
 from chardet.universaldetector import UniversalDetector
 
-from pandasqt.compat import Qt, QtCore, QtGui
-from pandasqt.DataFrameModel import DataFrameModel
-from pandasqt.ColumnDtypeModel import DtypeComboDelegate
-from pandasqt.ui import icons_rc
+from pandasqt.compat import Qt, QtCore, QtGui, Slot, Signal
+from pandasqt.models.DataFrameModel import DataFrameModel
+from pandasqt.views.CustomDelegates import DtypeComboDelegate
+from pandasqt.views._ui import icons_rc
 
 from pandasqt.utils import fillNoneValues, convertTimestamps
 
@@ -59,7 +59,7 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
 
     """
 
-    delimiter = QtCore.pyqtSignal('QString')
+    delimiter = Signal('QString')
 
     def __init__(self, parent=None):
         """Constructs the object with the given parent.
@@ -120,7 +120,7 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
         layout.addWidget(self.otherSeparatorLineEdit)
         self.setLayout(layout)
 
-    @QtCore.pyqtSlot('QBool')
+    @Slot('QBool')
     def _enableLine(self, toggled):
         self.otherSeparatorLineEdit.setEnabled(toggled)
 
@@ -142,7 +142,7 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
         return
 
 
-    @QtCore.pyqtSlot('QBool')
+    @Slot('QBool')
     def _delimiter(self, checked):
         if checked:
             if self.commaRadioButton.isChecked():
@@ -183,7 +183,7 @@ class CSVImportDialog(QtGui.QDialog):
             pressed. Returns DataFrameModel and path of chosen csv file.
     """
 
-    load = QtCore.pyqtSignal('QAbstractItemModel', str)
+    load = Signal('QAbstractItemModel', str)
 
     def __init__(self, parent=None):
         """Constructs the object with the given parent.
@@ -283,7 +283,7 @@ class CSVImportDialog(QtGui.QDialog):
         layout.addWidget(self._statusBar, 8, 0, 1, 4)
         self.setLayout(layout)
 
-    @QtCore.pyqtSlot('QString')
+    @Slot('QString')
     def updateStatusBar(self, message):
         """Updates the status bar widget of this dialog with the given message.
 
@@ -296,7 +296,7 @@ class CSVImportDialog(QtGui.QDialog):
         """
         self._statusBar.showMessage(message, 5000)
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def _openFile(self):
         """Opens a file dialog and sets a value for the QLineEdit widget.
 
@@ -308,7 +308,7 @@ class CSVImportDialog(QtGui.QDialog):
             self._filenameLineEdit.setText(ret)
             self._updateFilename()
 
-    @QtCore.pyqtSlot('QBool')
+    @Slot('QBool')
     def _updateHeader(self, toggled):
         """Changes the internal flag, whether the csv file contains a header or not.
 
@@ -325,7 +325,7 @@ class CSVImportDialog(QtGui.QDialog):
         self._header = 0 if toggled else None
         self._previewFile()
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def _updateFilename(self):
         """Calls several methods after the filename changed.
 
@@ -367,7 +367,7 @@ class CSVImportDialog(QtGui.QDialog):
                 index = self._encodingComboBox.findText(result.upper())
                 self._encodingComboBox.setCurrentIndex(index)
 
-    @QtCore.pyqtSlot('int')
+    @Slot('int')
     def _updateEncoding(self, index):
         """Changes the value of the encoding combo box to the value of given index.
 
@@ -384,7 +384,7 @@ class CSVImportDialog(QtGui.QDialog):
         self._encodingKey = _calculateEncodingKey(encoding)
         self._previewFile()
 
-    @QtCore.pyqtSlot('QString')
+    @Slot('QString')
     def _updateDelimiter(self, delimiter):
         """Changes the value of the delimiter for the csv file.
 
@@ -412,7 +412,7 @@ class CSVImportDialog(QtGui.QDialog):
         """Loads the given csv file with pandas and generate a new dataframe.
 
         The file will be loaded with the configured encoding, delimiter
-        and header.git 
+        and header.git
         If any execptions will occur, an empty Dataframe is generated
         and a message will appear in the status bar.
 
@@ -451,7 +451,7 @@ class CSVImportDialog(QtGui.QDialog):
         self._previewTableView.setModel(None)
         self._datatypeTableView.setModel(None)
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def accepted(self):
         """Successfully close the widget and return the loaded model.
 
@@ -468,7 +468,7 @@ class CSVImportDialog(QtGui.QDialog):
         self._resetWidgets()
         self.accept()
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def rejected(self):
         """Close the widget and reset its inital state.
 
@@ -484,7 +484,7 @@ class CSVExportDialog(QtGui.QDialog):
     """An widget to serialize a `DataFrameModel` to a `CSV-File`.
 
     """
-    exported = QtCore.pyqtSignal('QBool')
+    exported = Signal('QBool')
 
     def __init__(self, model=None, parent=None):
         super(CSVExportDialog, self).__init__(parent)
@@ -568,7 +568,7 @@ class CSVExportDialog(QtGui.QDialog):
         self._model = model
         return True
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def _createFile(self):
         ret = QtGui.QFileDialog.getSaveFileName(self, 'Save File', filter='Comma Separated Value (*.csv)')
         self._filenameLineEdit.setText(ret)
@@ -607,7 +607,7 @@ class CSVExportDialog(QtGui.QDialog):
         self._headerCheckBox.setChecked(False)
         self._statusBar.showMessage('')
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def accepted(self):
         """Successfully close the widget and emit an export signal.
 
@@ -626,7 +626,7 @@ class CSVExportDialog(QtGui.QDialog):
             self.exported.emit(True)
             self.accept()
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def rejected(self):
         """Close the widget and reset its inital state.
 

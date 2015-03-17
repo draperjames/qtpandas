@@ -6,7 +6,7 @@
 
 from datetime import datetime
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from pandasqt.compat import Qt, QtCore, QtGui, Slot, Signal
 
 
 import pandas
@@ -15,10 +15,12 @@ import numpy
 import parser
 import re
 
-from ColumnDtypeModel import ColumnDtypeModel
-from DataSearch import DataSearch
+from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel
+from pandasqt.models.DataSearch import DataSearch
+from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 DATAFRAME_ROLE = Qt.UserRole + 2
+
 
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
@@ -28,9 +30,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             Used in data method.
         sortingAboutToStart (QtCore.pyqtSignal): emitted directly before sorting starts.
         sortingFinished (QtCore.pyqtSignal): emitted, when sorting finished.
-        dtypeChanged (QtCore.pyqtSignal(columnName)): passed from related ColumnDtypeModel
+        dtypeChanged (Signal(columnName)): passed from related ColumnDtypeModel
             if a columns dtype has changed.
-        changingDtypeFailed (QtCore.pyqtSignal(columnName, index, dtype)):
+        changingDtypeFailed (Signal(columnName, index, dtype)):
             passed from related ColumnDtypeModel.
             emitted after a column has changed it's data type.
     """
@@ -42,38 +44,20 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     }
 
     """list of int datatypes for easy checking in data() and setData()"""
-    _intDtypes = [
-        numpy.int8,
-        numpy.int16,
-        numpy.int32,
-        numpy.int64,
-        numpy.uint8,
-        numpy.uint16,
-        numpy.uint32,
-        numpy.uint64
-    ]
+    _intDtypes = SupportedDtypes.intTypes() + SupportedDtypes.uintTypes()
     """list of float datatypes for easy checking in data() and setData()"""
-    _floatDtypes = [
-        numpy.float16,
-        numpy.float32,
-        numpy.float64
-    ]
+    _floatDtypes = SupportedDtypes.floatTypes()
     """list of bool datatypes for easy checking in data() and setData()"""
-    _boolDtypes = [
-        numpy.bool,
-        numpy.bool_
-    ]
+    _boolDtypes = SupportedDtypes.boolTypes()
     """list of datetime datatypes for easy checking in data() and setData()"""
-    _dateDtypes = [
-        numpy.dtype('<M8[ns]')
-    ]
+    _dateDtypes = SupportedDtypes.datetimeTypes()
 
     _timestampFormat = Qt.ISODate
 
-    sortingAboutToStart = QtCore.pyqtSignal()
-    sortingFinished = QtCore.pyqtSignal()
-    dtypeChanged = QtCore.pyqtSignal(object)
-    changingDtypeFailed = QtCore.pyqtSignal(object, QtCore.QModelIndex, object)
+    sortingAboutToStart = Signal()
+    sortingFinished = Signal()
+    dtypeChanged = Signal(int, object)
+    changingDtypeFailed = Signal(object, QtCore.QModelIndex, object)
 
     def __init__(self, dataFrame=None, copyDataFrame=False):
         """the __init__ method.
@@ -94,6 +78,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self._dataFrameOriginal = None
         self._search = DataSearch("nothing", "")
+        self.editable = False
 
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
@@ -130,13 +115,16 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             self._dataFrame = dataFrame
 
         self._columnDtypeModel = ColumnDtypeModel(dataFrame)
-        self._columnDtypeModel.dtypeChanged.connect(
-            lambda columnName: self.dtypeChanged.emit(columnName)
-        )
+        self._columnDtypeModel.dtypeChanged.connect(self.propagateDtypeChanges)
         # self._columnDtypeModel.changingDtypeFailed.connect(
         #     lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
         # )
         self.layoutChanged.emit()
+
+
+    @Slot(int, object)
+    def propagateDtypeChanges(self, column, dtype):
+        self.dtypeChanged.emit(column, dtype)
 
     @property
     def timestampFormat(self):
@@ -172,8 +160,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         Returns:
             None if not Qt.DisplayRole
             _dataFrame.columns.tolist()[section] if orientation == Qt.Horizontal
-            _dataFrame.index.tolist()[section] if orientation == Qt.Vertical
-            None if vertical or horizontal orientation and section raises IndexError
+            section if orientation == Qt.Vertical
+            None if horizontal orientation and section raises IndexError
         """
         if role != Qt.DisplayRole:
             return None
@@ -187,13 +175,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             except (IndexError, ):
                 return None
         elif orientation == Qt.Vertical:
-            try:
-                label = self._dataFrame.index.tolist()[section]
-                if label == section:
-                    label = section
-                return label
-            except (IndexError, ):
-                return None
+            return section
 
     def data(self, index, role=Qt.DisplayRole):
         """return data depending on index, Qt::ItemDataRole and data type of the column.
@@ -241,7 +223,12 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             elif columnDtype in self._intDtypes:
                 value = int(self._dataFrame.ix[row, col])
             elif columnDtype in self._boolDtypes:
+                # TODO this will most likely always be true
+                # See: http://stackoverflow.com/a/715455
+                # well no: I am mistaken here, the data is already in the dataframe
+                # so its already converted to a bool
                 value = bool(self._dataFrame.ix[row, col])
+
             elif columnDtype in self._dateDtypes:
                 #print numpy.datetime64(self._dataFrame.ix[row, col])
                 value = pandas.Timestamp(self._dataFrame.ix[row, col])
@@ -258,7 +245,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole:
             # return the value if you wanne show True/False as text
             if columnDtype == numpy.bool:
-                result = None
+                result = self._dataFrame.ix[row, col]
             else:
                 result = convertValue(row, col, columnDtype)
         elif role  == Qt.EditRole:
@@ -291,6 +278,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         """
         flags = super(DataFrameModel, self).flags(index)
 
+        if not self.editable:
+            return flags
+
         col = self._dataFrame.columns[index.column()]
         if self._dataFrame[col].dtype == numpy.bool:
             flags |= Qt.ItemIsUserCheckable
@@ -316,7 +306,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             False if value is not different from original value.
 
         """
-        if not index.isValid():
+        if not index.isValid() or not self.editable:
             return False
 
         if value != index.data(role):
@@ -471,3 +461,118 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             ColumnDtypeModel
         """
         return self._columnDtypeModel
+
+
+    def enableEditing(self, editable):
+        self.editable = editable
+        self._columnDtypeModel.setEditable(self.editable)
+
+    def dataFrameColumns(self):
+        return self._dataFrame.columns.tolist()
+
+    def addDataFrameColumn(self, columnName, dtype, defaultValue):
+        if not self.editable or dtype not in SupportedDtypes.allTypes():
+            return False
+
+        elements = self.rowCount()
+        columnPosition = self.columnCount()
+
+        newColumn = pandas.Series([defaultValue]*elements, index=self._dataFrame.index, dtype=dtype)
+
+        self.beginInsertColumns(QtCore.QModelIndex(), columnPosition - 1, columnPosition - 1)
+        try:
+            self._dataFrame.insert(columnPosition, columnName, newColumn, allow_duplicates=False)
+        except ValueError, e:
+            # columnName does already exist
+            return False
+
+        self.endInsertColumns()
+
+        return True
+
+    def addDataFrameRows(self, count=1):
+        # don't allow any gaps in the data rows.
+        # and always append at the end
+
+        if not self.editable:
+            return False
+
+        position = self.rowCount()
+
+        if count < 1:
+            return False
+
+        if len(self.dataFrame().columns) == 0:
+            # log an error message or warning
+            return False
+
+        # Note: This function emits the rowsAboutToBeInserted() signal which
+        # connected views (or proxies) must handle before the data is
+        # inserted. Otherwise, the views may end up in an invalid state.
+        self.beginInsertRows(QtCore.QModelIndex(), position, position + count - 1)
+
+        defaultValues = []
+        for dtype in self._dataFrame.dtypes:
+            if dtype.type == numpy.dtype('<M8[ns]'):
+                val = pandas.Timestamp('')
+            elif dtype.type == numpy.dtype(object):
+                val = ''
+            else:
+                val = dtype.type()
+            defaultValues.append(val)
+
+        for i in xrange(count):
+            self._dataFrame.loc[position + i] = defaultValues
+        self._dataFrame.reset_index()
+        self.endInsertRows()
+        return True
+
+    def removeDataFrameColumns(self, columns):
+        if not self.editable:
+            return False
+
+        if columns:
+            deleted = 0
+            errorOccured = False
+            for (position, name) in columns:
+                position = position - deleted
+                if position < 0:
+                    position = 0
+                self.beginRemoveColumns(QtCore.QModelIndex(), position, position)
+                try:
+                    self._dataFrame.drop(name, axis=1, inplace=True)
+                except ValueError, e:
+                    errorOccured = True
+                    continue
+                self.endRemoveColumns()
+                deleted += 1
+
+            if errorOccured:
+                return False
+            else:
+                return True
+        return False
+
+    def removeDataFrameRows(self, rows):
+        if not self.editable:
+            return False
+
+        if rows:
+            position = min(rows)
+            count = len(rows)
+            self.beginRemoveRows(QtCore.QModelIndex(), position, position + count - 1)
+
+            removedAny = False
+            for idx, line in self._dataFrame.iterrows():
+                if idx in rows:
+                    removedAny = True
+                    self._dataFrame.drop(idx, inplace=True)
+
+            if not removedAny:
+                return False
+
+            self._dataFrame.reset_index(inplace=True, drop=True)
+
+            self.endRemoveRows()
+            return True
+        return False

@@ -1,61 +1,43 @@
 # -*- coding: utf-8 -*-
 
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from pandasqt.compat import Qt, QtCore, QtGui, Signal, Slot
 
 import numpy
-from BigIntSpinbox import BigIntSpinbox
-from DataFrameModel import DataFrameModel
+from pandasqt.views.BigIntSpinbox import BigIntSpinbox
+from pandasqt.models.DataFrameModel import DataFrameModel
+from pandasqt.models.SupportedDtypes import SupportedDtypes
 
-def setDelegatesFromDtype(tableView):
-    """set delegates depending on columns dtype into passed tableView
+def createDelegate(dtype, column, view):
+    try:
+        model = view.model()
+    except AttributeError:
+        raise
 
-    Args:
-        tableView (QTableView): tableView to set delegates. Needs a DataFrameModel to be set.
+    if model is None:
+        raise ValueError('no model set for the current view')
 
-    Raises:
-        TypeError: If the given view/widget is not an instance/subclass of
-            QtGui.QTableView.
-        TypeError: If the model displayed by the given `tableView` is no
-            instance of a `DataFrameModel`.
-        AttributeError: If the model for the given `tableView` is not set.
+    if not isinstance(model, DataFrameModel):
+        raise TypeError('model is not of type DataFrameModel')
 
-    Returns:
-        Dict of QItemDelegates with column name as key. The table view doen't take ownership of set delegates.
-            To prevent them garbage collected they have to be saved somewhere else.
-            Otherwise segmentation fault is very likely.
-
-    """
-    if not isinstance(tableView, QtGui.QTableView):
-        raise TypeError('not of type QtGui.QTableView')
-    if tableView.model():
-        itemDelegates = {}
-        model = tableView.model()
-        try:
-            dataFrame = model.dataFrame()
-        except AttributeError, err:
-            raise TypeError('model is not of type DataFrameModel')
-
-        for i, columnName in enumerate(dataFrame.columns):
-            columnDtype = dataFrame[columnName].dtype
-            if columnDtype in model._intDtypes:
-                intInfo = numpy.iinfo(columnDtype)
-                delegate = BigIntSpinboxDelegate(intInfo.min, intInfo.max)
-                itemDelegates[columnName] = delegate
-                tableView.setItemDelegateForColumn(i, delegate)
-            elif columnDtype in model._floatDtypes:
-                floatInfo = numpy.finfo(columnDtype)
-                delegate = CustomDoubleSpinboxDelegate(floatInfo.min, floatInfo.max, decimals=model._float_precisions[str(columnDtype)])
-                itemDelegates[columnName] = delegate
-                tableView.setItemDelegateForColumn(i, delegate)
-            elif columnDtype == object:
-                delegate = TextDelegate()
-                itemDelegates[columnName] = delegate
-                tableView.setItemDelegateForColumn(i, delegate)
-
-        return itemDelegates
+    if dtype in model._intDtypes:
+        intInfo = numpy.iinfo(dtype)
+        delegate = BigIntSpinboxDelegate(intInfo.min, intInfo.max, parent=view)
+    elif dtype in model._floatDtypes:
+        floatInfo = numpy.finfo(dtype)
+        delegate = CustomDoubleSpinboxDelegate(floatInfo.min, floatInfo.max, decimals=model._float_precisions[str(dtype)], parent=view)
+    elif dtype == object:
+        delegate = TextDelegate(parent=view)
     else:
-        raise AttributeError, "no model set"
+        delegate = None
+
+    # get old delegate
+    oldDelegate = view.itemDelegateForColumn(column)
+    if oldDelegate is not None:
+        del oldDelegate
+    # update the view
+    view.setItemDelegateForColumn(column, delegate)
+    return delegate
 
 class BigIntSpinboxDelegate(QtGui.QItemDelegate):
     """delegate for very big integers.
@@ -67,7 +49,7 @@ class BigIntSpinboxDelegate(QtGui.QItemDelegate):
 
     """
 
-    def __init__(self, minimum=-18446744073709551616, maximum=18446744073709551615, singleStep=1):
+    def __init__(self, minimum=-18446744073709551616, maximum=18446744073709551615, singleStep=1, parent=None):
         """construct a new instance of a BigIntSpinboxDelegate.
 
         Args:
@@ -75,7 +57,7 @@ class BigIntSpinboxDelegate(QtGui.QItemDelegate):
             minimum (int or long, optional): maximum allowed number in BigIntSpinbox. defaults to 18446744073709551615.
             singleStep (int, optional): amount of steps to stepUp BigIntSpinbox. defaults to 1.
         """
-        super(BigIntSpinboxDelegate, self).__init__()
+        super(BigIntSpinboxDelegate, self).__init__(parent)
         self.minimum = minimum
         self.maximum = maximum
         self.singleStep = singleStep
@@ -144,7 +126,7 @@ class CustomDoubleSpinboxDelegate(QtGui.QItemDelegate):
 
     """
 
-    def __init__(self, minimum, maximum, decimals=2, singleStep=0.1):
+    def __init__(self, minimum, maximum, decimals=2, singleStep=0.1, parent=None):
         """construct a new instance of a CustomDoubleSpinboxDelegate.
 
         Args:
@@ -154,7 +136,7 @@ class CustomDoubleSpinboxDelegate(QtGui.QItemDelegate):
             decimals (int, optional): decimals to use.  defaults to 2.
 
         """
-        super(CustomDoubleSpinboxDelegate, self).__init__()
+        super(CustomDoubleSpinboxDelegate, self).__init__(parent)
 
         self.minimum = minimum
         self.maximum = maximum
@@ -266,3 +248,86 @@ class TextDelegate(QtGui.QItemDelegate):
             index (QModelIndex): model data index.
         """
         editor.setGeometry(option.rect)
+
+class DtypeComboDelegate(QtGui.QStyledItemDelegate):
+    """Combobox to set dtypes in a ColumnDtypeModel.
+
+    Parent has to be a QTableView with a set model of type ColumnDtypeModel.
+
+    """
+    def __init__(self, parent=None):
+        """Constructs a `DtypeComboDelegate` object with the given `parent`.
+
+        Args:
+            parent (Qtcore.QObject, optional): The parent argument causes this
+                objected to be owned by Qt instead of PyQt if. Defaults to `None`.
+
+        """
+        super(DtypeComboDelegate, self).__init__(parent)
+
+    def createEditor(self, parent, option, index):
+        """Creates an Editor Widget for the given index.
+
+        Enables the user to manipulate the displayed data in place. An editor
+        is created, which performs the change.
+        The widget used will be a `QComboBox` with all available datatypes in the
+        `pandas` project.
+
+        Args:
+            parent (QtCore.QWidget): Defines the parent for the created editor.
+            option (QtGui.QStyleOptionViewItem): contains all the information
+                that QStyle functions need to draw the items.
+            index (QtCore.QModelIndex): The item/index which shall be edited.
+
+        Returns:
+            QtGui.QWidget: he widget used to edit the item specified by index
+                for editing.
+
+        """
+        combo = QtGui.QComboBox(parent)
+        combo.addItems(SupportedDtypes.names())
+        combo.currentIndexChanged.connect(self.currentIndexChanged)
+        return combo
+
+    def setEditorData(self, editor, index):
+        """Sets the current data for the editor.
+
+        The data displayed has the same value as `index.data(Qt.EditRole)`
+        (the translated name of the datatype). Therefor a lookup for all items
+        of the combobox is made and the matching item is set as the currently
+        displayed item.
+
+        Signals emitted by the editor are blocked during exection of this method.
+
+        Args:
+            editor (QtGui.QComboBox): The current editor for the item. Should be
+                a `QtGui.QComboBox` as defined in `createEditor`.
+            index (QtCore.QModelIndex): The index of the current item.
+
+        """
+        editor.blockSignals(True)
+        data = index.data()
+        dataIndex = editor.findData(data, role=Qt.EditRole)
+        editor.setCurrentIndex(dataIndex)
+        editor.blockSignals(False)
+
+    def setModelData(self, editor, model, index):
+        """Updates the model after changing data in the editor.
+
+        Args:
+            editor (QtGui.QComboBox): The current editor for the item. Should be
+                a `QtGui.QComboBox` as defined in `createEditor`.
+            model (ColumnDtypeModel): The model which holds the displayed data.
+            index (QtCore.QModelIndex): The index of the current item of the model.
+
+        """
+        model.setData(index, editor.itemText(editor.currentIndex()))
+
+    @Slot()
+    def currentIndexChanged(self):
+        """Emits a signal after changing the selection for a `QComboBox`.
+
+        """
+        self.commitData.emit(self.sender())
+
+
