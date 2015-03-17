@@ -80,7 +80,7 @@ def test_TimestampFormat():
         (Qt.Horizontal, Qt.DisplayRole, 0, 'A'),
         (Qt.Horizontal, Qt.DisplayRole, 1, None),   # run into IndexError
         (Qt.Vertical, Qt.DisplayRole, 0, 0),
-        (Qt.Vertical, Qt.DisplayRole, 1, None),     # run into IndexError
+        (Qt.Vertical, Qt.DisplayRole, 1, 1)
     ]
 )
 def test_headerData(orientation, role, index, expectedHeader):

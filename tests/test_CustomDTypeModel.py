@@ -10,8 +10,9 @@ import decimal
 import numpy
 import pandas
 
-from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE, DtypeComboDelegate
+from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE
 from pandasqt.models.SupportedDtypes import SupportedDtypes
+from pandasqt.views.CustomDelegates import DtypeComboDelegate
 
 
 @pytest.fixture()

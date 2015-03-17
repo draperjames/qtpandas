@@ -26,20 +26,19 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
     dtypeChanged = Signal(int, object)
     changeFailed = Signal('QString')
 
-    def __init__(self, dataFrame=None, autoApplyChanges=True):
+    def __init__(self, dataFrame=None, editable=False):
         """the __init__ method.
 
         Args:
             dataFrame (pandas.core.frame.DataFrame, optional): initializes the model with given DataFrame.
                 If none is given an empty DataFrame will be set. defaults to None.
-            autoApplyChanges (bool, optional): apply changes while changing dtype. defaults to True.
+            editable (bool, optional): apply changes while changing dtype. defaults to True.
 
         """
         super(ColumnDtypeModel, self).__init__()
         self.headers = ['column', 'data type']
 
-        self._autoApplyChanges = True
-        self.setAutoApplyChanges(autoApplyChanges)
+        self._editable = editable
 
         self._dataFrame = pandas.DataFrame()
         if dataFrame is not None:
@@ -74,23 +73,23 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
         self._dataFrame = dataFrame
         self.layoutChanged.emit()
 
-    def autoApplyChanges(self):
-        """getter to _autoApplyChanges """
-        return self._autoApplyChanges
+    def editable(self):
+        """getter to _editable """
+        return self._editable
 
-    def setAutoApplyChanges(self, autoApplyChanges):
-        """setter to _autoApplyChanges. apply changes while changing dtype.
+    def setEditable(self, editable):
+        """setter to _editable. apply changes while changing dtype.
 
         Raises:
-            TypeError: if autoApplyChanges is not of type bool.
+            TypeError: if editable is not of type bool.
 
         Args:
-            autoApplyChanges (bool): apply changes while changing dtype.
+            editable (bool): apply changes while changing dtype.
 
         """
-        if not isinstance(autoApplyChanges, bool):
+        if not isinstance(editable, bool):
             raise TypeError('Argument is not of type bool')
-        self._autoApplyChanges = autoApplyChanges
+        self._editable = editable
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         """defines which labels the view/user shall see.
@@ -190,6 +189,9 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
         if role != DTYPE_CHANGE_ROLE or not index.isValid():
             return False
 
+        if not self.editable():
+            return False
+
         self.layoutAboutToBeChanged.emit()
 
         dtype = SupportedDtypes.dtype(value)
@@ -201,23 +203,22 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                 #row = self._dataFrame.columns[index.column()]
                 columnName = self._dataFrame.columns[index.row()]
 
-                if self.autoApplyChanges():
-                    try:
-                        if dtype == np.dtype('<M8[ns]'):
-                            self._dataFrame[columnName] = self._dataFrame[columnName].apply(pandas.to_datetime)
-                        else:
-                            self._dataFrame[columnName] = self._dataFrame[columnName].astype(dtype)
-                        self.dtypeChanged.emit(index.row(), dtype)
-                        self.layoutChanged.emit()
+                try:
+                    if dtype == np.dtype('<M8[ns]'):
+                        self._dataFrame[columnName] = self._dataFrame[columnName].apply(pandas.to_datetime)
+                    else:
+                        self._dataFrame[columnName] = self._dataFrame[columnName].astype(dtype)
+                    self.dtypeChanged.emit(index.row(), dtype)
+                    self.layoutChanged.emit()
 
-                        return True
-                    except Exception as e:
-                        message = 'Could not change datatype %s of column %s to datatype %s' % (currentDtype, columnName, dtype)
-                        self.changeFailed.emit(message)
-                        # self._dataFrame[columnName] = self._dataFrame[columnName].astype(currentDtype)
-                        # self.layoutChanged.emit()
-                        # self.dtypeChanged.emit(columnName)
-                        #raise NotImplementedError, "dtype changing not fully working, original error:\n{}".format(e)
+                    return True
+                except Exception as e:
+                    message = 'Could not change datatype %s of column %s to datatype %s' % (currentDtype, columnName, dtype)
+                    self.changeFailed.emit(message)
+                    # self._dataFrame[columnName] = self._dataFrame[columnName].astype(currentDtype)
+                    # self.layoutChanged.emit()
+                    # self.dtypeChanged.emit(columnName)
+                    #raise NotImplementedError, "dtype changing not fully working, original error:\n{}".format(e)
         return False
 
 
@@ -237,9 +238,9 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
 
         col = index.column()
 
-        if col == 0:
-            flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        else:
+        flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+
+        if col > 0 and self.editable():
             flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
 
         return flags
@@ -266,83 +267,3 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
         """
         return len(self.headers)
 
-class DtypeComboDelegate(QtGui.QStyledItemDelegate):
-    """Combobox to set dtypes in a ColumnDtypeModel.
-
-    Parent has to be a QTableView with a set model of type ColumnDtypeModel.
-
-    """
-    def __init__(self, parent=None):
-        """Constructs a `DtypeComboDelegate` object with the given `parent`.
-
-        Args:
-            parent (Qtcore.QObject, optional): The parent argument causes this
-                objected to be owned by Qt instead of PyQt if. Defaults to `None`.
-
-        """
-        super(DtypeComboDelegate, self).__init__(parent)
-
-    def createEditor(self, parent, option, index):
-        """Creates an Editor Widget for the given index.
-
-        Enables the user to manipulate the displayed data in place. An editor
-        is created, which performs the change.
-        The widget used will be a `QComboBox` with all available datatypes in the
-        `pandas` project.
-
-        Args:
-            parent (QtCore.QWidget): Defines the parent for the created editor.
-            option (QtGui.QStyleOptionViewItem): contains all the information
-                that QStyle functions need to draw the items.
-            index (QtCore.QModelIndex): The item/index which shall be edited.
-
-        Returns:
-            QtGui.QWidget: he widget used to edit the item specified by index
-                for editing.
-
-        """
-        combo = QtGui.QComboBox(parent)
-        combo.addItems(SupportedDtypes.names())
-        combo.currentIndexChanged.connect(self.currentIndexChanged)
-        return combo
-
-    def setEditorData(self, editor, index):
-        """Sets the current data for the editor.
-
-        The data displayed has the same value as `index.data(Qt.EditRole)`
-        (the translated name of the datatype). Therefor a lookup for all items
-        of the combobox is made and the matching item is set as the currently
-        displayed item.
-
-        Signals emitted by the editor are blocked during exection of this method.
-
-        Args:
-            editor (QtGui.QComboBox): The current editor for the item. Should be
-                a `QtGui.QComboBox` as defined in `createEditor`.
-            index (QtCore.QModelIndex): The index of the current item.
-
-        """
-        editor.blockSignals(True)
-        data = index.data()
-        dataIndex = editor.findData(data, role=Qt.EditRole)
-        editor.setCurrentIndex(dataIndex)
-        editor.blockSignals(False)
-
-    def setModelData(self, editor, model, index):
-        """Updates the model after changing data in the editor.
-
-        Args:
-            editor (QtGui.QComboBox): The current editor for the item. Should be
-                a `QtGui.QComboBox` as defined in `createEditor`.
-            model (ColumnDtypeModel): The model which holds the displayed data.
-            index (QtCore.QModelIndex): The index of the current item of the model.
-
-        """
-        model.setData(index, editor.itemText(editor.currentIndex()))
-
-    @Slot()
-    def currentIndexChanged(self):
-        """Emits a signal after changing the selection for a `QComboBox`.
-
-        """
-        self.commitData.emit(self.sender())

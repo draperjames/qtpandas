@@ -8,7 +8,7 @@ from chardet.universaldetector import UniversalDetector
 
 from pandasqt.compat import Qt, QtCore, QtGui, Slot, Signal
 from pandasqt.models.DataFrameModel import DataFrameModel
-from pandasqt.models.ColumnDtypeModel import DtypeComboDelegate
+from pandasqt.views.CustomDelegates import DtypeComboDelegate
 from pandasqt.views._ui import icons_rc
 
 from pandasqt.utils import fillNoneValues, convertTimestamps

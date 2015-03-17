@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from pandasqt.compat import Qt, QtCore, QtGui, Signal, Slot
 
 import numpy
 from pandasqt.views.BigIntSpinbox import BigIntSpinbox
@@ -248,3 +248,86 @@ class TextDelegate(QtGui.QItemDelegate):
             index (QModelIndex): model data index.
         """
         editor.setGeometry(option.rect)
+
+class DtypeComboDelegate(QtGui.QStyledItemDelegate):
+    """Combobox to set dtypes in a ColumnDtypeModel.
+
+    Parent has to be a QTableView with a set model of type ColumnDtypeModel.
+
+    """
+    def __init__(self, parent=None):
+        """Constructs a `DtypeComboDelegate` object with the given `parent`.
+
+        Args:
+            parent (Qtcore.QObject, optional): The parent argument causes this
+                objected to be owned by Qt instead of PyQt if. Defaults to `None`.
+
+        """
+        super(DtypeComboDelegate, self).__init__(parent)
+
+    def createEditor(self, parent, option, index):
+        """Creates an Editor Widget for the given index.
+
+        Enables the user to manipulate the displayed data in place. An editor
+        is created, which performs the change.
+        The widget used will be a `QComboBox` with all available datatypes in the
+        `pandas` project.
+
+        Args:
+            parent (QtCore.QWidget): Defines the parent for the created editor.
+            option (QtGui.QStyleOptionViewItem): contains all the information
+                that QStyle functions need to draw the items.
+            index (QtCore.QModelIndex): The item/index which shall be edited.
+
+        Returns:
+            QtGui.QWidget: he widget used to edit the item specified by index
+                for editing.
+
+        """
+        combo = QtGui.QComboBox(parent)
+        combo.addItems(SupportedDtypes.names())
+        combo.currentIndexChanged.connect(self.currentIndexChanged)
+        return combo
+
+    def setEditorData(self, editor, index):
+        """Sets the current data for the editor.
+
+        The data displayed has the same value as `index.data(Qt.EditRole)`
+        (the translated name of the datatype). Therefor a lookup for all items
+        of the combobox is made and the matching item is set as the currently
+        displayed item.
+
+        Signals emitted by the editor are blocked during exection of this method.
+
+        Args:
+            editor (QtGui.QComboBox): The current editor for the item. Should be
+                a `QtGui.QComboBox` as defined in `createEditor`.
+            index (QtCore.QModelIndex): The index of the current item.
+
+        """
+        editor.blockSignals(True)
+        data = index.data()
+        dataIndex = editor.findData(data, role=Qt.EditRole)
+        editor.setCurrentIndex(dataIndex)
+        editor.blockSignals(False)
+
+    def setModelData(self, editor, model, index):
+        """Updates the model after changing data in the editor.
+
+        Args:
+            editor (QtGui.QComboBox): The current editor for the item. Should be
+                a `QtGui.QComboBox` as defined in `createEditor`.
+            model (ColumnDtypeModel): The model which holds the displayed data.
+            index (QtCore.QModelIndex): The index of the current item of the model.
+
+        """
+        model.setData(index, editor.itemText(editor.currentIndex()))
+
+    @Slot()
+    def currentIndexChanged(self):
+        """Emits a signal after changing the selection for a `QComboBox`.
+
+        """
+        self.commitData.emit(self.sender())
+
+

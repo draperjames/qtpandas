@@ -27,8 +27,6 @@ class DefaultValueValidator(QtGui.QValidator):
         pass
 
     def validate(self, s, pos):
-        # TODO Check for PySide compability
-
         if not s:
             # s is emtpy
             return (QtGui.QValidator.Acceptable, s, pos)

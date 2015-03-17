@@ -160,8 +160,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         Returns:
             None if not Qt.DisplayRole
             _dataFrame.columns.tolist()[section] if orientation == Qt.Horizontal
-            _dataFrame.index.tolist()[section] if orientation == Qt.Vertical
-            None if vertical or horizontal orientation and section raises IndexError
+            section if orientation == Qt.Vertical
+            None if horizontal orientation and section raises IndexError
         """
         if role != Qt.DisplayRole:
             return None
@@ -175,13 +175,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             except (IndexError, ):
                 return None
         elif orientation == Qt.Vertical:
-            try:
-                label = self._dataFrame.index.tolist()[section]
-                if label == section:
-                    label = section
-                return label
-            except (IndexError, ):
-                return None
+            return section
 
     def data(self, index, role=Qt.DisplayRole):
         """return data depending on index, Qt::ItemDataRole and data type of the column.
@@ -471,6 +465,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
     def enableEditing(self, editable):
         self.editable = editable
+        self._columnDtypeModel.setEditable(self.editable)
 
     def dataFrameColumns(self):
         return self._dataFrame.columns.tolist()
@@ -507,7 +502,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         if count < 1:
             return False
 
-        if self.dataFrame().empty:
+        if len(self.dataFrame().columns) == 0:
             # log an error message or warning
             return False
 
