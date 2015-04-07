@@ -35,6 +35,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         changingDtypeFailed (Signal(columnName, index, dtype)):
             passed from related ColumnDtypeModel.
             emitted after a column has changed it's data type.
+        dataChanged (Signal): 
+            Emitted, if data has changed, e.x. finished loading, new columns added or removed.
+            It's not the same as layoutChanged.
+            Usefull to reset delegates in the view.
     """
 
     _float_precisions = {
@@ -58,6 +62,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     sortingFinished = Signal()
     dtypeChanged = Signal(int, object)
     changingDtypeFailed = Signal(object, QtCore.QModelIndex, object)
+    dataChanged = Signal()
 
     def __init__(self, dataFrame=None, copyDataFrame=False):
         """the __init__ method.
@@ -75,6 +80,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._dataFrame = pandas.DataFrame()
         if dataFrame is not None:
             self.setDataFrame(dataFrame, copyDataFrame=copyDataFrame)
+        self.dataChanged.emit()
 
         self._dataFrameOriginal = None
         self._search = DataSearch("nothing", "")
@@ -120,7 +126,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         #     lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
         # )
         self.layoutChanged.emit()
-
+        self.dataChanged.emit()
 
     @Slot(int, object)
     def propagateDtypeChanges(self, column, dtype):
@@ -488,6 +494,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self.endInsertColumns()
 
+        self.propagateDtypeChanges(columnPosition, newColumn.dtype)
+
         return True
 
     def addDataFrameRows(self, count=1):
@@ -546,6 +554,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                     continue
                 self.endRemoveColumns()
                 deleted += 1
+            self.dataChanged.emit()
 
             if errorOccured:
                 return False

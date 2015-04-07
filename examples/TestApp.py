@@ -10,13 +10,12 @@ import sys
 import pandas
 import numpy
 
-
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.models.DataSearch import DataSearch
 from pandasqt.views.CSVDialogs import CSVImportDialog, CSVExportDialog
 from pandasqt.views._ui import icons_rc
 from pandasqt.views.DataTableView import DataTableWidget
-from pandasqt.views.CustomDelegates import createDelegate, DtypeComboDelegate
+from pandasqt.views.CustomDelegates import DtypeComboDelegate
 from util import getCsvData, getRandomData
 
 class TestWidget(QtGui.QWidget):
@@ -25,7 +24,6 @@ class TestWidget(QtGui.QWidget):
         super(TestWidget, self).__init__(parent)
         self.resize(1680, 756)
         self.move(0, 0)
-
 
         self.df = pandas.DataFrame()
         #  init the data view's
@@ -102,14 +100,10 @@ class TestWidget(QtGui.QWidget):
         self.df = dataFrame
         dataModel = DataFrameModel()
         dataModel.setDataFrame(self.df)
+
         self.dataListView.setModel(dataModel)
         self.dataTableView.setViewModel(dataModel)
         self.dataComboBox.setModel(dataModel)
-
-        for index, column in enumerate(dataModel.dataFrame().columns):
-            dtype = dataModel.dataFrame()[column].dtype
-            self.updateDelegates(index, dtype)
-        #self.updateDelegates()
 
         # self.dataTableView.resizeColumnsToContents()
 
@@ -122,7 +116,6 @@ class TestWidget(QtGui.QWidget):
         self.tableViewColumnDtypes.setModel(dataModel.columnDtypeModel())
         self.tableViewColumnDtypes.horizontalHeader().setDefaultSectionSize(200)
         self.tableViewColumnDtypes.setItemDelegateForColumn(1, DtypeComboDelegate(self.tableViewColumnDtypes))
-        dataModel.dtypeChanged.connect(self.updateDelegates)
         dataModel.changingDtypeFailed.connect(self.changeColumnValue)
 
     @Slot()
@@ -142,19 +135,6 @@ class TestWidget(QtGui.QWidget):
     def setModelColumn(self, index):
         self.dataListView.setModelColumn(index)
         self.dataComboBox.setModelColumn(index)
-
-    @Slot(int, object)
-    def updateDelegates(self, column, dtype):
-        print "update delegate for column", column, dtype
-        # as documented in the setDelegatesFromDtype function
-        # we need to store all delegates, so going from
-        # type A -> type B -> type A
-        # would cause a segfault if not stored.
-        view = self.dataTableView.tableView
-        createDelegate(dtype, column, view)
-        # dlg = self.delegates or {}
-        # self.delegates = setDelegatesFromDtype(self.dataTableView.tableView, dlg)
-        # print dlg
 
     def goToColumn(self):
         print "go to column 7"
