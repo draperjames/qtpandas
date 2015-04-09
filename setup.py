@@ -65,7 +65,7 @@ setup(
     install_requires=['pandas>=0.15.1', 'chardet', 'pytest', 'pytest-qt==1.2.2', 'pytest-cov'],
     cmdclass={'test': PyTest},
     author_email='m.Ludwig@datalyze-solutions.com',
-    description='catches exceptions inside qt applications and writes them to a message box and into a log file',
+    description='Utilities to use pandas (the data analysis / manipulation library for Python) with Qt.',
     long_description=long_description,
     packages=['pandasqt'],
     include_package_data=True,

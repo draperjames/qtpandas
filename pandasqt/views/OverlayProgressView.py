@@ -1,21 +1,21 @@
 from pandasqt.compat import QtCore, QtGui, Qt, Signal, Slot
 
 class OverlayProgressWidget(QtGui.QFrame):
-    def __init__(self, parent, threads=[], debug=True):
+    def __init__(self, parent, workers=[], debug=True, margin=0):
         super(OverlayProgressWidget, self).__init__(parent)
         self._debug = debug
-        self._threads = threads
+        self._workers = workers
         self._detailProgressBars = []
         self._addedBars = 0
         self._minHeight = 50
-        self._width = parent.width() / 3
-        self._margin = 20
+        self._width = parent.width() * 0.38
+        self._margin = margin
         self._totalProgress = 0
 
         self.initUi()
 
-        for thread in threads:
-            self._addProgressBar(thread)
+        for worker in workers:
+            self._addProgressBar(worker)
 
 
     def initUi(self):
@@ -39,29 +39,29 @@ class OverlayProgressWidget(QtGui.QFrame):
         self.glayout.addWidget(self.totalProgressBar, 0, 0, 1, 1)
         self.glayout.addWidget(self.toggleButton, 0, 1, 1, 1)
 
-        styleSheet = """.QProgressBar {
-            border: none;
-            border-radius: 3px;
-            text-align: center;
-            background-color: rgba(37, 37, 37, 50%);
-            color: white;
-            margin: 1px;
-            border-bottom-left-radius:5px;
-            border-top-left-radius:5px;
-        }
+        #styleSheet = """.QProgressBar {
+            #border: none;
+            #border-radius: 3px;
+            #text-align: center;
+            #background-color: rgba(37, 37, 37, 50%);
+            #color: white;
+            #margin: 1px;
+            #border-bottom-left-radius:5px;
+            #border-top-left-radius:5px;
+        #}
 
-        .QProgressBar::chunk {
-            background-color: #05B8CC;
-            border-radius: 3px;
-        }
+        #.QProgressBar::chunk {
+            #background-color: #05B8CC;
+            #border-radius: 3px;
+        #}
 
-        .OverlayProgressWidget {
-            background-color: white;
-        }
+        #.OverlayProgressWidget {
+            #background-color: white;
+        #}
 
-        """
-        # set stylesheet for all progressbars in this widget
-        self.setStyleSheet(styleSheet)
+        #"""
+        ## set stylesheet for all progressbars in this widget
+        #self.setStyleSheet(styleSheet)
 
         parent = self.parent()
         xAnchor = parent.width() - self._width - self._margin
@@ -91,11 +91,15 @@ class OverlayProgressWidget(QtGui.QFrame):
         self._detailProgressBars.append((progressBar, label))
         worker.progressChanged.connect(progressBar.setValue)
         worker.progressChanged.connect(self.calculateTotalProgress)
+        
+        worker.progressChanged.connect(self.debugProgressChanged)
+        
+    def debugProgressChanged(self, value):
+        print "debugProgressChanged", value
 
-
-    def addThread(self, thread):
-        self._threads.append(thread)
-        self._addProgressBar(thread)
+    def addWorker(self, worker):
+        self._workers.append(worker)
+        self._addProgressBar(worker)
         self.resizeFrame()
 
     def resizeFrame(self):

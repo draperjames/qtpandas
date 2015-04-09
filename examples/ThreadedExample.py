@@ -59,7 +59,7 @@ class Example(QtGui.QWidget):
             threads.append(thread)
             worker.finished.connect(self.debugPrint)
 
-        self.pgFrame = OverlayProgressWidget(self.imgContainer, threads=workers)
+        self.pgFrame = OverlayProgressWidget(self.imgContainer, workers=workers)
 
         for t in threads:
             t.start()
