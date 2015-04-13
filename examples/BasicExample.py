@@ -1,35 +1,38 @@
 """set the sip version, cause pandas-qt uses version 2 by default"""
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
-from PyQt4 import QtGui
-
 import pandas
-import pandasqt
 import numpy
+# use QtGui from the compat module to take care if correct sip version, etc.
+from pandasqt.compat import QtGui
+from pandasqt.models.DataFrameModel import DataFrameModel
+from pandasqt.views.DataTableView import DataTableWidget
+from pandasqt.views._ui import icons_rc
 
 """setup a new empty model"""
-model = pandasqt.DataFrameModel()
+model = DataFrameModel()
 
 """setup an application and create a table view widget"""
 app = QtGui.QApplication([])
-widget = QtGui.QTableView()
+widget = DataTableWidget()
 widget.resize(800, 600)
 widget.show()
 """asign the created model"""
-widget.setModel(model)
+widget.setViewModel(model)
 
 """create some test data"""
-data = pandas.DataFrame([10], columns=['A'])
-"""convert the column to the numpy.int8 datatype to test limitation in the table
+data = {
+    'A': [10, 11, 12], 
+    'B': [20, 21, 22], 
+    'C': ['Peter Pan', 'Cpt. Hook', 'Tinkerbell']
+}
+df = pandas.DataFrame(data)
+"""convert the column to the numpy.int8 datatype to test the delegates in the table
 int8 is limited to -128-127
 """
-data['A'] = data['A'].astype(numpy.int8)
-"""fill the model with data"""
-model.setDataFrame(data)
+df['A'] = df['A'].astype(numpy.int8)
+df['B'] = df['B'].astype(numpy.float16)
 
-"""assign new delegates, only useful for big int or float values"""
-pandasqt.setDelegatesFromDtype(widget)
+"""fill the model with data"""
+model.setDataFrame(df)
 
 """start the app"""
 app.exec_()

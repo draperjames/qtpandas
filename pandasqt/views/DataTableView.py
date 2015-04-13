@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
 
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.EditDialogs import AddAttributesDialog, RemoveAttributesDialog
+from pandasqt.views.CustomDelegates import createDelegate
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -45,30 +47,40 @@ class DataTableWidget(QtGui.QWidget):
 
         self.editButton = QtGui.QToolButton(self.buttonFrame)
         self.editButton.setObjectName('editbutton')
+        self.editButton.setText(self.tr(u'edit'))
+        self.editButton.setToolTip(self.tr(u'toggle editing mode'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/document-edit.png')))
 
         self.editButton.setIcon(icon)
 
         self.addColumnButton = QtGui.QToolButton(self.buttonFrame)
         self.addColumnButton.setObjectName('addcolumnbutton')
+        self.addColumnButton.setText(self.tr(u'+col'))
+        self.addColumnButton.setToolTip(self.tr(u'add new column'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-insert-column-right.png')))
 
         self.addColumnButton.setIcon(icon)
 
         self.addRowButton = QtGui.QToolButton(self.buttonFrame)
         self.addRowButton.setObjectName('addrowbutton')
+        self.addRowButton.setText(self.tr(u'+row'))
+        self.addRowButton.setToolTip(self.tr(u'add new row'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-insert-row-below.png')))
 
         self.addRowButton.setIcon(icon)
 
         self.removeColumnButton = QtGui.QToolButton(self.buttonFrame)
         self.removeColumnButton.setObjectName('removecolumnbutton')
+        self.removeColumnButton.setText(self.tr(u'-col'))
+        self.removeColumnButton.setToolTip(self.tr(u'remove a column'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-delete-column.png')))
 
         self.removeColumnButton.setIcon(icon)
 
         self.removeRowButton = QtGui.QToolButton(self.buttonFrame)
         self.removeRowButton.setObjectName('removerowbutton')
+        self.removeRowButton.setText(self.tr(u'-row'))
+        self.removeRowButton.setToolTip(self.tr(u'remove selected rows'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-delete-row.png')))
 
         self.removeRowButton.setIcon(icon)
@@ -128,9 +140,13 @@ class DataTableWidget(QtGui.QWidget):
         This method is also a slot.
 
         """
-        for button in self.buttons[1:]:
-            if button.isChecked:
+        #for button in self.buttons[1:]:
+        for button in self.buttons:
+            # supress editButtons toggled event
+            button.blockSignals(True)
+            if button.isChecked():
                 button.setChecked(False)
+            button.blockSignals(False)
 
     @Slot(str, object, object)
     def addColumn(self, columnName, dtype, defaultValue):
@@ -253,8 +269,13 @@ class DataTableWidget(QtGui.QWidget):
 
         """
         if isinstance(model, DataFrameModel):
+            self.enableEditing(False)
+            self.uncheckButton()
+            
             selectionModel = self.tableView.selectionModel()
             self.tableView.setModel(model)
+            model.dtypeChanged.connect(self.updateDelegate)
+            model.dataChanged.connect(self.updateDelegates)
             del selectionModel
 
     def view(self):
@@ -266,4 +287,22 @@ class DataTableWidget(QtGui.QWidget):
         """
         return self.tableView
 
+    def updateDelegate(self, column, dtype):
+        """update the delegates for a specific column
+        
+        Args:
+            column (int): column index.
+            dtype (str): data type of column.
+        
+        """
+        # as documented in the setDelegatesFromDtype function
+        # we need to store all delegates, so going from
+        # type A -> type B -> type A
+        # would cause a segfault if not stored.
+        createDelegate(dtype, column, self.tableView)
 
+    def updateDelegates(self):
+        """reset all delegates"""
+        for index, column in enumerate(self.tableView.model().dataFrame().columns):
+            dtype = self.tableView.model().dataFrame()[column].dtype
+            self.updateDelegate(index, dtype)
