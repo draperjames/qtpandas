@@ -53,7 +53,7 @@ class PyTest(TestCommand):
         errcode = pytest.main(self.test_args)
         sys.exit(errcode)
 
-tests_require = ['pandas >= 0.15.2', 'pyside', 'pytest', 'pytest-cov', 'pytest-qt']
+tests_require = ['pandas >= 0.15.2', 'pyside', 'pytest', 'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
 setup(
     name='pandas-qt',
     version=__version__,
@@ -62,7 +62,7 @@ setup(
     namespace_packages = ['pandasqt'],
     author='Matthias Ludwig',
     tests_require=tests_require,
-    install_requires=['pandas>=0.15.1', 'chardet', 'pytest', 'pytest-qt==1.2.2', 'pytest-cov'],
+    install_requires=['pandas>=0.15.1', 'pytest', 'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
     cmdclass={'test': PyTest},
     author_email='m.Ludwig@datalyze-solutions.com',
     description='catches exceptions inside qt applications and writes them to a message box and into a log file',
