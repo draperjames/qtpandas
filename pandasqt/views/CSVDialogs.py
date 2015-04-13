@@ -4,9 +4,9 @@ import os
 from encodings.aliases import aliases as _encodings
 
 import pandas
-from chardet.universaldetector import UniversalDetector
 
 from pandasqt.compat import Qt, QtCore, QtGui, Slot, Signal
+from pandasqt.encoding import Detector
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.CustomDelegates import DtypeComboDelegate
 from pandasqt.views._ui import icons_rc
@@ -200,6 +200,7 @@ class CSVImportDialog(QtGui.QDialog):
         self._filename = None
         self._delimiter = None
         self._header = None
+        self._detector = Detector()
         self._initUI()
 
     def _initUI(self):
@@ -352,19 +353,18 @@ class CSVImportDialog(QtGui.QDialog):
 
         """
         if os.path.exists(path) and path.lower().endswith('csv'):
-            encodingDetector = UniversalDetector()
-            with open(path, 'r') as fp:
-                for line in fp:
-                    encodingDetector.feed(line)
-                    if encodingDetector.done:
-                        break
-            encodingDetector.close()
-            result = encodingDetector.result['encoding']
-            result = result.replace('-','_')
+            encoding = self._detector.detect(path)
 
-            self._encodingKey = _calculateEncodingKey(result)
-            if self._encodingKey:
-                index = self._encodingComboBox.findText(result.upper())
+            if encoding is not None:
+                if encoding.startswith('utf'):
+                    encoding = encoding.replace('-', '')
+                encoding = encoding.replace('-','_')
+
+                viewValue = _encodings.get(encoding)
+
+                self._encodingKey = encoding
+
+                index = self._encodingComboBox.findText(viewValue.upper())
                 self._encodingComboBox.setCurrentIndex(index)
 
     @Slot('int')
