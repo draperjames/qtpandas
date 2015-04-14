@@ -1,0 +1,4 @@
+recursive-include pandasqt *.py
+recursive-include pandasqt/_lib *
+recursive-include pandasqt/i18n *.qm
+prune examples/sample?/build/tests

@@ -67,8 +67,10 @@ setup(
     author_email='m.Ludwig@datalyze-solutions.com',
     description='catches exceptions inside qt applications and writes them to a message box and into a log file',
     long_description=long_description,
-    packages=['pandasqt'],
+    
     include_package_data=True,
+    packages=['pandasqt'],
+    
     platforms='any',
     test_suite='tests',
     classifiers = [
