@@ -16,8 +16,41 @@ from pandasqt.views.CSVDialogs import CSVImportDialog, CSVExportDialog
 from pandasqt.views._ui import icons_rc
 from pandasqt.views.DataTableView import DataTableWidget
 from pandasqt.views.CustomDelegates import DtypeComboDelegate
+from pandasqt.models.mime import PandasColumnMimeType
 from util import getCsvData, getRandomData
 
+
+class DropLineEdit(QtGui.QLineEdit):
+    
+    def __init__(self, text, parent=None):
+        super(DropLineEdit, self).__init__(text, parent)
+        self.setAcceptDrops(True)
+        
+    def dragEnterEvent(self, event):
+        """recieve a drag event and check if we want to accept or reject
+
+        Args:
+            event (QDragEnterEvent)
+        """
+        if event.mimeData().hasFormat(PandasColumnMimeType):
+            if event.mimeData().data().isValid():
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        """process the dragged data
+
+        Args:
+            event (QDragEnterEvent)
+        """
+        #event.mimeData().data().processData(self)
+        mimeDataPayload = event.mimeData().data()
+        #print mimeDataPayload.column, mimeDataPayload.dtype
+        self.setText(u"dropped column: {0}".format(mimeDataPayload.column))
+    
 class TestWidget(QtGui.QWidget):
 
     def __init__(self, parent=None):
@@ -94,7 +127,9 @@ class TestWidget(QtGui.QWidget):
         self.chooseColumnComboBox.currentIndexChanged.connect(self.setModelColumn)
 
         self.dataListView.mouseReleaseEvent = self.mouseReleaseEvent
-
+        
+        self.dropGoal = DropLineEdit("drop data from table here", self)
+        self.rightLayout.addWidget(self.dropGoal)
 
     def setDataFrame(self, dataFrame):
         self.df = dataFrame

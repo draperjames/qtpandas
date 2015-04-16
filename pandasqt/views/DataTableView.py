@@ -4,12 +4,54 @@ from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.EditDialogs import AddAttributesDialog, RemoveAttributesDialog
 from pandasqt.views.CustomDelegates import createDelegate
+from pandasqt.models.mime import MimePayloadPandasColumn, MimeData
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
     def _fromUtf8(s):
         return s
+    
+class DragTable(QtGui.QTableView):
+    def __init__(self, parent=None):
+        super(DragTable, self).__init__(parent)
+        self.setDragEnabled(True)
+
+    def setViewModel(self, model):
+        super(DragTable, self).setModel(model)
+
+    def startDrag(self, event):
+
+        index = self.indexAt(event.pos())
+        if not index.isValid():
+            return
+
+        #print index.column()
+        #print self.model().dataFrame().columns[index.column()]
+        
+        columnName = self.model().dataFrame().columns[index.column()]
+        dtype = self.model().dataFrame()[columnName].dtype
+        mimePayload = MimePayloadPandasColumn(columnName, dtype)
+        
+        ##bstream = cPickle.dumps(column)
+        #mimeData = QtCore.QMimeData()
+        ##mimeData.setData("application/pandascolumn", bstream)
+        mimeData = MimeData()
+        mimeData.setData(mimePayload)
+        
+        ##mimeData.setText(self.model().dataFrame().columns[index.column()])
+        
+        drag = QtGui.QDrag(self)
+        drag.setMimeData(mimeData)
+        pixmap = QtGui.QPixmap(":/icons/insert-table.png")
+        drag.setHotSpot(QtCore.QPoint(pixmap.width()/3, pixmap.height()/3))
+        drag.setPixmap(pixmap)
+        result = drag.start(Qt.MoveAction)
+
+    def mouseMoveEvent(self, event):
+        super(DragTable, self).mouseMoveEvent(event)
+        self.startDrag(event)
+
 
 class DataTableWidget(QtGui.QWidget):
     """A Custom widget with a TableView and a toolbar.
@@ -97,10 +139,11 @@ class DataTableWidget(QtGui.QWidget):
         for button in self.buttons[1:]:
             button.setEnabled(False)
 
-        self.tableView = QtGui.QTableView(self)
+        #self.tableView = QtGui.QTableView(self)
+        self.tableView = DragTable(self)
         self.tableView.setAlternatingRowColors(True)
         self.tableView.setSortingEnabled(True)
-
+        
         self.gridLayout.addWidget(self.buttonFrame, 0, 0, 1, 1)
         self.gridLayout.addWidget(self.tableView, 1, 0, 1, 1)
 
