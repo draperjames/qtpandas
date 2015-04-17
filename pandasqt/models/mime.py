@@ -1,20 +1,19 @@
 import cPickle as pickle
 from pandasqt.models.SupportedDtypes import SupportedDtypes
-
 from qgisspaf.utils.compat import QtCore
-import numpy as np
 
-PandasColumnMimeType = "application/pandas-column"
+PandasCellMimeType = "application/pandas-cell" # comparable to a QModelIndex for DataFrames
 
 class MimeData(QtCore.QMimeData):
     
-    _mimeType = PandasColumnMimeType
-
-    def __init__(self):
-        """create a new MimeData object.
+    def __init__(self, mimeType=PandasCellMimeType):
+        """create a new MimeData object.   
         
+        Args:
+            mimeType (str): the mime type.
         """
         super(MimeData, self).__init__()
+        self._mimeType = mimeType
         
     def mimeType(self):
         """return mimeType
@@ -57,9 +56,7 @@ class MimeData(QtCore.QMimeData):
 class MimeDataPayload(object):
     
     def __init__(self):
-        """
-        
-        """
+        """base class for your own payload"""
         super(MimeDataPayload, self).__init__()
         
     def isValid(self):
@@ -67,48 +64,54 @@ class MimeDataPayload(object):
            e.x. data is a filepath its valid if the file exists.
         
         Hint:
-            Use this to implement your own dragable data.
+            Implement your own validation criterias.
             
         Returns:
             True if valid
             False if invalid
         """
         return False
+
+class PandasCellPayload(MimeDataPayload):
     
-    def processData(self, canvas):
-        """Implement this to do what you want to do. e.x. add new data to canvas.
-        Base implementation does nothing usefull.
+    _allowedDtypes = SupportedDtypes.allTypes()
+
+    def __init__(self, dfindex, column, value, dtype, parentId):
+        """store dataframe information in a pickable object
         
         Args:
-            canvas (QgsSpafCanvas): Canvas that recieved the drop event.
+            dfindex (pandas.index): index of the dragged data.
+            column (str): name of column to be dragged.
+            value (object): value on according position.
+            dtype (pandas dtype): data type of column.
+            parentId (str): hex(id(...)) of according DataFrameModel.
 
         """
-        return True
-
-
-class MimePayloadPandasColumn(MimeDataPayload):
-    
-    _allowedDtypes = SupportedDtypes.intTypes() + SupportedDtypes.uintTypes() + SupportedDtypes.floatTypes()
-
-    def __init__(self, column, dtype):
-        super(MimePayloadPandasColumn, self).__init__()
+        super(PandasCellPayload, self).__init__()
+        self.dfindex = dfindex
         self.column = column
+        self.value = value
         self.dtype = dtype
+        self.parentId = parentId
         
-    def __repr__(self):
-        return u"Column {0} of type {1}".format(self.column, self.dtype)
+    def setAllowedDtypes(self, dtypes):
+        """set the allowed dtypes used by the dropped widget to determin if we accept or decline the data.
+        Defaults to allTypes.
+        
+        Args:
+            dtypes(SupportedDtypes type): combination of SupportedDtypes types. 
+                e.x. SupportedDtypes.intTypes() + SupportedDtypes.floatTypes()
+        
+        """
+        self._allowedDtypes = dtypes
+
+    def allowedDtypes(self):
+        """return allowedDtypes"""
+        return self._allowedDtypes
     
     def isValid(self):
+        """check if the dtype is in allowedDtypes. Used to accept or decline a drop in the view."""
         if self.dtype in self._allowedDtypes:
-        #if self.dtype == np.int64 or self.dtype == np.float64:
             return True
         else:
             return False
-        
-    def processData(self, widget):
-        print widget
-        return True
-        #if canvas.dataModel():
-            #if isinstance(canvas.dataModel(), pdqt.models.DataFrameModel.DataFrameModel):
-                #dataFrame = canvas.dataModel().dataFrame()
-                #canvas.mapModel().addLayer(dataFrame.mapLayer("{0}".format(self.column)), visible=True)

@@ -4,7 +4,8 @@ from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.EditDialogs import AddAttributesDialog, RemoveAttributesDialog
 from pandasqt.views.CustomDelegates import createDelegate
-from pandasqt.models.mime import MimePayloadPandasColumn, MimeData
+from pandasqt.models.mime import PandasCellPayload, MimeData
+from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -13,34 +14,42 @@ except AttributeError:
         return s
     
 class DragTable(QtGui.QTableView):
+    
     def __init__(self, parent=None):
+        """create a table view with the ability to start drag operations"""
         super(DragTable, self).__init__(parent)
         self.setDragEnabled(True)
 
-    def setViewModel(self, model):
-        super(DragTable, self).setModel(model)
+    def startDrag(self, index):
+        """start a drag operation with a PandasCellPayload on defined index.
+        
+        Args:
+            index (QModelIndex): model index you want to start the drag operation.
+        """
 
-    def startDrag(self, event):
-
-        index = self.indexAt(event.pos())
         if not index.isValid():
             return
+        
+        dataFrame = self.model().dataFrame()
 
-        #print index.column()
-        #print self.model().dataFrame().columns[index.column()]
-        
-        columnName = self.model().dataFrame().columns[index.column()]
-        dtype = self.model().dataFrame()[columnName].dtype
-        mimePayload = MimePayloadPandasColumn(columnName, dtype)
-        
-        ##bstream = cPickle.dumps(column)
-        #mimeData = QtCore.QMimeData()
-        ##mimeData.setData("application/pandascolumn", bstream)
+        # get all infos from dataFrame
+        dfindex = dataFrame.iloc[[index.row()]].index
+        columnName = dataFrame.columns[index.column()]
+        dtype = dataFrame[columnName].dtype
+        value = dataFrame[columnName][dfindex]
+
+        # create the mime data
+        mimePayload = PandasCellPayload(
+            dfindex,
+            columnName,
+            value,
+            dtype,
+            hex(id(self.model()))
+        )
         mimeData = MimeData()
         mimeData.setData(mimePayload)
-        
-        ##mimeData.setText(self.model().dataFrame().columns[index.column()])
-        
+                
+        # create the drag icon and start drag operation
         drag = QtGui.QDrag(self)
         drag.setMimeData(mimeData)
         pixmap = QtGui.QPixmap(":/icons/insert-table.png")
@@ -50,8 +59,7 @@ class DragTable(QtGui.QTableView):
 
     def mouseMoveEvent(self, event):
         super(DragTable, self).mouseMoveEvent(event)
-        self.startDrag(event)
-
+        self.startDrag(self.indexAt(event.pos()))
 
 class DataTableWidget(QtGui.QWidget):
     """A Custom widget with a TableView and a toolbar.
@@ -320,6 +328,10 @@ class DataTableWidget(QtGui.QWidget):
             model.dtypeChanged.connect(self.updateDelegate)
             model.dataChanged.connect(self.updateDelegates)
             del selectionModel
+            
+    def viewModel(self):
+        """Gets the viewModel"""
+        return self.view().model()
 
     def view(self):
         """Gets the enclosed TableView

@@ -16,7 +16,7 @@ from pandasqt.views.CSVDialogs import CSVImportDialog, CSVExportDialog
 from pandasqt.views._ui import icons_rc
 from pandasqt.views.DataTableView import DataTableWidget
 from pandasqt.views.CustomDelegates import DtypeComboDelegate
-from pandasqt.models.mime import PandasColumnMimeType
+from pandasqt.models.mime import PandasCellMimeType, PandasCellPayload
 from util import getCsvData, getRandomData
 
 
@@ -32,7 +32,7 @@ class DropLineEdit(QtGui.QLineEdit):
         Args:
             event (QDragEnterEvent)
         """
-        if event.mimeData().hasFormat(PandasColumnMimeType):
+        if event.mimeData().hasFormat(PandasCellMimeType):
             if event.mimeData().data().isValid():
                 event.accept()
             else:
@@ -46,10 +46,39 @@ class DropLineEdit(QtGui.QLineEdit):
         Args:
             event (QDragEnterEvent)
         """
-        #event.mimeData().data().processData(self)
+        super(DropLineEdit, self).dropEvent(event)
         mimeDataPayload = event.mimeData().data()
-        #print mimeDataPayload.column, mimeDataPayload.dtype
         self.setText(u"dropped column: {0}".format(mimeDataPayload.column))
+        
+class ComplexDropWidget(QtGui.QLineEdit):
+    
+    dropRecieved = Signal(QtCore.QMimeData)
+
+    def __init__(self, parent=None):
+        super(ComplexDropWidget, self).__init__(parent)
+        self.setAcceptDrops(True)
+        
+    def dragEnterEvent(self, event):
+        """recieve a drag event and check if we want to accept or reject
+
+        Args:
+            event (QDragEnterEvent)
+        """
+        if event.mimeData().hasFormat(PandasCellMimeType):
+            if event.mimeData().data().isValid():
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.ignore()
+            
+    def dropEvent(self, event):
+        """process the dragged data
+
+        Args:
+            event (QDragEnterEvent)
+        """
+        self.dropRecieved.emit(event.mimeData())
     
 class TestWidget(QtGui.QWidget):
 
@@ -59,6 +88,8 @@ class TestWidget(QtGui.QWidget):
         self.move(0, 0)
 
         self.df = pandas.DataFrame()
+        self.dataModel = None
+
         #  init the data view's
         self.dataTableView = DataTableWidget(self)
         # self.dataTableView.setSortingEnabled(True)
@@ -128,13 +159,28 @@ class TestWidget(QtGui.QWidget):
 
         self.dataListView.mouseReleaseEvent = self.mouseReleaseEvent
         
-        self.dropGoal = DropLineEdit("drop data from table here", self)
-        self.rightLayout.addWidget(self.dropGoal)
+        self.dropLineEdit = DropLineEdit("drop data from table here", self)
+        self.rightLayout.addWidget(self.dropLineEdit)
+        
+        self.dropWidget = ComplexDropWidget(self)
+        self.dropWidget.dropRecieved.connect(self.processDataDrops)
+        self.rightLayout.addWidget(self.dropWidget)
+        
+    @Slot('QMimeData')
+    def processDataDrops(self, mimeData):
+        """if you have more complicated stuff to do and you want to match some models, might be possible like that"""
+        mimeDataPayload = mimeData.data()
+        if isinstance(mimeDataPayload, PandasCellPayload):
+            if self.dataModel is not None:
+                if hex(id(self.dataModel)) == mimeDataPayload.parentId:
+                    self.dropWidget.setText("complex stuff done after drop event. {0}".format(mimeDataPayload.column))
 
     def setDataFrame(self, dataFrame):
         self.df = dataFrame
         dataModel = DataFrameModel()
         dataModel.setDataFrame(self.df)
+        
+        self.dataModel = dataModel
 
         self.dataListView.setModel(dataModel)
         self.dataTableView.setViewModel(dataModel)
@@ -161,6 +207,7 @@ class TestWidget(QtGui.QWidget):
 
     @Slot('QAbstractItemModel')
     def updateModel(self, model):
+        self.dataModel = model
         self.dataListView.setModel(model)
         self.dataTableView.setViewModel(model)
         self.dataComboBox.setModel(model)
