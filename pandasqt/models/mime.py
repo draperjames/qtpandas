@@ -1,6 +1,6 @@
 import cPickle as pickle
 from pandasqt.models.SupportedDtypes import SupportedDtypes
-from qgisspaf.utils.compat import QtCore
+from pandasqt.compat import QtCore
 
 PandasCellMimeType = "application/pandas-cell" # comparable to a QModelIndex for DataFrames
 
