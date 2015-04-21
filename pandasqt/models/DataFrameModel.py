@@ -58,6 +58,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     sortingFinished = Signal()
     dtypeChanged = Signal(int, object)
     changingDtypeFailed = Signal(object, QtCore.QModelIndex, object)
+    dataFrameChanged = Signal()
 
     def __init__(self, dataFrame=None, copyDataFrame=False):
         """the __init__ method.
@@ -120,6 +121,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         #     lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
         # )
         self.layoutChanged.emit()
+        self.dataFrameChanged.emit()
 
 
     @Slot(int, object)
@@ -437,12 +439,15 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self._search.setDataFrame(self._dataFrame)
         searchIndex, valid = self._search.search()
+
         if valid:
             self._dataFrame = self._dataFrame[searchIndex]
             self.layoutChanged.emit()
         else:
             self.clearFilter()
             self.layoutChanged.emit()
+
+        self.dataFrameChanged.emit()
 
     def clearFilter(self):
         """clear all filters.
