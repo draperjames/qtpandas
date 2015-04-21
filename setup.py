@@ -67,8 +67,10 @@ setup(
     author_email='m.Ludwig@datalyze-solutions.com',
     description='Utilities to use pandas (the data analysis / manipulation library for Python) with Qt.',
     long_description=long_description,
-    packages=['pandasqt'],
+    
     include_package_data=True,
+    packages=['pandasqt'],
+    
     platforms='any',
     test_suite='tests',
     classifiers = [
