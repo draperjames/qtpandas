@@ -35,7 +35,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         changingDtypeFailed (Signal(columnName, index, dtype)):
             passed from related ColumnDtypeModel.
             emitted after a column has changed it's data type.
-        dataChanged (Signal): 
+        dataChanged (Signal):
             Emitted, if data has changed, e.x. finished loading, new columns added or removed.
             It's not the same as layoutChanged.
             Usefull to reset delegates in the view.
@@ -63,6 +63,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     dtypeChanged = Signal(int, object)
     changingDtypeFailed = Signal(object, QtCore.QModelIndex, object)
     dataChanged = Signal()
+    dataFrameChanged = Signal()
 
     def __init__(self, dataFrame=None, copyDataFrame=False):
         """the __init__ method.
@@ -127,6 +128,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         # )
         self.layoutChanged.emit()
         self.dataChanged.emit()
+        self.dataFrameChanged.emit()
 
     @Slot(int, object)
     def propagateDtypeChanges(self, column, dtype):
@@ -443,12 +445,15 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self._search.setDataFrame(self._dataFrame)
         searchIndex, valid = self._search.search()
+
         if valid:
             self._dataFrame = self._dataFrame[searchIndex]
             self.layoutChanged.emit()
         else:
             self.clearFilter()
             self.layoutChanged.emit()
+
+        self.dataFrameChanged.emit()
 
     def clearFilter(self):
         """clear all filters.
