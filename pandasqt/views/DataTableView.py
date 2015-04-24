@@ -69,15 +69,17 @@ class DataTableWidget(QtGui.QWidget):
     rows/columns).
 
     """
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, iconSize=QtCore.QSize(36, 36)):
         """Constructs the object with the given parent.
 
         Args:
             parent (QObject, optional): Causes the objected to be owned
                 by `parent` instead of Qt. Defaults to `None`.
+            iconSize (QSize, optional): Size of edit buttons. Defaults to QSize(36, 36).
 
         """
         super(DataTableWidget, self).__init__(parent)
+        self._iconSize = iconSize
         self.initUi()
 
 
@@ -86,14 +88,16 @@ class DataTableWidget(QtGui.QWidget):
 
         """
         self.gridLayout = QtGui.QGridLayout(self)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
 
         self.buttonFrame = QtGui.QFrame(self)
-        self.buttonFrame.setMinimumSize(QtCore.QSize(250, 50))
-        self.buttonFrame.setMaximumSize(QtCore.QSize(250, 50))
+        #self.buttonFrame.setMinimumSize(QtCore.QSize(250, 50))
+        #self.buttonFrame.setMaximumSize(QtCore.QSize(250, 50))
         self.buttonFrame.setFrameShape(QtGui.QFrame.NoFrame)
+        spacerItemButton = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
 
         self.buttonFrameLayout = QtGui.QGridLayout(self.buttonFrame)
-        self.buttonFrameLayout.setContentsMargins(0, 6, 0, 6)
+        self.buttonFrameLayout.setContentsMargins(0, 0, 0, 0)
 
         self.editButton = QtGui.QToolButton(self.buttonFrame)
         self.editButton.setObjectName('editbutton')
@@ -138,11 +142,12 @@ class DataTableWidget(QtGui.QWidget):
         self.buttons = [self.editButton, self.addColumnButton, self.addRowButton, self.removeColumnButton, self.removeRowButton]
 
         for index, button in enumerate(self.buttons):
-            button.setMinimumSize(QtCore.QSize(36, 36))
-            button.setMaximumSize(QtCore.QSize(36, 36))
-            button.setIconSize(QtCore.QSize(36, 36))
+            button.setMinimumSize(self._iconSize)
+            button.setMaximumSize(self._iconSize)
+            button.setIconSize(self._iconSize)
             button.setCheckable(True)
             self.buttonFrameLayout.addWidget(button, 0, index, 1, 1)
+        self.buttonFrameLayout.addItem(spacerItemButton, 0, index+1, 1, 1)
 
         for button in self.buttons[1:]:
             button.setEnabled(False)
@@ -161,6 +166,10 @@ class DataTableWidget(QtGui.QWidget):
         self.removeRowButton.toggled.connect(self.removeRow)
         self.removeColumnButton.toggled.connect(self.showRemoveColumnDialog)
 
+    def setButtonsVisible(self, visible):
+        """hide/show the edit buttons"""
+        self.buttonFrame.setVisible(visible)
+        
     @Slot(bool)
     def enableEditing(self, enabled):
         """Enable the editing buttons to add/remove rows/columns and to edit the data.
@@ -329,6 +338,20 @@ class DataTableWidget(QtGui.QWidget):
             model.dataChanged.connect(self.updateDelegates)
             del selectionModel
             
+    def setModel(self, model):
+        """Sets the model for the enclosed TableView in this widget.
+
+        Args:
+            model (DataFrameModel): The model to be displayed by
+                the Table View.
+
+        """
+        self.setViewModel(model)
+
+    def model(self):
+        """Gets the viewModel"""
+        return self.view().model()
+
     def viewModel(self):
         """Gets the viewModel"""
         return self.view().model()
