@@ -384,3 +384,7 @@ class DataTableWidget(QtGui.QWidget):
         for index, column in enumerate(self.tableView.model().dataFrame().columns):
             dtype = self.tableView.model().dataFrame()[column].dtype
             self.updateDelegate(index, dtype)
+            
+    def selectionModel(self):
+        """return the table views selectionModel"""
+        return self.view().selectionModel()
