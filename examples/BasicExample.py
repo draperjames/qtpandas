@@ -1,6 +1,9 @@
-"""set the sip version, cause pandas-qt uses version 2 by default"""
 import pandas
 import numpy
+import sys
+from pandasqt.excepthook import excepthook
+sys.excepthook = excepthook
+
 # use QtGui from the compat module to take care if correct sip version, etc.
 from pandasqt.compat import QtGui
 from pandasqt.models.DataFrameModel import DataFrameModel

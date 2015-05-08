@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
+import sys
 
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+from pandasqt.excepthook import excepthook
+sys.excepthook = excepthook
 
 from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
 
-import sys
 import pandas
 import numpy
 
@@ -18,7 +17,6 @@ from pandasqt.views.DataTableView import DataTableWidget
 from pandasqt.views.CustomDelegates import DtypeComboDelegate
 from pandasqt.models.mime import PandasCellMimeType, PandasCellPayload
 from util import getCsvData, getRandomData
-
 
 class DropLineEdit(QtGui.QLineEdit):
     
