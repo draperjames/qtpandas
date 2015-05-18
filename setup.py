@@ -60,7 +60,7 @@ setup(
     url='https://github.com/datalyze-solutions/pandas-qt',
     license='MIT License',
     namespace_packages = ['pandasqt'],
-    author='Matthias Ludwig',
+    author='Matthias Ludwig, Marcel Radischat',
     tests_require=tests_require,
     install_requires=['pandas>=0.15.1', 'pytest', 'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
     cmdclass={'test': PyTest},

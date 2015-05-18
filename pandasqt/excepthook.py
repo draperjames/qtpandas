@@ -1,3 +1,5 @@
+# copied and modified from Eric IDE ( credits goes to author )
+
 import time
 import cStringIO
 import traceback

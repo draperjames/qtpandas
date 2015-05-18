@@ -403,6 +403,7 @@ class CSVImportDialog(QtGui.QDialog):
         """
         dataFrame = self._loadCSVDataFrame()
         dataFrameModel = DataFrameModel(dataFrame)
+        dataFrameModel.enableEditing(True)
         self._previewTableView.setModel(dataFrameModel)
         columnModel = dataFrameModel.columnDtypeModel()
         columnModel.changeFailed.connect(self.updateStatusBar)
