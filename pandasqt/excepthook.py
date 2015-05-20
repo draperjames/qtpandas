@@ -6,6 +6,10 @@ import traceback
 from pandasqt.compat import QtGui
 import codecs
 import os
+import tempfile
+# fallback solution to show a OS independent messagebox
+from pandasqt.ui.fallback.easygui.boxes.derived_boxes import msgbox
+
 def excepthook(excType, excValue, tracebackobj):
     """
     Global function to catch unhandled exceptions.
@@ -16,7 +20,7 @@ def excepthook(excType, excValue, tracebackobj):
     """
     separator = u'-' * 80
 
-    logFile = os.path.join(os.getcwd(), "error.log")
+    logFile = os.path.join(tempfile.gettempdir(), "error.log")
     notice = """An unhandled exception occurred. Please report the problem.\n"""
     notice += """A log has been written to "{}".\n\nError information:""".format(logFile)
     timeString = time.strftime("%Y-%m-%d, %H:%M:%S")
@@ -39,13 +43,16 @@ def excepthook(excType, excValue, tracebackobj):
         f = codecs.open(logFile, "a+", encoding='utf-8')
         f.write(msg)
         f.close()
-    except IOError:
-        raise
-    print unicode(notice) + unicode(msg)
+    except IOError, e:
+        msgbox(u"unable to write to {0}".format(logFile), u"Writing error")
 
-    if not _isQAppRunning():
-        app = QtGui.QApplication([])
-    _showMessageBox(unicode(notice) + unicode(msg))
+    # always show an error message
+    try:
+        if not _isQAppRunning():
+            app = QtGui.QApplication([])
+        _showMessageBox(unicode(notice) + unicode(msg))
+    except:
+        msgbox(unicode(notice) + unicode(msg), u"Error")
     
 def _isQAppRunning():
     if QtGui.QApplication.instance() is None:
