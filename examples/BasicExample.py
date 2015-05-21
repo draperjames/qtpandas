@@ -1,8 +1,14 @@
-import pandas
-import numpy
-import sys
-from pandasqt.excepthook import excepthook
-sys.excepthook = excepthook
+from pandasqt.excepthook import setExcepthook, handleException
+
+try:
+    import pandas
+    import numpy
+    import sys
+except ImportError, e:
+    handleException(e)
+    
+#from pandasqt.excepthook import excepthook
+#sys.excepthook = excepthook
 
 # use QtGui from the compat module to take care if correct sip version, etc.
 from pandasqt.compat import QtGui

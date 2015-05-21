@@ -1,23 +1,35 @@
 # copied and modified from Eric IDE ( credits goes to author )
 
-import time
-import cStringIO
-import traceback
-from pandasqt.compat import QtGui
-import codecs
-import os
-import tempfile
 # fallback solution to show a OS independent messagebox
 from pandasqt.ui.fallback.easygui.boxes.derived_boxes import msgbox
 
+import time
+import cStringIO
+import traceback
+import codecs
+import os
+import tempfile
+
+try:
+    from pandasqt.compat import QtGui
+except ImportError, e:
+    msgbox(e.message, u"Error")
+    
+def setExcepthook():
+    import sys
+    sys.excepthook = excepthook
+
+def handleException(exception):
+    msgbox(exception.message, u"Error")
+    
 def excepthook(excType, excValue, tracebackobj):
     """
-    Global function to catch unhandled exceptions.
+    Global function to catch unhandled exceptions and show a message box.
     
     @param excType exception type
     @param excValue exception value
     @param tracebackobj traceback object
-    """
+    """    
     separator = u'-' * 80
 
     logFile = os.path.join(tempfile.gettempdir(), "error.log")
@@ -44,7 +56,13 @@ def excepthook(excType, excValue, tracebackobj):
         f.write(msg)
         f.close()
     except IOError, e:
-        msgbox(u"unable to write to {0}".format(logFile), u"Writing error")
+        message = u"unable to write to {0}".format(logFile)
+        try:
+            if not _isQAppRunning():
+                app = QtGui.QApplication([])
+            _showMessageBox(message)
+        except:
+            msgbox(message)
 
     # always show an error message
     try:

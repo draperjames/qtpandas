@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from pandasqt.excepthook import setExcepthook
+#from pandasqt.excepthook import excepthook
+#import sys
+#sys.excepthook = excepthook
+
 from pandasqt.compat import Qt, QtCore, QtGui
 
 import pytest
 import pytestqt
-import sys
-from pandasqt.excepthook import excepthook
 
 # TODO write it with pytest...
 
@@ -22,7 +25,6 @@ def exception4():
     raise ValueError, "Test Test"
 
 app = QtGui.QApplication([])
-sys.excepthook = excepthook
 widget = QtGui.QPushButton("raise exceptions")
 widget.move(100, 100)
 widget.resize(100, 100)
