@@ -8,7 +8,7 @@ import codecs
 import os
 import tempfile
 # fallback solution to show a OS independent messagebox
-from pandasqt.ui.fallback.easygui.boxes.derived_boxes import msgbox
+from easygui.boxes.derived_boxes import msgbox
 
 def excepthook(excType, excValue, tracebackobj):
     """
