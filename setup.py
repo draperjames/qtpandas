@@ -53,7 +53,7 @@ class PyTest(TestCommand):
         errcode = pytest.main(self.test_args)
         sys.exit(errcode)
 
-tests_require = ['easygui', 'pandas >= 0.15.2', 'pyside', 'pytest', 'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
+tests_require = ['easygui', 'pandas == 0.17.1', 'pyside', 'pytest', 'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
 setup(
     name='pandas-qt',
     version=__version__,
@@ -62,7 +62,7 @@ setup(
     namespace_packages = ['pandasqt'],
     author='Matthias Ludwig, Marcel Radischat',
     tests_require=tests_require,
-    install_requires=['easygui', 'pandas>=0.15.1', 'pytest', 'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
+    install_requires=['easygui', 'pandas==0.17.1', 'pytest', 'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
     cmdclass={'test': PyTest},
     author_email='m.Ludwig@datalyze-solutions.com',
     description='Utilities to use pandas (the data analysis / manipulation library for Python) with Qt.',
