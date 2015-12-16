@@ -414,7 +414,9 @@ class TestSetData(object):
         assert model.data(index, role=DATAFRAME_ROLE) == newDate
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), pandas.Timestamp)
 
-        assert model.setData(index, 'foobar') == False
+        with pytest.raises(Exception) as err:
+            model.setData(index, 'foobar')
+        assert "Can't convert 'foobar' into a datetime" in str(err.value)
 
     @pytest.mark.parametrize(
         "value, dtype, precision", [
@@ -604,7 +606,7 @@ class TestEditMode(object):
             if isinstance(_type, numpy.dtype):
                 defaultVal = _type.type()
                 if _type.type == numpy.datetime64:
-                    defaultVal = pandas.Timestamp('')
+                    defaultVal = pandas.Timestamp('1-01-01 00:00:00')
             else:
                 defaultVal = _type()
 

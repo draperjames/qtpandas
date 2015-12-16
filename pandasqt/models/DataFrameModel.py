@@ -350,8 +350,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                     value = value.toString(self.timestampFormat)
                 try:
                     value = pandas.Timestamp(value)
-                except ValueError, e:
-                    raise
+                except Exception:
+                    raise Exception, u"Can't convert '{0}' into a datetime".format(value)
                     return False
             else:
                 raise TypeError, "try to set unhandled data type"
