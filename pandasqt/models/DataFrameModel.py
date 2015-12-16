@@ -123,9 +123,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self._columnDtypeModel = ColumnDtypeModel(dataFrame)
         self._columnDtypeModel.dtypeChanged.connect(self.propagateDtypeChanges)
-        # self._columnDtypeModel.changingDtypeFailed.connect(
-        #     lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
-        # )
+        self._columnDtypeModel.changeFailed.connect(
+            lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
+        )
         self.layoutChanged.emit()
         self.dataChanged.emit()
         self.dataFrameChanged.emit()
@@ -325,6 +325,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             col = self._dataFrame.columns[index.column()]
             #print 'before change: ', index.data().toUTC(), self._dataFrame.iloc[row][col]
             columnDtype = self._dataFrame[col].dtype
+
             if columnDtype == object:
                 pass
 
@@ -350,6 +351,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 try:
                     value = pandas.Timestamp(value)
                 except ValueError, e:
+                    raise
                     return False
             else:
                 raise TypeError, "try to set unhandled data type"

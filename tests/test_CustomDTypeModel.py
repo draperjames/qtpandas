@@ -111,8 +111,22 @@ class TestColumnDType(object):
 
         assert model.setData(index, 'bool', Qt.DisplayRole) == False
 
-        # change datatype to datetime
-        assert model.setData(index, datetime[0]) == True
+        with pytest.raises(Exception) as err:
+            model.setData(index, datetime[0])
+        assert "Can't convert a boolean value into a datetime value" in str(err.value)
+
+        # rewrite this with parameters
+        for data in [
+                ["2012-12-13"],
+                ["2012-12-13 19:10"],
+                ["2012-12-13 19:10:10"]
+        ]:
+            df = pandas.DataFrame(data, columns=["datetime"])
+            model = ColumnDtypeModel(dataFrame=df)
+            index = model.index(0, 0)
+            model.setEditable(True)
+            assert model.setData(index, "date and time") == True
+
         # convert datetime to anything else does not work and leave the
         # datatype unchanged. An error message is emitted.
 

@@ -24,7 +24,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
             datatype could not be changed. An errormessage is provided.
     """
     dtypeChanged = Signal(int, object)
-    changeFailed = Signal('QString')
+    changeFailed = Signal('QString', QtCore.QModelIndex, object)
 
     def __init__(self, dataFrame=None, editable=False):
         """the __init__ method.
@@ -205,6 +205,8 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
 
                 try:
                     if dtype == np.dtype('<M8[ns]'):
+                        if currentDtype in SupportedDtypes.boolTypes():
+                            raise Exception, u"Can't convert a boolean value into a datetime value."
                         self._dataFrame[columnName] = self._dataFrame[columnName].apply(pandas.to_datetime)
                     else:
                         self._dataFrame[columnName] = self._dataFrame[columnName].astype(dtype)
@@ -212,9 +214,10 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                     self.layoutChanged.emit()
 
                     return True
-                except Exception as e:
+                except Exception, e:
                     message = 'Could not change datatype %s of column %s to datatype %s' % (currentDtype, columnName, dtype)
-                    self.changeFailed.emit(message)
+                    self.changeFailed.emit(message, index, dtype)
+                    raise
                     # self._dataFrame[columnName] = self._dataFrame[columnName].astype(currentDtype)
                     # self.layoutChanged.emit()
                     # self.dtypeChanged.emit(columnName)
