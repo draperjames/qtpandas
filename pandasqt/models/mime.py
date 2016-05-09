@@ -1,4 +1,7 @@
-import cPickle as pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 from pandasqt.models.SupportedDtypes import SupportedDtypes
 from pandasqt.compat import QtCore
 
@@ -37,7 +40,7 @@ class MimeData(QtCore.QMimeData):
             bytestream = pickle.dumps(data)
             super(MimeData, self).setData(self._mimeType, bytestream)
         except TypeError:
-            raise TypeError, self.tr("can not pickle added data")
+            raise TypeError(self.tr("can not pickle added data"))
         except:
             raise
         

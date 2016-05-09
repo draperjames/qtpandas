@@ -124,7 +124,7 @@ class SupportedDtypesTranslator(QtCore.QObject):
         # return a 'text' description - working as intended or bug?
         try:
             value = np.dtype(value)
-        except TypeError, e:
+        except TypeError as e:
             return None
         for (dtype, string) in self._all:
             if dtype == value:
@@ -172,7 +172,7 @@ class SupportedDtypesTranslator(QtCore.QObject):
         """
         try:
             return self._all[index]
-        except IndexError, e:
+        except IndexError as e:
             return ()
 
 

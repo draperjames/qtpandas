@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from pandasqt.compat import Qt, QtCore, QtGui
+import sys
+if sys.version_info.major != 2:
+    unicode = str
+
 
 import parser
 import re
@@ -146,7 +150,7 @@ class DataSearch(object):
             question = self._dataFrame.index == -9999
             for column in self._dataFrame.columns:
                 dfColumn = self._dataFrame[column]
-                dfColumn = dfColumn.apply(unicode)
+                dfColumn = dfColumn.apply(str)
 
                 question2 = dfColumn.str.contains(searchString, flags=re.IGNORECASE, regex=True, na=False)
                 question = np.logical_or(question, question2)

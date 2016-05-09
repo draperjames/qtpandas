@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from pandasqt.compat import Qt, QtCore, QtWidgets
 
 
 import pytest
@@ -173,7 +173,7 @@ class TestDtypeComboDelegate(object):
 
         model.setEditable(True)
 
-        tableView = QtGui.QTableView()
+        tableView = QtWidgets.QTableView()
         qtbot.addWidget(tableView)
 
         tableView.setModel(model)
@@ -185,7 +185,7 @@ class TestDtypeComboDelegate(object):
         preedit_data = index.data(DTYPE_ROLE)
 
         tableView.edit(index)
-        editor = tableView.findChildren(QtGui.QComboBox)[0]
+        editor = tableView.findChildren(QtWidgets.QComboBox)[0]
         selectedIndex = editor.currentIndex()
         editor.setCurrentIndex(selectedIndex+1)
         postedit_data = index.data(DTYPE_ROLE)

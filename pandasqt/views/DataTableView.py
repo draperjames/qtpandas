@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
+from pandasqt.compat import QtCore, QtGui, QtWidgets, Qt, Slot, Signal
 
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.EditDialogs import AddAttributesDialog, RemoveAttributesDialog
@@ -13,7 +13,7 @@ except AttributeError:
     def _fromUtf8(s):
         return s
     
-class DragTable(QtGui.QTableView):
+class DragTable(QtWidgets.QTableView):
     
     def __init__(self, parent=None):
         """create a table view with the ability to start drag operations"""
@@ -55,13 +55,13 @@ class DragTable(QtGui.QTableView):
         pixmap = QtGui.QPixmap(":/icons/insert-table.png")
         drag.setHotSpot(QtCore.QPoint(pixmap.width()/3, pixmap.height()/3))
         drag.setPixmap(pixmap)
-        result = drag.start(Qt.MoveAction)
+        result = drag.exec(Qt.MoveAction)
 
     def mouseMoveEvent(self, event):
         super(DragTable, self).mouseMoveEvent(event)
         self.startDrag(self.indexAt(event.pos()))
 
-class DataTableWidget(QtGui.QWidget):
+class DataTableWidget(QtWidgets.QWidget):
     """A Custom widget with a TableView and a toolbar.
 
     This widget shall display all `DataFrameModels` and
@@ -87,19 +87,19 @@ class DataTableWidget(QtGui.QWidget):
         """Initalizes the Uuser Interface with all sub widgets.
 
         """
-        self.gridLayout = QtGui.QGridLayout(self)
+        self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.buttonFrame = QtGui.QFrame(self)
+        self.buttonFrame = QtWidgets.QFrame(self)
         #self.buttonFrame.setMinimumSize(QtCore.QSize(250, 50))
         #self.buttonFrame.setMaximumSize(QtCore.QSize(250, 50))
-        self.buttonFrame.setFrameShape(QtGui.QFrame.NoFrame)
-        spacerItemButton = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.buttonFrame.setFrameShape(QtWidgets.QFrame.NoFrame)
+        spacerItemButton = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
 
-        self.buttonFrameLayout = QtGui.QGridLayout(self.buttonFrame)
+        self.buttonFrameLayout = QtWidgets.QGridLayout(self.buttonFrame)
         self.buttonFrameLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.editButton = QtGui.QToolButton(self.buttonFrame)
+        self.editButton = QtWidgets.QToolButton(self.buttonFrame)
         self.editButton.setObjectName('editbutton')
         self.editButton.setText(self.tr(u'edit'))
         self.editButton.setToolTip(self.tr(u'toggle editing mode'))
@@ -107,7 +107,7 @@ class DataTableWidget(QtGui.QWidget):
 
         self.editButton.setIcon(icon)
 
-        self.addColumnButton = QtGui.QToolButton(self.buttonFrame)
+        self.addColumnButton = QtWidgets.QToolButton(self.buttonFrame)
         self.addColumnButton.setObjectName('addcolumnbutton')
         self.addColumnButton.setText(self.tr(u'+col'))
         self.addColumnButton.setToolTip(self.tr(u'add new column'))
@@ -115,7 +115,7 @@ class DataTableWidget(QtGui.QWidget):
 
         self.addColumnButton.setIcon(icon)
 
-        self.addRowButton = QtGui.QToolButton(self.buttonFrame)
+        self.addRowButton = QtWidgets.QToolButton(self.buttonFrame)
         self.addRowButton.setObjectName('addrowbutton')
         self.addRowButton.setText(self.tr(u'+row'))
         self.addRowButton.setToolTip(self.tr(u'add new row'))
@@ -123,7 +123,7 @@ class DataTableWidget(QtGui.QWidget):
 
         self.addRowButton.setIcon(icon)
 
-        self.removeColumnButton = QtGui.QToolButton(self.buttonFrame)
+        self.removeColumnButton = QtWidgets.QToolButton(self.buttonFrame)
         self.removeColumnButton.setObjectName('removecolumnbutton')
         self.removeColumnButton.setText(self.tr(u'-col'))
         self.removeColumnButton.setToolTip(self.tr(u'remove a column'))
@@ -131,7 +131,7 @@ class DataTableWidget(QtGui.QWidget):
 
         self.removeColumnButton.setIcon(icon)
 
-        self.removeRowButton = QtGui.QToolButton(self.buttonFrame)
+        self.removeRowButton = QtWidgets.QToolButton(self.buttonFrame)
         self.removeRowButton.setObjectName('removerowbutton')
         self.removeRowButton.setText(self.tr(u'-row'))
         self.removeRowButton.setToolTip(self.tr(u'remove selected rows'))
@@ -152,7 +152,7 @@ class DataTableWidget(QtGui.QWidget):
         for button in self.buttons[1:]:
             button.setEnabled(False)
 
-        #self.tableView = QtGui.QTableView(self)
+        #self.tableView = QtWidgets.QTableView(self)
         self.tableView = DragTable(self)
         self.tableView.setAlternatingRowColors(True)
         self.tableView.setSortingEnabled(True)
@@ -360,7 +360,7 @@ class DataTableWidget(QtGui.QWidget):
         """Gets the enclosed TableView
 
         Returns:
-            QtGui.QTableView: A Qt TableView object.
+            QtWidgets.QTableView: A Qt TableView object.
 
         """
         return self.tableView
