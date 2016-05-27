@@ -214,6 +214,7 @@ class CSVImportDialog(QtGui.QDialog):
 
         self._filenameLabel = QtGui.QLabel(u'Choose File', self)
         self._filenameLineEdit = QtGui.QLineEdit(self)
+        self._filenameLineEdit.setObjectName(u"_filenameLineEdit")
         self._filenameLineEdit.textEdited.connect(self._updateFilename)
         chooseFileButtonIcon = QtGui.QIcon(QtGui.QPixmap(':/icons/document-open.png'))
         self._chooseFileAction = QtGui.QAction(self)
