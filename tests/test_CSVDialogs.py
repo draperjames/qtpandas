@@ -4,7 +4,6 @@ import tempfile
 
 from pandasqt.compat import Qt, QtCore, QtGui
 
-
 import numpy
 import pytest
 import pytestqt
