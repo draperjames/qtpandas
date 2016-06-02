@@ -4,9 +4,15 @@
 @author: Matthias Ludwig - Datalyze Solutions
 """
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from pandasqt.compat import Qt, QtCore, QtGui, QtWidgets
+if sys.version_info.major != 2:
+    unicode = str
+    int_or_long = (int, )
+else:
+    int_or_long = (int, long)
 
-class BigIntSpinbox(QtGui.QAbstractSpinBox):
+
+class BigIntSpinbox(QtWidgets.QAbstractSpinBox):
     """Custom spinbox for very big integers (like numpy.int64 and uint64)
 
     Attributes:
@@ -31,7 +37,7 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         rx = QtCore.QRegExp("[0-9]\\d{0,20}")
         validator = QtGui.QRegExpValidator(rx, self)
 
-        self._lineEdit = QtGui.QLineEdit(self)
+        self._lineEdit = QtWidgets.QLineEdit(self)
         self._lineEdit.setText('0')
         self._lineEdit.setValidator(validator)
         self.setLineEdit(self._lineEdit)
@@ -53,7 +59,7 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
             True if all went fine.
         """
         if value >= self.minimum() and value <= self.maximum():
-            self._lineEdit.setText(unicode(value))
+            self._lineEdit.setText(str(value))
         elif value < self.minimum():
             self._lineEdit.setText(unicode(self.minimum()))
         elif value > self.maximum():
@@ -116,7 +122,7 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         Raises:
             TypeError: If the given argument is not an integer.
         """
-        if not isinstance(minimum, (int, long)):
+        if not isinstance(minimum, int_or_long):
             raise TypeError("Argument is not of type int or long")
         self._minimum = minimum
 
@@ -130,6 +136,6 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         Args:
             maximum (int or long): new _maximum value
         """
-        if not isinstance(maximum, (int, long)):
+        if not isinstance(maximum, int_or_long):
             raise TypeError("Argument is not of type int or long")
         self._maximum = maximum

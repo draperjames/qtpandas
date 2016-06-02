@@ -1,6 +1,7 @@
-from pandasqt.compat import QtCore, QtGui, Qt, Signal, Slot
+from __future__ import print_function
+from pandasqt.compat import QtCore, QtWidgets, QtGui, Qt, Signal, Slot
 
-class OverlayProgressWidget(QtGui.QFrame):
+class OverlayProgressWidget(QtWidgets.QFrame):
     def __init__(self, parent, workers=[], debug=True, margin=0):
         super(OverlayProgressWidget, self).__init__(parent)
         self._debug = debug
@@ -19,7 +20,7 @@ class OverlayProgressWidget(QtGui.QFrame):
 
 
     def initUi(self):
-        self.sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Expanding)
+        self.sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Expanding)
 
         self._pbHeight = 30
 
@@ -27,13 +28,13 @@ class OverlayProgressWidget(QtGui.QFrame):
         #self.setMaximumWidth(self._width)
         self.setMinimumHeight(self._minHeight)
 
-        self.glayout = QtGui.QGridLayout(self)
+        self.glayout = QtWidgets.QGridLayout(self)
 
-        self.totalProgressBar = QtGui.QProgressBar(self)
+        self.totalProgressBar = QtWidgets.QProgressBar(self)
         self.totalProgressBar.setMinimumHeight(self._pbHeight)
         self.totalProgressBar.setMaximumHeight(self._pbHeight)
 
-        self.toggleButton = QtGui.QPushButton('Details', self)
+        self.toggleButton = QtWidgets.QPushButton('Details', self)
         self.toggleButton.setCheckable(True)
         self.toggleButton.toggled.connect(self.showDetails)
         self.glayout.addWidget(self.totalProgressBar, 0, 0, 1, 1)
@@ -77,10 +78,10 @@ class OverlayProgressWidget(QtGui.QFrame):
 
 
     def _addProgressBar(self, worker):
-        progressBar = QtGui.QProgressBar(self)
+        progressBar = QtWidgets.QProgressBar(self)
         progressBar.setMinimumHeight(self._pbHeight - 5)
         progressBar.setMaximumHeight(self._pbHeight - 5)
-        label = QtGui.QLabel(worker.name, self)
+        label = QtWidgets.QLabel(worker.name, self)
         if not self.toggleButton.isChecked():
             progressBar.hide()
             label.hide()
@@ -95,7 +96,7 @@ class OverlayProgressWidget(QtGui.QFrame):
         worker.progressChanged.connect(self.debugProgressChanged)
         
     def debugProgressChanged(self, value):
-        print "debugProgressChanged", value
+        print("debugProgressChanged", value)
 
     def addWorker(self, worker):
         self._workers.append(worker)

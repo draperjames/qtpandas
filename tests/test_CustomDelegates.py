@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from pandasqt.compat import Qt, QtCore, QtGui, QtWidgets
 
 
 import pytest
@@ -12,7 +12,7 @@ import pandas
 from pandasqt.views.CustomDelegates import BigIntSpinboxDelegate, CustomDoubleSpinboxDelegate, TextDelegate, createDelegate
 from pandasqt.models.DataFrameModel import DataFrameModel
 
-class DemoTableView(QtGui.QTableView):
+class DemoTableView(QtWidgets.QTableView):
 
     def __init__(self, parent=None):
         super(DemoTableView, self).__init__(parent)
@@ -48,7 +48,7 @@ class TestCustomDelegates(object):
 
     @pytest.mark.parametrize(
         "widgetClass, model, exception, exceptionContains", [
-            (QtGui.QWidget, None, AttributeError, "has no attribute 'model'"),
+            (QtWidgets.QWidget, None, AttributeError, "has no attribute 'model'"),
             (DemoTableView, None, ValueError, "no model set for the current view"),
             (DemoTableView, QtGui.QStandardItemModel(), TypeError, 'model is not of type DataFrameModel'),
         ]
@@ -89,7 +89,7 @@ class TestCustomDelegates(object):
         for i, delegate in enumerate([dlg]):
             assert tableView.itemDelegateForColumn(i) == delegate
 
-            option = QtGui.QStyleOptionViewItem()
+            option = QtWidgets.QStyleOptionViewItem()
             option.rect = QtCore.QRect(0, 0, 100, 100)
             editor = delegate.createEditor(tableView, option, index)
             delegate.setEditorData(editor, index)
@@ -138,7 +138,7 @@ class TestTextDelegate(object):
     def test_editing(self, dataFrame, qtbot):
         model = DataFrameModel(dataFrame)
 
-        tableView = QtGui.QTableView()
+        tableView = QtWidgets.QTableView()
 
         qtbot.addWidget(tableView)
         tableView.setModel(model)
@@ -153,9 +153,9 @@ class TestTextDelegate(object):
         assert not model.editable
         model.enableEditing(True)
         tableView.edit(index)
-        editor = tableView.findChildren(QtGui.QLineEdit)[0]
+        editor = tableView.findChildren(QtWidgets.QLineEdit)[0]
         qtbot.keyPress(editor, QtCore.Qt.Key_F)
         qtbot.keyPress(editor, QtCore.Qt.Key_Enter)
-        QtGui.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents()
         with qtbot.waitSignal(timeout=100):
             assert index.data(QtCore.Qt.DisplayRole) == 'f'

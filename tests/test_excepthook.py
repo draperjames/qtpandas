@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from pandasqt.compat import Qt, QtCore, QtWidgets
 
 import pytest
 import pytestqt
@@ -10,20 +10,20 @@ from pandasqt.excepthook import excepthook
 # TODO write it with pytest...
 
 def exception():
-    raise ValueError, "Test Test ä"
+    raise ValueError("Test Test ä")
 
 def exception2():
-    raise ValueError, u"Test Test ä"
+    raise ValueError(u"Test Test ä")
 
 def exception3():
-    raise ValueError, u"Test Test"
+    raise ValueError(u"Test Test")
 
 def exception4():
-    raise ValueError, "Test Test"
+    raise ValueError("Test Test")
 
-app = QtGui.QApplication([])
+app = QtWidgets.QApplication([])
 sys.excepthook = excepthook
-widget = QtGui.QPushButton("raise exceptions")
+widget = QtWidgets.QPushButton("raise exceptions")
 widget.move(100, 100)
 widget.resize(100, 100)
 widget.show()
@@ -41,7 +41,7 @@ app.exec_()
 #class TestTableViewWidget(object):
 
     #def test_init(self, qtbot):
-        #widget = QtGui.QWidget()
+        #widget = QtWidgets.QWidget()
         #qtbot.addWidget(widget)
         #widget.show()
         

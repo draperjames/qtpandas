@@ -5,7 +5,7 @@ from pandasqt.excepthook import excepthook
 sys.excepthook = excepthook
 
 # use QtGui from the compat module to take care if correct sip version, etc.
-from pandasqt.compat import QtGui
+from pandasqt.compat import QtWidgets
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.DataTableView import DataTableWidget
 from pandasqt.views._ui import icons_rc
@@ -14,7 +14,7 @@ from pandasqt.views._ui import icons_rc
 model = DataFrameModel()
 
 """setup an application and create a table view widget"""
-app = QtGui.QApplication([])
+app = QtWidgets.QApplication([])
 widget = DataTableWidget()
 widget.resize(800, 600)
 widget.show()

@@ -1,12 +1,16 @@
+from __future__ import print_function
 import sys
 import time
-from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
-import imgs
+from pandasqt.compat import QtCore, QtGui, QtWidgets, Qt, Slot, Signal
+import os
+
+# import imgs
 
 from pandasqt.views.OverlayProgressView import OverlayProgressWidget
 
 from pandasqt.models.ProgressThread import ProgressWorker, createThread
 
+europe_png = os.path.join(os.path.dirname(__file__),'europe.png')
 
 class ExampleWorker(ProgressWorker):
     def __init__(self, name, ticks):
@@ -26,7 +30,7 @@ class ExampleWorker(ProgressWorker):
             self.progressChanged.emit(count)
 
 
-class Example(QtGui.QWidget):
+class Example(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(Example, self).__init__(parent)
 
@@ -36,16 +40,16 @@ class Example(QtGui.QWidget):
     def initUI(self):
         self.setGeometry(100, 100, 300, 300)
 
-        self.vlayout = QtGui.QVBoxLayout(self)
+        self.vlayout = QtWidgets.QVBoxLayout(self)
 
-        self.imgContainer = QtGui.QLabel(self)
-        img = QtGui.QPixmap(':/europe.png')
+        self.imgContainer = QtWidgets.QLabel(self)
+        img = QtGui.QPixmap(europe_png)
         self.imgContainer.setPixmap(img)
         size = img.size()
         self.imgContainer.resize(size.width(), self.height())
 
         self.vlayout.addWidget(self.imgContainer)
-        self.vlayout.addWidget(QtGui.QLabel('FOOO',self))
+        self.vlayout.addWidget(QtWidgets.QLabel('FOOO',self))
 
         threads = []
 
@@ -66,12 +70,12 @@ class Example(QtGui.QWidget):
 
     @Slot()
     def debugPrint(self):
-        print 'THREAD %s ended' % (self.sender().name, )
+        print('THREAD %s ended' % (self.sender().name, ))
 
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     widget = Example()
     widget.show()
     app.exec_()
