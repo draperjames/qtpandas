@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pandasqt.compat import QtCore, QtGui, QtWidgets, Qt, Slot, Signal
+from pandasqt.compat import QtCore, QtGui, QtWidgets, Qt, Slot, Signal, qt_version_short
 
 from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.EditDialogs import AddAttributesDialog, RemoveAttributesDialog
@@ -22,14 +22,14 @@ class DragTable(QtWidgets.QTableView):
 
     def startDrag(self, index):
         """start a drag operation with a PandasCellPayload on defined index.
-        
+
         Args:
             index (QModelIndex): model index you want to start the drag operation.
         """
 
         if not index.isValid():
             return
-        
+
         dataFrame = self.model().dataFrame()
 
         # get all infos from dataFrame
@@ -48,14 +48,20 @@ class DragTable(QtWidgets.QTableView):
         )
         mimeData = MimeData()
         mimeData.setData(mimePayload)
-                
+
         # create the drag icon and start drag operation
         drag = QtGui.QDrag(self)
         drag.setMimeData(mimeData)
         pixmap = QtGui.QPixmap(":/icons/insert-table.png")
         drag.setHotSpot(QtCore.QPoint(pixmap.width()/3, pixmap.height()/3))
         drag.setPixmap(pixmap)
-        result = drag.exec(Qt.MoveAction)
+
+        if qt_version_short == '4':
+            result = drag.start(Qt.MoveAction)
+        else:
+            # FIXME Py27 with Qt4 crashes with syntax error
+            #result = drag.exec(Qt.MoveAction)
+            result = getattr(drag, "start")(Qt.MoveAction)
 
     def mouseMoveEvent(self, event):
         super(DragTable, self).mouseMoveEvent(event)

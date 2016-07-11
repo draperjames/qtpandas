@@ -1,0 +1,7 @@
+easygui
+pandas>=0.13.1
+python-magic==0.4.6
+pytest
+pytest-cov
+pytest-qt
+tox

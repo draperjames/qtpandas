@@ -3,7 +3,7 @@
 
 @author: Matthias Ludwig - Datalyze Solutions
 """
-
+import sys
 from pandasqt.compat import Qt, QtCore, QtGui, QtWidgets
 if sys.version_info.major != 2:
     unicode = str

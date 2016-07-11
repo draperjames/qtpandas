@@ -2,9 +2,6 @@
 
 from pandasqt.compat import Qt, QtCore, QtGui
 import sys
-if sys.version_info.major != 2:
-    unicode = str
-
 
 import parser
 import re
@@ -44,7 +41,9 @@ class DataSearch(object):
 
     def __repr__(self):
         string = u"DataSearch({}): {} ({})".format(hex(id(self)), self.name, self._filterString)
-        string = string.encode("utf-8")
+        # don't return byte in python 3
+        if sys.version_info.major == 2:
+            string = string.encode("utf-8")
         return string
 
     def dataFrame(self):

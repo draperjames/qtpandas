@@ -352,6 +352,7 @@ class CSVImportDialog(QtWidgets.QDialog):
             path (string): Path to a csv file on the file system.
 
         """
+
         if os.path.exists(path) and path.lower().endswith('csv'):
             encoding = self._detector.detect(path)
 

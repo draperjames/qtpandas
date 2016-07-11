@@ -84,10 +84,10 @@ class TestTableViewWidget(object):
         for btn in buttons:
             if btn.isEnabled:
                 qtbot.mouseClick(btn, QtCore.Qt.LeftButton)
-                assert widget.view().model().editable
+                assert widget.view().model().editable()
 
                 qtbot.mouseClick(btn, QtCore.Qt.LeftButton)
-                assert not widget.view().model().editable
+                assert not widget.view().model().editable()
 
                 break
 

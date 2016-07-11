@@ -150,7 +150,7 @@ class TestTextDelegate(object):
         index = model.index(0, 0)
         preedit_data = index.data()
 
-        assert not model.editable
+        assert not model.editable()
         model.enableEditing(True)
         tableView.edit(index)
         editor = tableView.findChildren(QtWidgets.QLineEdit)[0]

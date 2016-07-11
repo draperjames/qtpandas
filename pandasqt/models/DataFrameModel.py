@@ -11,8 +11,6 @@ import sys
 if sys.version_info.major != 2:
     unicode = str
 
-
-
 import pandas
 import numpy
 
@@ -24,7 +22,6 @@ from pandasqt.models.DataSearch import DataSearch
 from pandasqt.models.SupportedDtypes import SupportedDtypes
 
 DATAFRAME_ROLE = Qt.UserRole + 2
-
 
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
@@ -89,7 +86,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         self._dataFrameOriginal = None
         self._search = DataSearch("nothing", "")
-        self.editable = False
+        self._editable = False
 
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
@@ -155,8 +152,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 Formatting string for conversion of timestamps to QtCore.QDateTime. Used in data method.
 
         """
-        if not isinstance(timestampFormat, (unicode, )):
-            raise TypeError('not of type unicode')
+        #FIXME do we really need to test for unicode?
+        #if not isinstance(timestampFormat, (unicode, )):
+            #raise TypeError('not of type unicode')
         #assert isinstance(timestampFormat, unicode) or timestampFormat.__class__.__name__ == "DateFormat", "not of type unicode"
         self._timestampFormat = timestampFormat
 
@@ -188,6 +186,18 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 return None
         elif orientation == Qt.Vertical:
             return section
+
+    # tests for qml usage
+    #def roleNames(self):
+        #roles = {
+            #Qt.DisplayRole: b'show',
+            #Qt.DisplayRole + 1: b'show2',
+            #Qt.EditRole: b'edit',
+            #Qt.UserRole + 1: b'columnA',
+            #Qt.UserRole + 2: b'columnB',
+            #Qt.UserRole + 3: b'columnC',
+        #}
+        #return roles
 
     def data(self, index, role=Qt.DisplayRole):
         """return data depending on index, Qt::ItemDataRole and data type of the column.
@@ -222,7 +232,6 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
             raises TypeError if an unhandled dtype is found in column.
         """
-
         if not index.isValid():
             return None
 
@@ -246,8 +255,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 value = pandas.Timestamp(self._dataFrame.ix[row, col])
                 value = QtCore.QDateTime.fromString(str(value), self.timestampFormat)
                 #print value
-            # else:
-            #     raise TypeError, "returning unhandled data type"
+            #else:
+                #raise TypeError("returning unhandled data type")
             return value
 
         row = self._dataFrame.index[index.row()]
@@ -274,6 +283,16 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             result = self._dataFrame.ix[row, col]
         else:
             result = None
+
+        # qml test
+        #if role >= Qt.UserRole + 1:
+            ## caller requests UserRole data, convert role to column (role - Qt.UserRole -1) to return correct data
+            #print(role - Qt.UserRole -1)
+            #col = self._dataFrame.columns[role - Qt.UserRole -1]
+            #print(col)
+            #columnDtype = self._dataFrame[col].dtype
+            #result = convertValue(row, col, columnDtype)
+
         return result
 
     def flags(self, index):
@@ -290,7 +309,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         """
         flags = super(DataFrameModel, self).flags(index)
 
-        if not self.editable:
+        if not self._editable:
             return flags
 
         col = self._dataFrame.columns[index.column()]
@@ -315,10 +334,11 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         Returns:
             True if value is changed. Calls layoutChanged after update.
-            False if value is not different from original value.
+            False if value is not different from original value, index was invalid 
+                or model edit mode deactivated.
 
         """
-        if not index.isValid() or not self.editable:
+        if not index.isValid() or not self._editable:
             return False
 
         if value != index.data(role):
@@ -350,8 +370,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 # convert the given value to a compatible datetime object.
                 # if the conversation could not be done, keep the original
                 # value.
+                #import pdb
+                #pdb.set_trace()
                 if isinstance(value, QtCore.QDateTime):
-                    value = value.toString(self.timestampFormat)
+                    value = str(value.toString(self.timestampFormat))
                 try:
                     value = pandas.Timestamp(value)
                 except Exception:
@@ -479,16 +501,38 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         """
         return self._columnDtypeModel
 
+    def editable(self):
+        """Can the model be edited?
+
+        Returns:
+            bool
+        """
+        return self._editable
 
     def enableEditing(self, editable):
-        self.editable = editable
-        self._columnDtypeModel.setEditable(self.editable)
+        """Allow/Disallow the model to be edited
+
+        Args:
+            editable (bool): editable or not to be editable, that's the question.
+
+        Returns:
+            True if all went correct
+        """
+        self._editable = editable
+        self._columnDtypeModel.setEditable(self._editable)
+
+        return True
 
     def dataFrameColumns(self):
+        """Returns a list of the dataFrames columns
+
+        Returns:
+            List of dataFrames column names
+        """
         return self._dataFrame.columns.tolist()
 
     def addDataFrameColumn(self, columnName, dtype, defaultValue):
-        if not self.editable or dtype not in SupportedDtypes.allTypes():
+        if not self._editable or dtype not in SupportedDtypes.allTypes():
             return False
 
         elements = self.rowCount()
@@ -513,7 +557,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         # don't allow any gaps in the data rows.
         # and always append at the end
 
-        if not self.editable:
+        if not self._editable:
             return False
 
         position = self.rowCount()
@@ -547,7 +591,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         return True
 
     def removeDataFrameColumns(self, columns):
-        if not self.editable:
+        if not self._editable:
             return False
 
         if columns:
@@ -574,7 +618,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         return False
 
     def removeDataFrameRows(self, rows):
-        if not self.editable:
+        if not self._editable:
             return False
 
         if rows:

@@ -26,18 +26,33 @@ class Detector(object):
                 magic_db = None  # Use installation default for compatibility reasons
             else:
                 if sys.platform.startswith('linux'):
-                    # use the system wide installed version comming with windows, the included magic.mgc might be incompatible
+                    # use the system wide installed version comming with linux, the included magic.mgc might be incompatible
                     magic_db = os.path.join('/usr/share/file', 'magic.mgc')
                 else:
                     magic_db = os.path.join(BASEDIR, '_lib', 'magic', 'db', 'magic.mgc')
                 if not os.path.exists(magic_db):
                     raise ImportError('Please install libmagic.')
-            self.magic = magic.Magic(magic_file=magic_db, mime_encoding=True)
+            self._magic = magic.Magic(magic_file=magic_db, mime_encoding=True)
         else:
-            self.magic = False
+            self._magic = False
+
+    @property
+    def active(self):
+        if self._magic:
+            return True
+        else:
+            return False
 
     def detect(self, filepath):
-        if self.magic:
-            encoding = self.magic.from_file(filepath)
+        """Tries to detect the encoding of given file.
+
+        Args:
+            filepath (str): Path of file you want encoding from.
+
+        Returns:
+            str representation of encoding or None if no encoding could be detected.
+        """
+        if self._magic:
+            encoding = self._magic.from_file(filepath).decode()
             return encoding
         return None

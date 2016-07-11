@@ -3,7 +3,9 @@ import os
 import tempfile
 
 from pandasqt.compat import Qt, QtCore, QtGui, QtWidgets
-
+import sys
+if sys.version_info.major != 2:
+    unicode = str
 
 import numpy
 import pytest
@@ -14,13 +16,6 @@ from pandasqt.views.CSVDialogs import (
     CSVImportDialog, CSVExportDialog
 )
 from pandasqt.models.DataFrameModel import DataFrameModel
-
-FIXTUREDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures')
-
-@pytest.fixture()
-def csv_file():
-    return os.path.join(FIXTUREDIR, 'csv_file.csv')
-
 
 @pytest.fixture()
 def tmp(request):
@@ -183,7 +178,10 @@ class TestCSVImportWidget(object):
             try:
                 assert isinstance(path, basestr)
             except NameError:
-                assert isinstance(path, str)
+                try:
+                    assert isinstance(path, unicode)
+                except UnicodeError:
+                    assert isinstance(path, str)
 
         csvwidget.load.connect(_assert)
         with qtbot.waitSignal(csvwidget.load):
