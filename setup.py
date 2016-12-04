@@ -8,17 +8,25 @@ import os
 import re
 import sys
 
-# TODO: sip is only needed for PyQt4, they should be imported together.
+has_qt4 = True
 try:
+    # TODO: sip is only needed for PyQt4, they should be imported together.
+    import PyQt4
     import sip
 except ImportError as e:
-    raise ImportError("install sip first (comming with PyQt4)")
-
+    has_qt4 = False
+    
 try:
-    import PyQt4
+    import PySide
 except ImportError as e:
     # TODO: try to import PySide.
-    raise ImportError("install PyQt4 or PySide")
+    if not has_qt4:
+        #We know we failed to import PyQt4/sip...
+        #And we failed to import pyside.
+        raise ImportError( "\n\ninstall PyQt4 and sip or PySide")
+    else:
+        print("Using PyQt4")
+        
 
 
 here = os.path.abspath(os.path.dirname(__file__))
