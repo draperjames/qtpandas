@@ -7,9 +7,9 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore
+from pandasqt.compat import QtCore
 
-qt_resource_data = "\
+qt_resource_data = u"\
 \x00\x00\x0a\x69\
 \x89\
 \x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52\x00\
@@ -1955,7 +1955,7 @@ qt_resource_data = "\
 \x4b\x62\x59\x00\x00\x00\x00\x49\x45\x4e\x44\xae\x42\x60\x82\
 "
 
-qt_resource_name = "\
+qt_resource_name = u"\
 \x00\x05\
 \x00\x6f\xa6\x53\
 \x00\x69\
@@ -2012,7 +2012,7 @@ qt_resource_name = "\
 \x00\x70\x00\x6e\x00\x67\
 "
 
-qt_resource_struct = "\
+qt_resource_struct = u"\
 \x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x01\
 \x00\x00\x00\x00\x00\x02\x00\x00\x00\x0a\x00\x00\x00\x02\
 \x00\x00\x00\xd6\x00\x00\x00\x00\x00\x01\x00\x00\x2f\x76\
@@ -2026,11 +2026,12 @@ qt_resource_struct = "\
 \x00\x00\x01\xde\x00\x00\x00\x00\x00\x01\x00\x00\x69\x47\
 \x00\x00\x01\x46\x00\x00\x00\x00\x00\x01\x00\x00\x42\xbf\
 "
-
+rsc_args = [qt_resource_struct, qt_resource_name, qt_resource_data]
+rsc_args = [str.encode(s) for s in rsc_args]
 def qInitResources():
-    QtCore.qRegisterResourceData(0x01, qt_resource_struct, qt_resource_name, qt_resource_data)
+    QtCore.qRegisterResourceData(int(0x01), *rsc_args)
 
 def qCleanupResources():
-    QtCore.qUnregisterResourceData(0x01, qt_resource_struct, qt_resource_name, qt_resource_data)
+    QtCore.qUnregisterResourceData(int(0x01), *rsc_args)
 
 qInitResources()

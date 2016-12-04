@@ -1,6 +1,6 @@
 import sys
 import os
-
+import warnings
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
 if sys.platform == 'win32':
@@ -12,9 +12,13 @@ if sys.platform == 'win32':
 try:
     import magic
     AUTODETECT = True
-except ImportError, e:
+except ImportError as e:
     #if sys.platform == 'darwin':
-    raise ImportError('Please install libmagic')
+    #raise ImportError('Please install libmagic')
+    warnings.warn("Please install libmagic - got an error: {}".format(e))
+    AUTODETECT = False
+except OSError as e:
+    warnings.warn("Detector.Issues importing libmagic - got an error: {}".format(e))
     AUTODETECT = False
 
 

@@ -351,10 +351,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 try:
                     value = pandas.Timestamp(value)
                 except Exception:
-                    raise Exception, u"Can't convert '{0}' into a datetime".format(value)
+                    raise Exception(u"Can't convert '{0}' into a datetime".format(value))
                     return False
             else:
-                raise TypeError, "try to set unhandled data type"
+                raise TypeError("try to set unhandled data type")
 
             self._dataFrame.set_value(row, col, value)
 
@@ -495,7 +495,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self.beginInsertColumns(QtCore.QModelIndex(), columnPosition - 1, columnPosition - 1)
         try:
             self._dataFrame.insert(columnPosition, columnName, newColumn, allow_duplicates=False)
-        except ValueError, e:
+        except ValueError as e:
             # columnName does already exist
             return False
 
@@ -556,7 +556,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 self.beginRemoveColumns(QtCore.QModelIndex(), position, position)
                 try:
                     self._dataFrame.drop(name, axis=1, inplace=True)
-                except ValueError, e:
+                except ValueError as e:
                     errorOccured = True
                     continue
                 self.endRemoveColumns()

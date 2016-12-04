@@ -2,7 +2,6 @@
 import os
 
 from encodings.aliases import aliases as _encodings
-
 import pandas
 
 from pandasqt.compat import Qt, QtCore, QtGui, Slot, Signal
@@ -11,7 +10,7 @@ from pandasqt.models.DataFrameModel import DataFrameModel
 from pandasqt.views.CustomDelegates import DtypeComboDelegate
 from pandasqt.views._ui import icons_rc
 
-from pandasqt.utils import fillNoneValues, convertTimestamps
+from pandasqt.utils import fillNoneValues, convertTimestamps, superReadFile
 
 class DelimiterValidator(QtGui.QRegExpValidator):
     """A Custom RegEx Validator.
@@ -94,7 +93,7 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
         self.commaRadioButton = QtGui.QRadioButton(u'Comma')
         self.tabRadioButton = QtGui.QRadioButton(u'Tab')
         self.otherRadioButton = QtGui.QRadioButton(u'Other')
-        self.semicolonRadioButton.setChecked(True)
+        self.commaRadioButton.setChecked(True)
 
         self.otherSeparatorLineEdit = QtGui.QLineEdit(self)
         self.otherSeparatorLineEdit.setEnabled(False)
@@ -229,7 +228,7 @@ class CSVImportDialog(QtGui.QDialog):
 
         self._encodingLabel = QtGui.QLabel(u'File Encoding', self)
 
-        encoding_names = map(lambda x: x.upper(), sorted(list(set(_encodings.viewvalues()))))
+        encoding_names = list(map(lambda x: x.upper(), sorted(list(set(_encodings.values())))))
         self._encodingComboBox = QtGui.QComboBox(self)
         self._encodingComboBox.addItems(encoding_names)
         self._encodingComboBox.activated.connect(self._updateEncoding)
@@ -240,6 +239,7 @@ class CSVImportDialog(QtGui.QDialog):
         self._hasHeaderLabel = QtGui.QLabel(u'Header Available?', self)
         self._headerCheckBox = QtGui.QCheckBox(self)
         self._headerCheckBox.toggled.connect(self._updateHeader)
+
 
         layout.addWidget(self._hasHeaderLabel, 2, 0)
         layout.addWidget(self._headerCheckBox, 2, 1)
@@ -281,6 +281,7 @@ class CSVImportDialog(QtGui.QDialog):
 
         self._statusBar = QtGui.QStatusBar(self)
         self._statusBar.setSizeGripEnabled(False)
+        self._headerCheckBox.setChecked(True)
         layout.addWidget(self._statusBar, 8, 0, 1, 4)
         self.setLayout(layout)
 
@@ -305,6 +306,9 @@ class CSVImportDialog(QtGui.QDialog):
 
         """
         ret = QtGui.QFileDialog.getOpenFileName(self, self.tr(u'open file'), filter='Comma Separated Values (*.csv)')
+        if isinstance(ret, tuple):
+            ret = ret[0] #PySide compatibility maybe?
+
         if ret:
             self._filenameLineEdit.setText(ret)
             self._updateFilename()
@@ -422,22 +426,23 @@ class CSVImportDialog(QtGui.QDialog):
                 information of the csv file.
 
         """
-        if self._filename and os.path.exists(self._filename) and self._filename.endswith('.csv'):
+        if self._filename and os.path.exists(self._filename):
             # default fallback if no encoding was found/selected
-            encoding = self._encodingKey or 'uft8'
+            encoding = self._encodingKey or 'UTF_8'
 
             try:
-                dataFrame = pandas.read_csv(self._filename,
-                    sep=self._delimiter, encoding=encoding,
+                dataFrame = superReadFile(self._filename,
+                    sep=self._delimiter, first_codec=encoding,
                     header=self._header)
                 dataFrame = dataFrame.apply(fillNoneValues)
                 dataFrame = dataFrame.apply(convertTimestamps)
-            except Exception, err:
+            except Exception as err:
                 self.updateStatusBar(str(err))
+                print(err)
                 return pandas.DataFrame()
             self.updateStatusBar('Preview generated.')
             return dataFrame
-        self.updateStatusBar('File does not exists or does not end with .csv')
+        self.updateStatusBar('File could not be read.')
         return pandas.DataFrame()
 
     def _resetWidgets(self):
@@ -466,6 +471,7 @@ class CSVImportDialog(QtGui.QDialog):
             df = model.dataFrame().copy()
             dfModel = DataFrameModel(df)
             self.load.emit(dfModel, self._filename)
+            print("Emitted model for {}".format(self._filename))
         self._resetWidgets()
         self.accept()
 
@@ -586,14 +592,14 @@ class CSVExportDialog(QtGui.QDialog):
 
         try:
             dataFrame = self._model.dataFrame()
-        except AttributeError, err:
+        except AttributeError as err:
             raise AttributeError('No data loaded to export.')
         else:
             try:
                 dataFrame.to_csv(filename, encoding=encoding, header=header, index=index, sep=delimiter)
-            except IOError, err:
+            except IOError as err:
                 raise IOError('No filename given')
-            except UnicodeError, err:
+            except UnicodeError as err:
                 raise UnicodeError('Could not encode all data. Choose a different encoding')
             except Exception:
                 raise
@@ -620,7 +626,7 @@ class CSVExportDialog(QtGui.QDialog):
         """
         try:
             self._saveModel()
-        except Exception, err:
+        except Exception as err:
             self._statusBar.showMessage(str(err))
         else:
             self._resetWidgets()
@@ -654,7 +660,7 @@ def _calculateEncodingKey(comparator):
 
     """
     encodingName = None
-    for k, v in _encodings.viewitems():
+    for k, v in _encodings.items():
         if v == comparator:
             encodingName = k
             break
