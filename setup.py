@@ -12,13 +12,13 @@ import sys
 try:
     import sip
 except ImportError as e:
-    raise ImportError, "install sip first (comming with PyQt4)"
+    raise ImportError("install sip first (comming with PyQt4)")
 
 try:
     import PyQt4
 except ImportError as e:
     # TODO: try to import PySide.
-    raise ImportError, "install PyQt4 or PySide"
+    raise ImportError("install PyQt4 or PySide")
 
 
 here = os.path.abspath(os.path.dirname(__file__))
