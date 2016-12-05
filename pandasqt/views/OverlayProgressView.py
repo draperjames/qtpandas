@@ -95,6 +95,7 @@ class OverlayProgressWidget(QtGui.QFrame):
         worker.progressChanged.connect(self.debugProgressChanged)
         
     def debugProgressChanged(self, value):
+        print(("debugProgressChanged", value))
 
     def addWorker(self, worker):
         self._workers.append(worker)
