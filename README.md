@@ -9,7 +9,7 @@ Requirements;
 
 To install run the following in the command prompt;
 ```
-pip install git+https://github.com/drapja/QtPandas.git
+pip install git+https://github.com/zbarge/QtPandas.git
 pip install --upgrade git+https://github.com/robertlugg/easygui.git
 ```
 
