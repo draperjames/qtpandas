@@ -1,14 +1,17 @@
-# Utilities to use pandas (the data analysis / manipulation library for Python) with Qt.
+# QtPandas
 
-I forked this library because I liked the great detail and effort datalyze-solutions put into this package.
-I have converted some of this to Python 3+ so it will at least install, but more work is needed.
-I think it would be fun to bring this package back to life and get some upgrades put into it.
+### Utilities to use pandas (the data analysis/manipulation library for Python) with Qt.
 
+Requirements;
+> Python 3.x    
+> Pandas 20.0   
+> PyQt 4.7.8
 
-To install:
-
-pip install git+https://github.com/zbarge/QtPandas.git
-
+To install run the following in the command prompt;
+```
+pip install git+https://github.com/drapja/QtPandas.git
+pip install --upgrade git+https://github.com/robertlugg/easygui.git
+```
 
 To use, create a new Python script containing the following:
 ```
@@ -25,6 +28,16 @@ if __name__ == "__main__":
     dialog.show()
     app.exec_()
 ```
+Several examples can also be found in the tests directory.
 
-There are many more features but I don't have documentation. Maybe I'll add it sometime.
-
+## TO DO:
+- [ ] Add documentation.
+- [ ] Add screen shots
+- [ ] Create Wiki
+- [ ] Make verison agnostic.
+- [ ] Create specific Python version tests.
+- [ ] Add Windows, Apple, and Linux tests.
+- [ ] Consider adding functions seen in [Spyder IDE's dataframeeditor](https://github.com/spyder-ide/spyder/blob/f2b36f00f873cf4080087bfb529e6256b3e24792/spyder/widgets/variableexplorer/dataframeeditor.py)
+    - [ ] Sort
+    - [ ] Color coding
+Forked from @zbarge's fork of @datalyze-solutions's [master](https://github.com/datalyze-solutions/pandas-qt).
