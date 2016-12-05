@@ -66,7 +66,7 @@ class Example(QtGui.QWidget):
 
     @Slot()
     def debugPrint(self):
-        print 'THREAD %s ended' % (self.sender().name, )
+        print('THREAD %s ended' % (self.sender().name, ))
 
 
 if __name__ == '__main__':

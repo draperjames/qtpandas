@@ -29,21 +29,21 @@ class TestClass(object):
 
     def test_setMinimumMaximum(self, spinbox):
         spinbox.setMinimum(0)
-        spinbox.setMinimum(long(0))
+        spinbox.setMinimum(int(0))
         spinbox.setMinimum(1)
-        spinbox.setMinimum(long(1))
+        spinbox.setMinimum(int(1))
         spinbox.setMinimum(-1)
-        spinbox.setMinimum(long(-1))
+        spinbox.setMinimum(int(-1))
         with pytest.raises(TypeError) as excinfo:
             spinbox.setMinimum('')
         assert "int or long" in str(excinfo.value)
 
         spinbox.setMaximum(0)
-        spinbox.setMaximum(long(0))
+        spinbox.setMaximum(int(0))
         spinbox.setMaximum(1)
-        spinbox.setMaximum(long(1))
+        spinbox.setMaximum(int(1))
         spinbox.setMaximum(-1)
-        spinbox.setMaximum(long(-1))
+        spinbox.setMaximum(int(-1))
         with pytest.raises(TypeError) as excinfo:
             spinbox.setMaximum('')
         assert "int or long" in str(excinfo.value)

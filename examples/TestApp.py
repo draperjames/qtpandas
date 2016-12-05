@@ -46,7 +46,7 @@ class DropLineEdit(QtGui.QLineEdit):
         """
         super(DropLineEdit, self).dropEvent(event)
         mimeDataPayload = event.mimeData().data()
-        self.setText(u"dropped column: {0}".format(mimeDataPayload.column))
+        self.setText("dropped column: {0}".format(mimeDataPayload.column))
         
 class ComplexDropWidget(QtGui.QLineEdit):
     
@@ -217,13 +217,13 @@ class TestWidget(QtGui.QWidget):
         self.dataComboBox.setModelColumn(index)
 
     def goToColumn(self):
-        print "go to column 7"
+        print("go to column 7")
         index = self.dataTableView.view().model().index(7, 0)
         self.dataTableView.view().setCurrentIndex(index)
 
     def changeColumnValue(self, columnName, index, dtype):
-        print "failed to change", columnName, "to", dtype
-        print index.data(), index.isValid()
+        print("failed to change", columnName, "to", dtype)
+        print(index.data(), index.isValid())
         self.dataTableView.view().setCurrentIndex(index)
 
     def setFilter(self):

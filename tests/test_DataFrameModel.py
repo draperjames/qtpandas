@@ -34,7 +34,7 @@ def test_setDataFrame():
 
     with pytest.raises(TypeError) as excinfo:
         model.setDataFrame(None)
-    assert "pandas.core.frame.DataFrame" in unicode(excinfo.value)
+    assert "pandas.core.frame.DataFrame" in str(excinfo.value)
 
 @pytest.mark.parametrize(
     "copy, operator",
@@ -54,13 +54,13 @@ def test_copyDataFrame(copy, operator):
 def test_TimestampFormat():
     model = DataFrameModel()
     assert model.timestampFormat == Qt.ISODate
-    newFormat = u"yy-MM-dd hh:mm"
+    newFormat = "yy-MM-dd hh:mm"
     model.timestampFormat = newFormat
     assert model.timestampFormat == newFormat
 
     with pytest.raises(TypeError) as excinfo:
         model.timestampFormat = "yy-MM-dd hh:mm"
-    assert "unicode" in unicode(excinfo.value)
+    assert "unicode" in str(excinfo.value)
 
 #def test_signalUpdate(qtbot):
     #model = DataFrameModel()
@@ -194,7 +194,7 @@ class TestData(object):
     @pytest.mark.parametrize(
         "value, dtype", [
             ("test", object),
-            (u"äöü", object),
+            ("äöü", object),
         ]
     )
     def test_strAndUnicode(self, model, index, value, dtype):
@@ -348,19 +348,19 @@ class TestSetData(object):
         model.enableEditing(True)
         with pytest.raises(TypeError) as excinfo:
             model.setData(index, numpy.complex64(92+151j))
-        assert "unhandled data type" in unicode(excinfo.value)
+        assert "unhandled data type" in str(excinfo.value)
 
     @pytest.mark.parametrize(
         "value, dtype", [
             ("test", object),
-            (u"äöü", object),
+            ("äöü", object),
         ]
     )
     def test_strAndUnicode(self, model, index, value, dtype):
         dataFrame = pandas.DataFrame([value], columns=['A'])
         dataFrame['A'] = dataFrame['A'].astype(dtype)
         model.setDataFrame(dataFrame)
-        newValue = u"{}123".format(value)
+        newValue = "{}123".format(value)
         model.enableEditing(True)
         assert model.setData(index, newValue)
         assert model.data(index) == newValue
@@ -611,7 +611,7 @@ class TestEditMode(object):
                 defaultVal = _type()
 
             assert model.addDataFrameColumn(desc, _type, defaultVal)
-            for row in xrange(rowCount):
+            for row in range(rowCount):
                 idx = model.index(row, columnCount + index)
                 newVal = idx.data(DATAFRAME_ROLE)
                 assert newVal == defaultVal
@@ -642,7 +642,7 @@ class TestEditMode(object):
         columnNames = dataFrame.columns.tolist()
         columnNames = [(i, n) for i, n in enumerate(columnNames)]
 
-        for cycle in xrange(1000):
+        for cycle in range(1000):
             elements = random.randint(1, len(columnNames))
             names = random.sample(columnNames, elements)
             df = dataFrame.copy()

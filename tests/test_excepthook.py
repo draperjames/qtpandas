@@ -10,16 +10,16 @@ from pandasqt.excepthook import excepthook
 # TODO write it with pytest...
 
 def exception():
-    raise ValueError, "Test Test ä"
+    raise ValueError("Test Test ä")
 
 def exception2():
-    raise ValueError, u"Test Test ä"
+    raise ValueError("Test Test ä")
 
 def exception3():
-    raise ValueError, u"Test Test"
+    raise ValueError("Test Test")
 
 def exception4():
-    raise ValueError, "Test Test"
+    raise ValueError("Test Test")
 
 app = QtGui.QApplication([])
 sys.excepthook = excepthook

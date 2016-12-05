@@ -145,7 +145,7 @@ class TestTableViewWidget(object):
                 dlg_buttons = dlg.findChildren(QtGui.QPushButton)
                 comboBox = dlg.findChildren(QtGui.QComboBox)[-1]
 
-                for i in xrange(comboBox.count()):
+                for i in range(comboBox.count()):
                     columns.append(comboBox.itemText(i))
 
                 for b in dlg_buttons:
@@ -206,3 +206,13 @@ class TestTableViewWidget(object):
                         break
 
         assert widget.view().model().columnCount() == 0
+
+if __name__ == "__main__":
+    TestTableViewWidget.Test_removeColumns()
+    # from PyQt4.QtCore import *
+    # from PyQt4.QtGui import *
+    # from sys import argv,exit
+    # app = QApplication(argv)
+    # w = TestTableViewWidget.test_init()
+    # # w.show()
+    # app.exec_()
