@@ -305,9 +305,10 @@ class CSVImportDialog(QtGui.QDialog):
         This method is also a `SLOT`.
 
         """
+        file_types = "Comma Separated Values (*.csv);;Text files (*.txt);;All Files (*)"
         ret = QtGui.QFileDialog.getOpenFileName(self,
                                                 self.tr(u'open file'),
-                                                filter='Comma Separated Values (*.csv);;Text files (*.txt);;All Files (*)')
+                                                filter=file_types)
         if isinstance(ret, tuple):
             ret = ret[0] #PySide compatibility maybe?
 
