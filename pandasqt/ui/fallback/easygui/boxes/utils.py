@@ -29,9 +29,9 @@ try:
     import tkinter.filedialog as tk_FileDialog
 except ImportError:
     try:
-        import Tkinter as tk  # python2
-        from Tkinter import *
-        import tkFileDialog as tk_FileDialog
+        import tkinter as tk  # python2
+        from tkinter import *
+        import tkinter.filedialog as tk_FileDialog
     except ImportError:
         raise ImportError("Unable to find tkinter package.")
 
@@ -49,9 +49,9 @@ except:
 # Code should use 'basestring' anywhere you might think to use the system 'str'.  This is all to support
 # Python 2.  If 2 ever goes away, this logic can go away and uses of utils.basestring should be changed to just str
 if runningPython27:
-    basestring = basestring
+    str = str
 if runningPython34:
-    basestring = str
+    str = str
 
 def lower_case_sort(things):
     if runningPython34:

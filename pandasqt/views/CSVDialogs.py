@@ -89,10 +89,10 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
         """
         #layout = QtGui.QHBoxLayout(self)
 
-        self.semicolonRadioButton = QtGui.QRadioButton(u'Semicolon')
-        self.commaRadioButton = QtGui.QRadioButton(u'Comma')
-        self.tabRadioButton = QtGui.QRadioButton(u'Tab')
-        self.otherRadioButton = QtGui.QRadioButton(u'Other')
+        self.semicolonRadioButton = QtGui.QRadioButton('Semicolon')
+        self.commaRadioButton = QtGui.QRadioButton('Comma')
+        self.tabRadioButton = QtGui.QRadioButton('Tab')
+        self.otherRadioButton = QtGui.QRadioButton('Other')
         self.commaRadioButton.setChecked(True)
 
         self.otherSeparatorLineEdit = QtGui.QLineEdit(self)
@@ -194,7 +194,7 @@ class CSVImportDialog(QtGui.QDialog):
         """
         super(CSVImportDialog, self).__init__(parent)
         self._modal = True
-        self._windowTitle = u'Import CSV'
+        self._windowTitle = 'Import CSV'
         self._encodingKey = None
         self._filename = None
         self._delimiter = None
@@ -211,7 +211,7 @@ class CSVImportDialog(QtGui.QDialog):
 
         layout = QtGui.QGridLayout()
 
-        self._filenameLabel = QtGui.QLabel(u'Choose File', self)
+        self._filenameLabel = QtGui.QLabel('Choose File', self)
         self._filenameLineEdit = QtGui.QLineEdit(self)
         self._filenameLineEdit.textEdited.connect(self._updateFilename)
         chooseFileButtonIcon = QtGui.QIcon(QtGui.QPixmap(':/icons/document-open.png'))
@@ -226,9 +226,9 @@ class CSVImportDialog(QtGui.QDialog):
         layout.addWidget(self._filenameLineEdit, 0, 1, 1, 2)
         layout.addWidget(self._chooseFileButton, 0, 3)
 
-        self._encodingLabel = QtGui.QLabel(u'File Encoding', self)
+        self._encodingLabel = QtGui.QLabel('File Encoding', self)
 
-        encoding_names = list(map(lambda x: x.upper(), sorted(list(set(_encodings.values())))))
+        encoding_names = list([x.upper() for x in sorted(list(set(_encodings.values())))])
         self._encodingComboBox = QtGui.QComboBox(self)
         self._encodingComboBox.addItems(encoding_names)
         self._encodingComboBox.activated.connect(self._updateEncoding)
@@ -236,7 +236,7 @@ class CSVImportDialog(QtGui.QDialog):
         layout.addWidget(self._encodingLabel, 1, 0)
         layout.addWidget(self._encodingComboBox, 1, 1, 1, 1)
 
-        self._hasHeaderLabel = QtGui.QLabel(u'Header Available?', self)
+        self._hasHeaderLabel = QtGui.QLabel('Header Available?', self)
         self._headerCheckBox = QtGui.QCheckBox(self)
         self._headerCheckBox.toggled.connect(self._updateHeader)
 
@@ -244,7 +244,7 @@ class CSVImportDialog(QtGui.QDialog):
         layout.addWidget(self._hasHeaderLabel, 2, 0)
         layout.addWidget(self._headerCheckBox, 2, 1)
 
-        self._delimiterLabel = QtGui.QLabel(u'Column Delimiter', self)
+        self._delimiterLabel = QtGui.QLabel('Column Delimiter', self)
         self._delimiterBox = DelimiterSelectionWidget(self)
         self._delimiter = self._delimiterBox.currentSelected()
         self._delimiterBox.delimiter.connect(self._updateDelimiter)
@@ -255,18 +255,18 @@ class CSVImportDialog(QtGui.QDialog):
         self._tabWidget = QtGui.QTabWidget(self)
         self._previewTableView = QtGui.QTableView(self)
         self._datatypeTableView = QtGui.QTableView(self)
-        self._tabWidget.addTab(self._previewTableView, u'Preview')
-        self._tabWidget.addTab(self._datatypeTableView, u'Change Column Types')
+        self._tabWidget.addTab(self._previewTableView, 'Preview')
+        self._tabWidget.addTab(self._datatypeTableView, 'Change Column Types')
         layout.addWidget(self._tabWidget, 4, 0, 3, 4)
 
         self._datatypeTableView.horizontalHeader().setDefaultSectionSize(200)
         self._datatypeTableView.setItemDelegateForColumn(1, DtypeComboDelegate(self._datatypeTableView))
 
 
-        self._loadButton = QtGui.QPushButton(u'Load Data', self)
+        self._loadButton = QtGui.QPushButton('Load Data', self)
         #self.loadButton.setAutoDefault(False)
 
-        self._cancelButton = QtGui.QPushButton(u'Cancel', self)
+        self._cancelButton = QtGui.QPushButton('Cancel', self)
         # self.cancelButton.setDefault(False)
         # self.cancelButton.setAutoDefault(True)
 
@@ -308,7 +308,7 @@ class CSVImportDialog(QtGui.QDialog):
 
         file_types = "Comma Separated Values (*.csv);;Text files (*.txt);;All Files (*)"
         ret = QtGui.QFileDialog.getOpenFileName(self,
-                                                self.tr(u'open file'),
+                                                self.tr('open file'),
                                                 filter=file_types)
 
         if isinstance(ret, tuple):
@@ -476,7 +476,7 @@ class CSVImportDialog(QtGui.QDialog):
             df = model.dataFrame().copy()
             dfModel = DataFrameModel(df)
             self.load.emit(dfModel, self._filename)
-            print("Emitted model for {}".format(self._filename))
+            print(("Emitted model for {}".format(self._filename)))
         self._resetWidgets()
         self.accept()
 
@@ -502,7 +502,7 @@ class CSVExportDialog(QtGui.QDialog):
         super(CSVExportDialog, self).__init__(parent)
         self._model = model
         self._modal = True
-        self._windowTitle = u'Export to CSV'
+        self._windowTitle = 'Export to CSV'
         self._idx = -1
         self._initUI()
 
@@ -515,7 +515,7 @@ class CSVExportDialog(QtGui.QDialog):
 
         layout = QtGui.QGridLayout()
 
-        self._filenameLabel = QtGui.QLabel(u'Output File', self)
+        self._filenameLabel = QtGui.QLabel('Output File', self)
         self._filenameLineEdit = QtGui.QLineEdit(self)
         chooseFileButtonIcon = QtGui.QIcon(QtGui.QPixmap(':/icons/document-save-as.png'))
         self._chooseFileAction = QtGui.QAction(self)
@@ -529,9 +529,9 @@ class CSVExportDialog(QtGui.QDialog):
         layout.addWidget(self._filenameLineEdit, 0, 1, 1, 2)
         layout.addWidget(self._chooseFileButton, 0, 3)
 
-        self._encodingLabel = QtGui.QLabel(u'File Encoding', self)
+        self._encodingLabel = QtGui.QLabel('File Encoding', self)
 
-        encoding_names = map(lambda x: x.upper(), sorted(list(set(_encodings.viewvalues()))))
+        encoding_names = [x.upper() for x in sorted(list(set(_encodings.values())))]
         self._encodingComboBox = QtGui.QComboBox(self)
         self._encodingComboBox.addItems(encoding_names)
         self._idx = encoding_names.index('UTF_8')
@@ -541,21 +541,21 @@ class CSVExportDialog(QtGui.QDialog):
         layout.addWidget(self._encodingLabel, 1, 0)
         layout.addWidget(self._encodingComboBox, 1, 1, 1, 1)
 
-        self._hasHeaderLabel = QtGui.QLabel(u'Header Available?', self)
+        self._hasHeaderLabel = QtGui.QLabel('Header Available?', self)
         self._headerCheckBox = QtGui.QCheckBox(self)
         #self._headerCheckBox.toggled.connect(self._updateHeader)
 
         layout.addWidget(self._hasHeaderLabel, 2, 0)
         layout.addWidget(self._headerCheckBox, 2, 1)
 
-        self._delimiterLabel = QtGui.QLabel(u'Column Delimiter', self)
+        self._delimiterLabel = QtGui.QLabel('Column Delimiter', self)
         self._delimiterBox = DelimiterSelectionWidget(self)
 
         layout.addWidget(self._delimiterLabel, 3, 0)
         layout.addWidget(self._delimiterBox, 3, 1, 1, 3)
 
-        self._exportButton = QtGui.QPushButton(u'Export Data', self)
-        self._cancelButton = QtGui.QPushButton(u'Cancel', self)
+        self._exportButton = QtGui.QPushButton('Export Data', self)
+        self._cancelButton = QtGui.QPushButton('Cancel', self)
 
         self._buttonBox = QtGui.QDialogButtonBox(self)
         self._buttonBox.addButton(self._exportButton, QtGui.QDialogButtonBox.AcceptRole)
@@ -665,7 +665,7 @@ def _calculateEncodingKey(comparator):
 
     """
     encodingName = None
-    for k, v in _encodings.items():
+    for k, v in list(_encodings.items()):
         if v == comparator:
             encodingName = k
             break

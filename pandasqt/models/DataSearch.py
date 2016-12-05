@@ -39,7 +39,7 @@ class DataSearch(object):
         self.name = name
 
     def __repr__(self):
-        string = u"DataSearch({}): {} ({})".format(hex(id(self)), self.name, self._filterString)
+        string = "DataSearch({}): {} ({})".format(hex(id(self)), self.name, self._filterString)
         string = string.encode("utf-8")
         return string
 
@@ -146,7 +146,7 @@ class DataSearch(object):
             question = self._dataFrame.index == -9999
             for column in self._dataFrame.columns:
                 dfColumn = self._dataFrame[column]
-                dfColumn = dfColumn.apply(unicode)
+                dfColumn = dfColumn.apply(str)
 
                 question2 = dfColumn.str.contains(searchString, flags=re.IGNORECASE, regex=True, na=False)
                 question = np.logical_or(question, question2)

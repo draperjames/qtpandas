@@ -756,7 +756,7 @@ class FileTypeObject:
 
         self.masks = list()
 
-        if isinstance(filemask, ut.basestring):  # a str or unicode
+        if isinstance(filemask, ut.str):  # a str or unicode
             self.initializeFromString(filemask)
 
         elif isinstance(filemask, list):
@@ -1022,7 +1022,7 @@ def __buttonEvent(event=None, buttons=None, virtual_event=None):
 
     # print('{0}:{1}:{2}'.format(event, buttons, virtual_event))
     if virtual_event == 'cancel':
-        for button_name, button in buttons.items():
+        for button_name, button in list(buttons.items()):
             if 'cancel_choice' in button:
                 __replyButtonText = button['original_text']
         __replyButtonText = None
@@ -1031,9 +1031,9 @@ def __buttonEvent(event=None, buttons=None, virtual_event=None):
 
     if virtual_event == 'select':
         text = event.widget.config('text')[-1]
-        if not isinstance(text, ut.basestring):
+        if not isinstance(text, ut.str):
             text = ' '.join(text)
-        for button_name, button in buttons.items():
+        for button_name, button in list(buttons.items()):
             if button['clean_text'] == text:
                 __replyButtonText = button['original_text']
                 boxRoot.quit()
@@ -1041,7 +1041,7 @@ def __buttonEvent(event=None, buttons=None, virtual_event=None):
 
     # Hotkeys
     if buttons:
-        for button_name, button in buttons.items():
+        for button_name, button in list(buttons.items()):
             hotkey_pressed = event.keysym
             if event.keysym != event.char:  # A special character
                 hotkey_pressed = '<{}>'.format(event.keysym)
@@ -1078,7 +1078,7 @@ def __put_buttons_in_buttonframe(choices, default_choice, cancel_choice):
             expand=YES, side=LEFT, padx='1m', pady='1m', ipadx='2m', ipady='1m')
         buttons[unique_button_text] = this_button
     # Bind arrows, Enter, Escape
-    for this_button in buttons.values():
+    for this_button in list(buttons.values()):
         bindArrows(this_button['widget'])
         for selectionEvent in st.STANDARD_SELECTION_EVENTS:
             this_button['widget'].bind("<{}>".format(selectionEvent),
@@ -1097,7 +1097,7 @@ def __put_buttons_in_buttonframe(choices, default_choice, cancel_choice):
         buttons[default_choice]['default_choice'] = True
         buttons[default_choice]['widget'].focus_force()
     # Bind hotkeys
-    for hk in [button['hotkey'] for button in buttons.values() if button['hotkey']]:
+    for hk in [button['hotkey'] for button in list(buttons.values()) if button['hotkey']]:
         boxRoot.bind_all(hk, lambda e: __buttonEvent(e, buttons), add=True)
 
     return
