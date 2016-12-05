@@ -15,7 +15,7 @@ try:
     import sip
 except ImportError as e:
     has_qt4 = False
-    
+
 try:
     import PySide
 except ImportError as e:
@@ -26,7 +26,7 @@ except ImportError as e:
         raise ImportError( "\n\ninstall PyQt4 and sip or PySide")
     else:
         print("Using PyQt4")
-        
+
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -48,7 +48,7 @@ def read(*filenames, **kwargs):
             buf.append(f.read())
     return sep.join(buf)
 
-long_description = read('README')
+long_description = read('README.md')
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -75,10 +75,10 @@ setup(
     author_email='m.Ludwig@datalyze-solutions.com',
     description='Utilities to use pandas (the data analysis / manipulation library for Python) with Qt.',
     long_description=long_description,
-    
+
     include_package_data=True,
     packages=['pandasqt'],
-    
+
     platforms='any',
     test_suite='tests',
     classifiers = [
