@@ -73,7 +73,7 @@ class DefaultValueValidator(QtGui.QValidator):
 
             elif self.dtype in SupportedDtypes.floatTypes():
                 match = re.search(self.floatPattern, s)
-                print match
+                print(match)
                 if match:
                     try:
                         value = float(match.string)
