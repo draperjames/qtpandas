@@ -145,7 +145,7 @@ of user settings for an EasyGui application.
         # find the length of the longest attribute name
         longest_key_length = 0
         keys = list()
-        for key in self.__dict__.keys():
+        for key in list(self.__dict__.keys()):
             keys.append(key)
             longest_key_length = max(longest_key_length, len(key))
 

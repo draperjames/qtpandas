@@ -174,7 +174,7 @@ def textbox(msg="", title=" ", text="", codebox=0):
 
 
 def to_string(something):
-    if isinstance(something, ut.basestring):
+    if isinstance(something, ut.str):
         return something
     try:
         text = "".join(something)  # convert a list or a tuple to a string
@@ -196,4 +196,4 @@ def demo_textbox():
     title = "Demo of textbox"
     msg = "Here is some sample text. " * 16
     reply = textbox(msg, title, text_snippet)
-    print("Reply was: {!s}".format(reply))
+    print(("Reply was: {!s}".format(reply)))

@@ -101,40 +101,40 @@ class DataTableWidget(QtGui.QWidget):
 
         self.editButton = QtGui.QToolButton(self.buttonFrame)
         self.editButton.setObjectName('editbutton')
-        self.editButton.setText(self.tr(u'edit'))
-        self.editButton.setToolTip(self.tr(u'toggle editing mode'))
+        self.editButton.setText(self.tr('edit'))
+        self.editButton.setToolTip(self.tr('toggle editing mode'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/document-edit.png')))
 
         self.editButton.setIcon(icon)
 
         self.addColumnButton = QtGui.QToolButton(self.buttonFrame)
         self.addColumnButton.setObjectName('addcolumnbutton')
-        self.addColumnButton.setText(self.tr(u'+col'))
-        self.addColumnButton.setToolTip(self.tr(u'add new column'))
+        self.addColumnButton.setText(self.tr('+col'))
+        self.addColumnButton.setToolTip(self.tr('add new column'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-insert-column-right.png')))
 
         self.addColumnButton.setIcon(icon)
 
         self.addRowButton = QtGui.QToolButton(self.buttonFrame)
         self.addRowButton.setObjectName('addrowbutton')
-        self.addRowButton.setText(self.tr(u'+row'))
-        self.addRowButton.setToolTip(self.tr(u'add new row'))
+        self.addRowButton.setText(self.tr('+row'))
+        self.addRowButton.setToolTip(self.tr('add new row'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-insert-row-below.png')))
 
         self.addRowButton.setIcon(icon)
 
         self.removeColumnButton = QtGui.QToolButton(self.buttonFrame)
         self.removeColumnButton.setObjectName('removecolumnbutton')
-        self.removeColumnButton.setText(self.tr(u'-col'))
-        self.removeColumnButton.setToolTip(self.tr(u'remove a column'))
+        self.removeColumnButton.setText(self.tr('-col'))
+        self.removeColumnButton.setToolTip(self.tr('remove a column'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-delete-column.png')))
 
         self.removeColumnButton.setIcon(icon)
 
         self.removeRowButton = QtGui.QToolButton(self.buttonFrame)
         self.removeRowButton.setObjectName('removerowbutton')
-        self.removeRowButton.setText(self.tr(u'-row'))
-        self.removeRowButton.setToolTip(self.tr(u'remove selected rows'))
+        self.removeRowButton.setText(self.tr('-row'))
+        self.removeRowButton.setToolTip(self.tr('remove selected rows'))
         icon = QtGui.QIcon(QtGui.QPixmap(_fromUtf8(':/icons/edit-table-delete-row.png')))
 
         self.removeRowButton.setIcon(icon)

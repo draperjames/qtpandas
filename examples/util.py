@@ -46,7 +46,7 @@ def getCsvData():
     return df
 
 def getRandomData(rows=100, columns=5):
-    columns = [u"column {}".format(column) for column in range(columns) ]
+    columns = ["column {}".format(column) for column in range(columns) ]
     data = {}
     for column in columns:
         data[column] = numpy.random.rand(rows)

@@ -145,7 +145,7 @@ class TestTableViewWidget(object):
                 dlg_buttons = dlg.findChildren(QtGui.QPushButton)
                 comboBox = dlg.findChildren(QtGui.QComboBox)[-1]
 
-                for i in xrange(comboBox.count()):
+                for i in range(comboBox.count()):
                     columns.append(comboBox.itemText(i))
 
                 for b in dlg_buttons:
