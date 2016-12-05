@@ -7,6 +7,7 @@ from pandasqt.models.SupportedDtypes import SupportedDtypes
 import numpy
 from pandas import Timestamp
 from pandas.tslib import NaTType
+import warnings
 
 class DefaultValueValidator(QtGui.QValidator):
     def __init__(self, parent=None):
@@ -44,7 +45,7 @@ class DefaultValueValidator(QtGui.QValidator):
         elif self.dtype in SupportedDtypes.datetimeTypes():
             try:
                 ts = Timestamp(s)
-            except ValueError, e:
+            except ValueError as e:
                 return (QtGui.QValidator.Intermediate, s, pos)
             return (QtGui.QValidator.Acceptable, s, pos)
 
@@ -55,7 +56,7 @@ class DefaultValueValidator(QtGui.QValidator):
                 if match:
                     try:
                         value = int(match.string)
-                    except ValueError, e:
+                    except ValueError as e:
                         return (QtGui.QValidator.Invalid, s, pos)
 
                     dtypeInfo = numpy.iinfo(self.dtype)
@@ -65,18 +66,18 @@ class DefaultValueValidator(QtGui.QValidator):
                 if match:
                     try:
                         value = int(match.string)
-                    except ValueError, e:
+                    except ValueError as e:
                         return (QtGui.QValidator.Invalid, s, pos)
 
                     dtypeInfo = numpy.iinfo(self.dtype)
 
             elif self.dtype in SupportedDtypes.floatTypes():
                 match = re.search(self.floatPattern, s)
-                print match
+                print(match)
                 if match:
                     try:
                         value = float(match.string)
-                    except ValueError, e:
+                    except ValueError as e:
                         return (QtGui.QValidator.Invalid, s, pos)
 
                     dtypeInfo = numpy.finfo(self.dtype)
@@ -169,7 +170,7 @@ class AddAttributesDialog(QtGui.QDialog):
                     defaultValue = Timestamp('')
             else:
                 defaultValue = dtype.type()
-        except ValueError, e:
+        except ValueError as e:
             defaultValue = dtype.type()
 
         self.accepted.emit(newColumn, dtype, defaultValue)

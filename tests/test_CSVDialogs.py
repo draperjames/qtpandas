@@ -92,18 +92,18 @@ class TestCSVImportWidget(object):
         qtbot.addWidget(csvwidget)
         csvwidget.show()
         assert csvwidget.isModal()
-        assert csvwidget.windowTitle() == u'Import CSV'
+        assert csvwidget.windowTitle() == 'Import CSV'
 
     def test_fileinput(self, qtbot, csv_file):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
         labels = csvwidget.findChildren(QtGui.QLabel)
-        assert labels[0].text() == u'Choose File'
+        assert labels[0].text() == 'Choose File'
         lineedits = csvwidget.findChildren(QtGui.QLineEdit)
         qtbot.keyClicks(lineedits[0], csv_file)
         assert csvwidget._previewTableView.model() is not None
-        assert csvwidget._delimiter == u';'
+        assert csvwidget._delimiter == ';'
         assert csvwidget._header is None
 
     def test_header(self, qtbot):
@@ -180,7 +180,7 @@ class TestCSVImportWidget(object):
             assert x
             assert isinstance(x, DataFrameModel)
             assert path
-            assert isinstance(path, basestring)
+            assert isinstance(path, str)
 
         csvwidget.load.connect(_assert)
         with qtbot.waitSignal(csvwidget.load):
@@ -193,14 +193,14 @@ class TestCSVExportWidget(object):
         qtbot.addWidget(csvwidget)
         csvwidget.show()
         assert csvwidget.isModal()
-        assert csvwidget.windowTitle() == u'Export to CSV'
+        assert csvwidget.windowTitle() == 'Export to CSV'
 
     def test_fileoutput(self, qtbot, csv_file):
         csvwidget = CSVExportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
         labels = csvwidget.findChildren(QtGui.QLabel)
-        assert labels[0].text() == u'Output File'
+        assert labels[0].text() == 'Output File'
         lineedits = csvwidget.findChildren(QtGui.QLineEdit)
         qtbot.keyClicks(lineedits[0], csv_file)
         assert csvwidget._filenameLineEdit.text() == csv_file

@@ -43,7 +43,7 @@ class TestSupportedDtypes(object):
         for datatype in expected_support:
             assert obj.description(datatype) is not None
 
-        from StringIO import StringIO
+        from io import StringIO
         s = StringIO()
         assert obj.description(s) is None
         assert obj.description(str) is None

@@ -32,22 +32,22 @@ if runningPython3:
     import tkinter.filedialog as tk_FileDialog
     from io import StringIO
 else:
-    from Tkinter import *
-    import tkFileDialog as tk_FileDialog
-    from StringIO import StringIO
+    from tkinter import *
+    import tkinter.filedialog as tk_FileDialog
+    from io import StringIO
 
 # Set up basestring appropriately
 if runningPython3:
-    basestring = str
+    str = str
 
 
 if TkVersion < 8.0:
     stars = "*" * 75
-    print("""\n\n\n""" + stars + """
+    print(("""\n\n\n""" + stars + """
 You are running Tk version: """ + str(TkVersion) + """
 You must be using Tk version 8.0 or greater to use EasyGui.
 Terminating.
-""" + stars + """\n\n\n""")
+""" + stars + """\n\n\n"""))
     sys.exit(0)
 
 rootWindowPosition = "+300+200"
@@ -223,7 +223,7 @@ def textbox(msg="", title=" ", text="", codebox=0, get_updated_text=None):
     # ----------------- the action begins ------------------------------------
     try:
         # load the text into the textArea
-        if isinstance(text, basestring):
+        if isinstance(text, str):
             pass
         else:
             try:
@@ -267,4 +267,4 @@ def _demo_textbox():
     text_snippet = ((
         "Update button!!!. " * 5) + "\n\n") * 10
     reply = textbox(msg, title, text_snippet, get_updated_text=update)
-    print("Reply was: {!s}".format(reply))
+    print(("Reply was: {!s}".format(reply)))

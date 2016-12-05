@@ -225,7 +225,7 @@ class TextDelegate(QtGui.QItemDelegate):
         """
         if index.isValid():
             value = index.model().data(index, QtCore.Qt.EditRole)
-            editor.setText(unicode(value))
+            editor.setText(str(value))
 
     def setModelData(self, editor, model, index):
         """Gets data from the editor widget and stores it in the specified model at the item index.
