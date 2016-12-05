@@ -28,7 +28,7 @@ if __name__ == "__main__":
     dialog.show()
     app.exec_()
 ```
-Several examples can also be found in the tests directory.
+Several examples can also be found in the exmples directory.
 
 ## TO DO:
 - [ ] Add documentation.
