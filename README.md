@@ -2,6 +2,9 @@
 
 ### Utilities to use pandas (the data analysis/manipulation library for Python) with Qt.
 
+## Build status
+[![Travis status](https://travis-ci.org/draperjames/QtPandas)]
+
 Requirements;
 > Python 3.x    
 > Pandas 20.0   
