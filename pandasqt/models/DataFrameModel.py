@@ -65,7 +65,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     dataChanged = Signal()
     dataFrameChanged = Signal()
 
-    def __init__(self, dataFrame=None, copyDataFrame=False):
+    def __init__(self, dataFrame=None, copyDataFrame=False, filePath=None):
         """the __init__ method.
 
         Args:
@@ -74,6 +74,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             copyDataFrame (bool, optional): create a copy of dataFrame or use it as is. defaults to False.
                 If you use it as is, you can change it from outside otherwise you have to reset the dataFrame
                 after external changes.
+            filePath (str, optional): stores the original path for tracking.
 
         """
         super(DataFrameModel, self).__init__()
@@ -86,6 +87,11 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._dataFrameOriginal = None
         self._search = DataSearch("nothing", "")
         self.editable = False
+        self._filePath = filePath
+
+    @property
+    def filePath(self):
+        return self._filePath
 
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
@@ -96,7 +102,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         """
         return self._dataFrame
 
-    def setDataFrame(self, dataFrame, copyDataFrame=False):
+    def setDataFrame(self, dataFrame, copyDataFrame=False, filePath=None):
         """setter function to _dataFrame. Holds all data.
 
         Note:
@@ -126,6 +132,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._columnDtypeModel.changeFailed.connect(
             lambda columnName, index, dtype: self.changingDtypeFailed.emit(columnName, index, dtype)
         )
+        if filePath is not None:
+            self._filePath = filePath
         self.layoutChanged.emit()
         self.dataChanged.emit()
         self.dataFrameChanged.emit()

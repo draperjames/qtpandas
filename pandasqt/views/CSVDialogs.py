@@ -96,6 +96,7 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
         self.commaRadioButton.setChecked(True)
 
         self.otherSeparatorLineEdit = QtGui.QLineEdit(self)
+        #TODO: Enable this or add BAR radio and option.
         self.otherSeparatorLineEdit.setEnabled(False)
 
         self.semicolonRadioButton.toggled.connect(self._delimiter)
@@ -411,7 +412,7 @@ class CSVImportDialog(QtGui.QDialog):
 
         """
         dataFrame = self._loadCSVDataFrame()
-        dataFrameModel = DataFrameModel(dataFrame)
+        dataFrameModel = DataFrameModel(dataFrame, filePath=self._filename)
         dataFrameModel.enableEditing(True)
         self._previewTableView.setModel(dataFrameModel)
         columnModel = dataFrameModel.columnDtypeModel()
@@ -531,7 +532,11 @@ class CSVExportDialog(QtGui.QDialog):
 
         self._encodingLabel = QtGui.QLabel('File Encoding', self)
 
+<<<<<<< HEAD
+        encoding_names = list(map(lambda x: x.upper(), sorted(list(set(_encodings.values())))))
+=======
         encoding_names = [x.upper() for x in sorted(list(set(_encodings.values())))]
+>>>>>>> aa3f3798361534bc5c0ac831f2a2edcf2e74d8e6
         self._encodingComboBox = QtGui.QComboBox(self)
         self._encodingComboBox.addItems(encoding_names)
         self._idx = encoding_names.index('UTF_8')
@@ -583,6 +588,8 @@ class CSVExportDialog(QtGui.QDialog):
     @Slot()
     def _createFile(self):
         ret = QtGui.QFileDialog.getSaveFileName(self, 'Save File', filter='Comma Separated Value (*.csv)')
+        if isinstance(ret, tuple):
+            ret = ret[0]
         self._filenameLineEdit.setText(ret)
 
     def _saveModel(self):
