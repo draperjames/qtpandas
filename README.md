@@ -4,7 +4,7 @@
 
 ## Project Information
 
-[![Join the chat at https://gitter.im/qtpandas/Lobby#](https://badges.gitter.im/qtpandas/lobby.svg)]((https://gitter.im/qtpandas/Lobby#)
+[![Join the chat at https://gitter.im/qtpandas/Lobby#](https://badges.gitter.im/qtpandas/lobby.svg)](https://gitter.im/qtpandas/Lobby#)
 
 ## Build Status
 
