@@ -2,8 +2,13 @@
 
 ### Utilities to use pandas (the data analysis/manipulation library for Python) with Qt.
 
-## Build status
-[![Travis status](https://travis-ci.org/draperjames/QtPandas)]
+## Project Information
+
+[![Join the chat at https://gitter.im/qtpandas/Lobby#](https://badges.gitter.im/qtpandas/lobby.svg)]((https://gitter.im/qtpandas/Lobby#)
+
+## Build Status
+
+[![Travis status](https://travis-ci.org/draperjames/QtPandas.svg?branch=master)](https://travis-ci.org/draperjames/QtPandas)
 
 Requirements;
 > Python 3.x    
@@ -44,7 +49,8 @@ Join us on [gitter](https://gitter.im/qtpandas/Lobby#)
 - [ ] Secure qtpandas namespace on pip.
 - [ ] Wait for reply
     - [ ] If no reply create new repo for QtPandas.
-- [ ] Create .travis.yaml file.
+- [x] Create .travis.yml file.
+    - [x] integrate into README.md
 - [ ] Add documentation.
 - [ ] Add screen shots
 - [ ] Create Wiki
@@ -54,7 +60,6 @@ Join us on [gitter](https://gitter.im/qtpandas/Lobby#)
 - [ ] Consider adding functions seen in [Spyder IDE's dataframeeditor](https://github.com/spyder-ide/spyder/blob/f2b36f00f873cf4080087bfb529e6256b3e24792/spyder/widgets/variableexplorer/dataframeeditor.py)
     - [ ] Sort
     - [ ] Color coding    
-
 
 
 Forked from @datalyze-solutions's [master](https://github.com/datalyze-solutions/pandas-qt).
