@@ -532,11 +532,9 @@ class CSVExportDialog(QtGui.QDialog):
 
         self._encodingLabel = QtGui.QLabel('File Encoding', self)
 
-<<<<<<< HEAD
+
         encoding_names = list(map(lambda x: x.upper(), sorted(list(set(_encodings.values())))))
-=======
-        encoding_names = [x.upper() for x in sorted(list(set(_encodings.values())))]
->>>>>>> aa3f3798361534bc5c0ac831f2a2edcf2e74d8e6
+
         self._encodingComboBox = QtGui.QComboBox(self)
         self._encodingComboBox.addItems(encoding_names)
         self._idx = encoding_names.index('UTF_8')
