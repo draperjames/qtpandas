@@ -44,22 +44,4 @@ Several examples can also be found in the exmples directory.
 
 Join us on [gitter](https://gitter.im/qtpandas/Lobby#)
 
-### TO DO:
-- [x] Reach out to @kaotika and @datalyze-solutions
-- [x] Secure qtpandas namespace on pip.
-- [x] Wait for reply
-    - [x] If no reply create new repo for QtPandas.
-- [x] Create .travis.yml file.
-    - [x] integrate into README.md
-- [ ] Add documentation.
-- [ ] Add screen shots
-- [x] Create Wiki
-- [ ] Make verison agnostic.
-- [ ] Create specific Python version tests.
-- [ ] Add Windows, Apple, and Linux tests.
-- [ ] Consider adding functions seen in [Spyder IDE's dataframeeditor](https://github.com/spyder-ide/spyder/blob/f2b36f00f873cf4080087bfb529e6256b3e24792/spyder/widgets/variableexplorer/dataframeeditor.py)
-    - [ ] Sort
-    - [ ] Color coding    
-
-
 Forked from @datalyze-solutions's [master](https://github.com/datalyze-solutions/qtpandas).
