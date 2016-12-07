@@ -14,6 +14,8 @@ try:
     sip.setapi('QUrl', 2)
 except ValueError as e:
     log.error(e)
+except ImportError as e:
+    log.error(e)
 
 try:
     from PyQt4 import QtCore as QtCore_
