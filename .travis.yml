@@ -2,10 +2,12 @@ language: python
 
 python:
   - "3.5"
+  - "3.4"
+  - "2.7"
 before_install:
     - sudo mkdir -p /downloads
     - sudo chmod a+rw /downloads
-    - curl -L http://sourceforge.net/projects/pyqt/files/sip/sip-4.16.5/sip-4.16.5.tar.gz -o /downloads/sip.tar.gz 
+    - curl -L http://sourceforge.net/projects/pyqt/files/sip/sip-4.16.5/sip-4.16.5.tar.gz -o /downloads/sip.tar.gz
     - curl -L http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.3/PyQt-x11-gpl-4.11.3.tar.gz -o /downloads/pyqt4.tar.gz
     # Builds
     - sudo mkdir -p /builds
@@ -41,7 +43,7 @@ install:
 #    - pip install pytest-qt
 #    - pip install python-magic==0.4.6
     - pip install .
-    
+
 script: echo "Done!"
 
 notifications:
