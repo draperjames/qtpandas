@@ -4,10 +4,12 @@ python:
   - "3.5"
   - "3.4"
   - "2.7"
+
 before_install:
     - sudo mkdir -p /downloads
     - sudo chmod a+rw /downloads
     - curl -L http://sourceforge.net/projects/pyqt/files/sip/sip-4.16.5/sip-4.16.5.tar.gz -o /downloads/sip.tar.gz
+    #FIXME : Try the same version of pyqt that we use.
     - curl -L http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.3/PyQt-x11-gpl-4.11.3.tar.gz -o /downloads/pyqt4.tar.gz
     # Builds
     - sudo mkdir -p /builds
@@ -18,7 +20,7 @@ install:
     - sh -e /etc/init.d/xvfb start
     - sudo apt-get install -y libqt4-dev
     - sudo apt-get install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
-#    - sudo apt-get install -y python3-sip python3-sip-dev python3-pyqt4 cmake
+
     # Qt4
     - pushd /builds
     # SIP
@@ -37,11 +39,6 @@ install:
     - popd
     # Builds Complete
     - popd
-#    - pip install easygui
-#    - pip install pandas==0.17.1
-#    - pip install pytest-cov
-#    - pip install pytest-qt
-#    - pip install python-magic==0.4.6
     - pip install .
 
 script: echo "Done!"
@@ -50,4 +47,4 @@ notifications:
   email:
     recipients:
       - james.draper@duke.edu
-    on_failure: never # default: always
+    #on_failure: never # default: always

@@ -11,10 +11,11 @@
 [![Travis status](https://travis-ci.org/draperjames/qtpandas.svg?branch=master)](https://travis-ci.org/draperjames/qtpandas)
 
 Requirements;
-> Python 3.x
+> Python 3.4 or greater    
+> Pthon 2.7 or greater     
 > PyQt4
 
-## Install 
+## Install
 To install run the following in the command prompt;
 ```
 pip install qtpandas
