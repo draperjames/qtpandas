@@ -46,14 +46,14 @@ Join us on [gitter](https://gitter.im/qtpandas/Lobby#)
 
 ### TO DO:
 - [x] Reach out to @kaotika and @datalyze-solutions
-- [ ] Secure qtpandas namespace on pip.
-- [ ] Wait for reply
-    - [ ] If no reply create new repo for QtPandas.
+- [x] Secure qtpandas namespace on pip.
+- [x] Wait for reply
+    - [x] If no reply create new repo for QtPandas.
 - [x] Create .travis.yml file.
     - [x] integrate into README.md
 - [ ] Add documentation.
 - [ ] Add screen shots
-- [ ] Create Wiki
+- [x] Create Wiki
 - [ ] Make verison agnostic.
 - [ ] Create specific Python version tests.
 - [ ] Add Windows, Apple, and Linux tests.
