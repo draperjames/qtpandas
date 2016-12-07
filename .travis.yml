@@ -24,3 +24,19 @@ matrix:
     - python: "3.5"
       env: USE_QT_API=PyQt5 USE_CONDA=true
       os: linux
+      
+install:
+  - ./continuous_integration/travis/install.sh;
+  - export PATH="$HOME/miniconda/bin:$PATH";
+  - if [ "${USE_CONDA}" = "true" ]; then
+        source activate test-environment;
+    fi
+  - pip install coveralls
+
+script:
+  - ./continuous_integration/travis/build_test.sh
+  - ./continuous_integration/travis/run_test.sh
+  - ./continuous_integration/travis/modules_test.sh
+  - pip install pytest-qt
+  - python runtests.py
+- coveralls
