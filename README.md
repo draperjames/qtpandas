@@ -8,7 +8,7 @@
 
 ## Build Status
 
-[![Travis status](https://travis-ci.org/draperjames/QtPandas.svg?branch=master)](https://travis-ci.org/draperjames/QtPandas)
+[![Travis status](https://travis-ci.org/draperjames/qtpandas.svg?branch=master)](https://travis-ci.org/draperjames/qtpandas)
 
 Requirements;
 > Python 3.x    
