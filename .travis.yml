@@ -1,10 +1,5 @@
-notifications:
-  email:
-    recipients:
-      - james.draper@duke.edu
-    on_failure: never # default: always
-    
 language: python
+
 python:
   - "3.5"
 before_install:
@@ -40,11 +35,17 @@ install:
     - popd
     # Builds Complete
     - popd
-    - pip install easygui
-    - pip install pandas==0.17.1
-    - pip install pytest-cov
+#    - pip install easygui
+#    - pip install pandas==0.17.1
+#    - pip install pytest-cov
 #    - pip install pytest-qt
-    - pip install python-magic==0.4.6
+#    - pip install python-magic==0.4.6
     - pip install .
     
 script: echo "Done!"
+
+notifications:
+  email:
+    recipients:
+      - james.draper@duke.edu
+    on_failure: never # default: always
