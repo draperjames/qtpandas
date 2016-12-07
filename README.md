@@ -36,7 +36,17 @@ if __name__ == "__main__":
     dialog.show()
     app.exec_()
 ```
-Several examples can also be found in the exmples directory.
+# Examples
+
+These can be found in QtPandas/examples.
+
+- BasicExmple.py
+
+![basic](images/BasicExample_screen_shot.PNG)
+
+- Here is TestApp.py
+
+![testapp](images/TestApp_screen_shot.PNG)
 
 # Development
 

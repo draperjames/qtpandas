@@ -16,7 +16,7 @@ DTYPE_ROLE = Qt.UserRole + 1
 DTYPE_CHANGE_ROLE = Qt.UserRole + 3
 
 class ColumnDtypeModel(QtCore.QAbstractTableModel):
-    """data model returning datatypes per column
+    """Data model returning datatypes per column
 
     Attributes:
         dtypeChanged (Signal(columnName)): emitted after a column has changed it's data type.
@@ -269,4 +269,3 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
             number of columns
         """
         return len(self.headers)
-
