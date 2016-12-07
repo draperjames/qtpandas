@@ -7,7 +7,8 @@ python:
 install:
   - pip install easygui
   - pip install pandas==0.17.1
-  - pip install pyside 
+#  - pip install pyside
+  - pip install PyQt4
   - pip install pytest
   - pip install pytest-cov
   - pip install pytest-qt
