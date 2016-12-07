@@ -8,18 +8,23 @@
 
 ## Build Status
 
-[![Travis status](https://travis-ci.org/draperjames/QtPandas.svg?branch=master)](https://travis-ci.org/draperjames/QtPandas)
+[![Travis status](https://travis-ci.org/draperjames/qtpandas.svg?branch=master)](https://travis-ci.org/draperjames/qtpandas)
 
 Requirements;
-> Python 3.x    
-> Pandas 20.0   
-> PyQt 4.7.8
+> Python 3.4 or greater    
+> Pthon 2.7 or greater     
+> PyQt4
 
+## Install
 To install run the following in the command prompt;
 ```
 pip install qtpandas
+```
+If that doesn't work try installing the lastest version of easy gui;
+```
 pip install --upgrade git+https://github.com/robertlugg/easygui.git
 ```
+If that doesn't work then please [report an issue](https://github.com/draperjames/qtpandas/issues)
 
 To use, create a new Python script containing the following:
 ```
@@ -51,7 +56,9 @@ These can be found in QtPandas/examples.
 # Development
 
 ## Wanna contribute?
-
-Join us on [gitter](https://gitter.im/qtpandas/Lobby#)
+Any feedback is apprecaited.
+- Report an issue
+- Check out the wiki for development info (coming soon!)
+- Fork us.
 
 Forked from @datalyze-solutions's [master](https://github.com/datalyze-solutions/qtpandas).

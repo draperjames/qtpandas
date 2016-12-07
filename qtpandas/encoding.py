@@ -13,8 +13,8 @@ try:
     import magic
     AUTODETECT = True
 except ImportError as e:
-    #if sys.platform == 'darwin':
-    #raise ImportError('Please install libmagic')
+    # if sys.platform == 'darwin':
+    # raise ImportError('Please install libmagic')
     warnings.warn("Please install libmagic - got an error: {}".format(e))
     AUTODETECT = False
 except OSError as e:

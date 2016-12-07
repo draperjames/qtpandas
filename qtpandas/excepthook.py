@@ -10,10 +10,11 @@ import tempfile
 # fallback solution to show a OS independent messagebox
 from easygui.boxes.derived_boxes import msgbox
 
+
 def excepthook(excType, excValue, tracebackobj):
     """
     Global function to catch unhandled exceptions.
-    
+
     @param excType exception type
     @param excValue exception value
     @param tracebackobj traceback object
@@ -35,7 +36,7 @@ def excepthook(excType, excValue, tracebackobj):
         excValueStr = str(excValue).decode('utf-8')
     except UnicodeEncodeError as e:
         excValueStr = str(excValue)
-    
+
     errmsg = '{0}: \n{1}'.format(excType, excValueStr)
     sections = ['\n', separator, timeString, separator, errmsg, separator, tbinfo]
     msg = '\n'.join(sections)
@@ -53,12 +54,14 @@ def excepthook(excType, excValue, tracebackobj):
         _showMessageBox(str(notice) + str(msg))
     except:
         msgbox(str(notice) + str(msg), "Error")
-    
+
+
 def _isQAppRunning():
     if QtGui.QApplication.instance() is None:
         return False
     else:
         return True
+
 
 def _showMessageBox(text):
     errorbox = QtGui.QMessageBox()

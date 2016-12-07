@@ -1,5 +1,4 @@
 
-
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 import io
@@ -21,13 +20,11 @@ try:
 except ImportError as e:
     # TODO: try to import PySide.
     if not has_qt4:
-        #We know we failed to import PyQt4/sip...
-        #And we failed to import pyside.
-        raise ImportError( "\n\ninstall PyQt4 and sip or PySide")
+        # We know we failed to import PyQt4/sip...
+        # And we failed to import pyside.
+        raise ImportError("\n\ninstall PyQt4 and sip or PySide")
     else:
         print("Using PyQt4")
-
-
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -35,9 +32,10 @@ version_file = open(os.path.join(here, 'qtpandas', '__init__.py'), 'rU')
 __version__ = re.sub(
     r".*\b__version__\s+=\s+'([^']+)'.*",
     r'\1',
-    [ line.strip() for line in version_file if '__version__' in line ].pop(0)
+    [line.strip() for line in version_file if '__version__' in line].pop(0)
 )
 version_file.close()
+
 
 def read(*filenames, **kwargs):
     encoding = kwargs.get('encoding', 'utf-8')
@@ -48,7 +46,14 @@ def read(*filenames, **kwargs):
             buf.append(f.read())
     return sep.join(buf)
 
-long_description = read('README.md')
+short_description = """Utilities to use pandas (the data analysis / manipulation
+library for Python) with Qt."""
+
+try:
+    long_description = read('README.md')
+except:
+    long_description = "See README.md where installed"
+
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -61,33 +66,34 @@ class PyTest(TestCommand):
         errcode = pytest.main(self.test_args)
         sys.exit(errcode)
 
-tests_require = ['easygui', 'pandas == 0.17.1', 'pyside', 'pytest', 'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
+tests_require = ['easygui', 'pandas == 0.17.1', 'pyside', 'pytest',
+                            'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
 setup(
     name='qtpandas',
     version=__version__,
     url='https://github.com/draperjames/qtpandas',
     license='MIT License',
-    namespace_packages = ['qtpandas'],
+    namespace_packages=['qtpandas'],
     author='Matthias Ludwig, Marcel Radischat, Zeke, James Draper',
     tests_require=tests_require,
-    install_requires=['easygui', 'pandas==0.17.1', 'pytest', 'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
+    install_requires=['easygui', 'pandas==0.17.1', 'pytest',
+                      'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
     cmdclass={'test': PyTest},
     author_email='james.draper@duke.edu',
-    description='Utilities to use pandas (the data analysis / manipulation library for Python) with Qt.',
+    description=short_description,
     long_description=long_description,
-
     include_package_data=True,
     packages=['qtpandas'],
 
     platforms='any',
     test_suite='tests',
-    classifiers = [
+    classifiers=[
         'Programming Language :: Python',
         'Development Status :: 4 - Beta',
-        'Natural Language :: German',
+        'Natural Language :: English',
         'Environment :: X11 Applications :: Qt',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: User Interfaces'
