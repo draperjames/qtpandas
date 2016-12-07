@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from qtpandas.compat import Qt, QtCore, QtGui
 
 import pytest
 import pytestqt
 import sys
-from pandasqt.excepthook import excepthook
+from qtpandas.excepthook import excepthook
 
 # TODO write it with pytest...
 

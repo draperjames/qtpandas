@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from qtpandas.compat import Qt, QtCore, QtGui
 
 
 import pytest
@@ -10,9 +10,9 @@ import decimal
 import numpy
 import pandas
 
-from pandasqt.models.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE
-from pandasqt.models.SupportedDtypes import SupportedDtypes
-from pandasqt.views.CustomDelegates import DtypeComboDelegate
+from qtpandas.models.ColumnDtypeModel import ColumnDtypeModel, DTYPE_ROLE
+from qtpandas.models.SupportedDtypes import SupportedDtypes
+from qtpandas.views.CustomDelegates import DtypeComboDelegate
 
 
 @pytest.fixture()

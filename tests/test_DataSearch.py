@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from qtpandas.compat import Qt, QtCore, QtGui
 
 
 import pytest
@@ -10,8 +10,8 @@ import decimal
 import numpy
 import pandas
 
-from pandasqt.models.DataFrameModel import DataFrameModel, DATAFRAME_ROLE
-from pandasqt.models.DataSearch import DataSearch
+from qtpandas.models.DataFrameModel import DataFrameModel, DATAFRAME_ROLE
+from qtpandas.models.DataSearch import DataSearch
 
 class TestDataSearch(object):
 

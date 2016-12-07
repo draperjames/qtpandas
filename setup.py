@@ -31,7 +31,7 @@ except ImportError as e:
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-version_file = open(os.path.join(here, 'pandasqt', '__init__.py'), 'rU')
+version_file = open(os.path.join(here, 'qtpandas', '__init__.py'), 'rU')
 __version__ = re.sub(
     r".*\b__version__\s+=\s+'([^']+)'.*",
     r'\1',
@@ -63,21 +63,21 @@ class PyTest(TestCommand):
 
 tests_require = ['easygui', 'pandas == 0.17.1', 'pyside', 'pytest', 'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
 setup(
-    name='pandas-qt',
+    name='qtpandas',
     version=__version__,
-    url='https://github.com/datalyze-solutions/pandas-qt',
+    url='https://github.com/draperjames/qtpandas',
     license='MIT License',
-    namespace_packages = ['pandasqt'],
-    author='Matthias Ludwig, Marcel Radischat',
+    namespace_packages = ['qtpandas'],
+    author='Matthias Ludwig, Marcel Radischat, Zeke, James Draper',
     tests_require=tests_require,
     install_requires=['easygui', 'pandas==0.17.1', 'pytest', 'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
     cmdclass={'test': PyTest},
-    author_email='m.Ludwig@datalyze-solutions.com',
+    author_email='james.draper@duke.edu',
     description='Utilities to use pandas (the data analysis / manipulation library for Python) with Qt.',
     long_description=long_description,
 
     include_package_data=True,
-    packages=['pandasqt'],
+    packages=['qtpandas'],
 
     platforms='any',
     test_suite='tests',

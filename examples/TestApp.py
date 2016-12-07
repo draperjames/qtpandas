@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 import sys
 
-from pandasqt.excepthook import excepthook
+from qtpandas.excepthook import excepthook
 sys.excepthook = excepthook
 
-from pandasqt.compat import QtCore, QtGui, Qt, Slot, Signal
+from qtpandas.compat import QtCore, QtGui, Qt, Slot, Signal
 
 import pandas
 import numpy
 
-from pandasqt.models.DataFrameModel import DataFrameModel
-from pandasqt.models.DataSearch import DataSearch
-from pandasqt.views.CSVDialogs import CSVImportDialog, CSVExportDialog
-from pandasqt.views._ui import icons_rc
-from pandasqt.views.DataTableView import DataTableWidget
-from pandasqt.views.CustomDelegates import DtypeComboDelegate
-from pandasqt.models.mime import PandasCellMimeType, PandasCellPayload
+from qtpandas.models.DataFrameModel import DataFrameModel
+from qtpandas.models.DataSearch import DataSearch
+from qtpandas.views.CSVDialogs import CSVImportDialog, CSVExportDialog
+from qtpandas.views._ui import icons_rc
+from qtpandas.views.DataTableView import DataTableWidget
+from qtpandas.views.CustomDelegates import DtypeComboDelegate
+from qtpandas.models.mime import PandasCellMimeType, PandasCellPayload
 from util import getCsvData, getRandomData
 
 class DropLineEdit(QtGui.QLineEdit):

@@ -1,6 +1,6 @@
 import numpy
 import pytest
-from pandasqt.models.SupportedDtypes import SupportedDtypes, SupportedDtypesTranslator
+from qtpandas.models.SupportedDtypes import SupportedDtypes, SupportedDtypesTranslator
 
 @pytest.fixture()
 def expected_support():

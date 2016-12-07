@@ -17,7 +17,7 @@ Requirements;
 
 To install run the following in the command prompt;
 ```
-pip install git+https://github.com/zbarge/QtPandas.git
+pip install qtpandas
 pip install --upgrade git+https://github.com/robertlugg/easygui.git
 ```
 
@@ -26,7 +26,7 @@ To use, create a new Python script containing the following:
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from pandasqt.views.CSVDialogs import CSVImportDialog
+from qtpandas.views.CSVDialogs import CSVImportDialog
 
 if __name__ == "__main__":
     from sys import argv, exit
@@ -62,4 +62,4 @@ Join us on [gitter](https://gitter.im/qtpandas/Lobby#)
     - [ ] Color coding    
 
 
-Forked from @datalyze-solutions's [master](https://github.com/datalyze-solutions/pandas-qt).
+Forked from @datalyze-solutions's [master](https://github.com/datalyze-solutions/qtpandas).

@@ -2,18 +2,18 @@
 import os
 import tempfile
 
-from pandasqt.compat import Qt, QtCore, QtGui
+from qtpandas.compat import Qt, QtCore, QtGui
 
 
 import numpy
 import pytest
 import pytestqt
 
-from pandasqt.views.CSVDialogs import (
+from qtpandas.views.CSVDialogs import (
     DelimiterValidator, DelimiterSelectionWidget,
     CSVImportDialog, CSVExportDialog
 )
-from pandasqt.models.DataFrameModel import DataFrameModel
+from qtpandas.models.DataFrameModel import DataFrameModel
 
 FIXTUREDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures')
 

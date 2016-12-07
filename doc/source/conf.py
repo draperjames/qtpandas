@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# pandas-qt documentation build configuration file, created by
+# qtpandas documentation build configuration file, created by
 # sphinx-quickstart on Fri Nov 14 15:32:14 2014.
 #
 # This file is execfile()d with the current directory set to its
@@ -19,7 +19,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../../pandasqt'))
+sys.path.insert(0, os.path.abspath('../../qtpandas'))
 sys.path.insert(0, os.path.abspath('../../examples'))
 
 # -- General configuration ------------------------------------------------
@@ -53,7 +53,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'pandas-qt'
+project = 'qtpandas'
 copyright = '2014, Matthias Ludwig - Datalyze Solutions'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -203,7 +203,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pandas-qtdoc'
+htmlhelp_basename = 'qtpandasdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -225,7 +225,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'pandas-qt.tex', 'pandas-qt Documentation',
+  ('index', 'qtpandas.tex', 'qtpandas Documentation',
    'Matthias Ludwig - Datalyze Solutions', 'manual'),
 ]
 
@@ -255,7 +255,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pandas-qt', 'pandas-qt Documentation',
+    ('index', 'qtpandas', 'qtpandas Documentation',
      ['Matthias Ludwig - Datalyze Solutions'], 1)
 ]
 
@@ -269,8 +269,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'pandas-qt', 'pandas-qt Documentation',
-   'Matthias Ludwig - Datalyze Solutions', 'pandas-qt', 'One line description of project.',
+  ('index', 'qtpandas', 'qtpandas Documentation',
+   'Matthias Ludwig - Datalyze Solutions', 'qtpandas', 'One line description of project.',
    'Miscellaneous'),
 ]
 
