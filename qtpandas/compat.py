@@ -1,9 +1,10 @@
-import sip
+
 import logging
 log = logging.getLogger(__name__)
 
 
 try:
+    import sip
     sip.setapi('QString', 2)
     sip.setapi('QVariant', 2)
     sip.setapi('QDate', 2)
