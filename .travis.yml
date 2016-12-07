@@ -5,6 +5,13 @@ python:
 # command to install dependencies
 # install: "pip install -r requirements.txt"
 install:
+  - pip install easygui
+  - pip install pandas == 0.17.1
+  - pip install pyside 
+  - pip install pytest
+  - pip install pytest-cov
+  - pip install pytest-qt
+  - pip install python-magic==0.4.6
   - pip install .
 # command to run tests
 script: pytest
