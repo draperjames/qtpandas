@@ -54,7 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'qtpandas'
-copyright = '2014, Matthias Ludwig - Datalyze Solutions'
+copyright = 'qtpandas contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

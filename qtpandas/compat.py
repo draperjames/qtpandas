@@ -1,7 +1,8 @@
+import sip
 import logging
 log = logging.getLogger(__name__)
 
-import sip
+
 try:
     sip.setapi('QString', 2)
     sip.setapi('QVariant', 2)

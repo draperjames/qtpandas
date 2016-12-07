@@ -87,7 +87,7 @@ setup(
 
     platforms='any',
     test_suite='tests',
-    classifiers = [
+    classifiers=[
         'Programming Language :: Python',
         'Development Status :: 4 - Beta',
         'Natural Language :: English',
