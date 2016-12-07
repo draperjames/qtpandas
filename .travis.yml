@@ -10,13 +10,6 @@ env:
 matrix:
   include:
     # Python3
-    # Windows using pip packages
-    - python: "3.5"
-      env: USE_QT_API=PyQt5 USE_CONDA=false
-      os: windows
-    - python: "3.5"
-      env: USE_QT_API=PyQt4 USE_CONDA=false
-      os: windows
     # Linux using pip packages
     - python: "3.5"
       env: USE_QT_API=PyQt5 USE_CONDA=false
@@ -24,20 +17,7 @@ matrix:
     - python: "3.5"
       env: USE_QT_API=PyQt4 USE_CONDA=false
       os: linux
-    # Windows using conda packages
-    - python: "3.5"
-      env: USE_QT_API=PyQt5 USE_CONDA=true
-      os: windows
-    - python: "3.5"
-      env: USE_QT_API=PyQt4 USE_CONDA=true
-      os: windows
     # Linux using conda packages
-    - python: "2.7"
-      env: USE_QT_API=PyQt4 USE_CONDA=true
-      os: linux
-    - python: "2.7"
-      env: USE_QT_API=PyQt5 USE_CONDA=true
-      os: linux
     - python: "3.5"
       env: USE_QT_API=PyQt4 USE_CONDA=true
       os: linux
