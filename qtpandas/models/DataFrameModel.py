@@ -5,7 +5,7 @@
 """
 
 from datetime import datetime
-
+from qtpandas.utils import superReadFile
 from qtpandas.compat import Qt, QtCore, QtGui, Slot, Signal
 
 
@@ -93,6 +93,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     def filePath(self):
         return self._filePath
 
+
+
     def dataFrame(self):
         """getter function to _dataFrame. Holds all data.
 
@@ -101,6 +103,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         """
         return self._dataFrame
+
+    def setDataFrameFromFile(self, filepath, **kwargs):
+        df = superReadFile(filepath, **kwargs)
+        self.setDataFrame(df, filePath=filepath)
 
     def setDataFrame(self, dataFrame, copyDataFrame=False, filePath=None):
         """setter function to _dataFrame. Holds all data.
