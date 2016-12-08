@@ -5,7 +5,7 @@ from encodings.aliases import aliases as _encodings
 import pandas
 
 from qtpandas.compat import Qt, QtCore, QtGui, Slot, Signal
-from qtpandas.encoding import Detector
+# from qtpandas.encoding import Detector
 from qtpandas.models.DataFrameModel import DataFrameModel
 from qtpandas.views.CustomDelegates import DtypeComboDelegate
 from qtpandas.views._ui import icons_rc
@@ -200,7 +200,7 @@ class CSVImportDialog(QtGui.QDialog):
         self._filename = None
         self._delimiter = None
         self._header = None
-        self._detector = Detector()
+        # self._detector = Detector()
         self._initUI()
 
     def _initUI(self):
@@ -363,7 +363,8 @@ class CSVImportDialog(QtGui.QDialog):
 
         """
         if os.path.exists(path) and path.lower().endswith('csv'):
-            encoding = self._detector.detect(path)
+            # encoding = self._detector.detect(path)
+            encoding = None
 
             if encoding is not None:
                 if encoding.startswith('utf'):
