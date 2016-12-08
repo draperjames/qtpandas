@@ -1,13 +1,14 @@
 from qtpandas.compat import QtCore, QtGui, Qt, Signal, Slot
 
+
 class ProgressWorker(QtCore.QObject):
-    
+
     progressChanged = Signal(int)       # set value of OverlayProgressView
     finished = Signal()
 
     def __init__(self, name):
         """Worker object that will be passed to the thread.
-        
+
         Args:
             name (str): name shown in progress ui.
 
@@ -24,15 +25,15 @@ class ProgressWorker(QtCore.QObject):
 
     def run(self):
         """Implement your job here. This is what the thread will do.
-        
+
         """
-        raise NotImplemented
+        raise NotImplementedError
 
 
 
 def createThread(parent, worker, deleteWorkerLater=False):
     """Create a new thread for given worker.
-    
+
     Args:
         parent (QObject): parent of thread and worker.
         worker (ProgressWorker): worker to use in thread.
@@ -47,7 +48,7 @@ def createThread(parent, worker, deleteWorkerLater=False):
     worker.finished.connect(thread.quit)
     if deleteWorkerLater:
         thread.finished.connect(worker.deleteLater)
-    
+
     worker.moveToThread(thread)
     worker.setParent(parent)
     return thread
