@@ -49,7 +49,8 @@ def superReadCSV(filepath, first_codec='UTF_8', usecols=None,
                  low_memory=False, dtype=None, parse_dates=True,
                  sep=',', chunksize=None, verbose=False, **kwargs):
 
-        """ A wrap to pandas read_csv with mods to accept a dataframe or
+        """
+        A wrap to pandas read_csv with mods to accept a dataframe or
         filepath. returns dataframe untouched, reads filepath and returns
         dataframe based on arguments.
         """
@@ -97,9 +98,11 @@ def _count(item, string):
 
 
 def identify_sep(filepath):
-    """Identifies the separator of data in a filepath.
+    """
+    Identifies the separator of data in a filepath.
     It reads the first line of the file and counts supported separators.
-    Currently supported separators: ['|', ';', ',','\t',':']"""
+    Currently supported separators: ['|', ';', ',','\t',':']
+    """
     ext = os.path.splitext(filepath)[1].lower()
     allowed_exts = ['.csv', '.txt', '.tsv']
     assert ext in ['.csv', '.txt'], "Unexpected file extension {}. \
@@ -126,7 +129,8 @@ def identify_sep(filepath):
 
 
 def superReadText(filepath, **kwargs):
-    """ A wrapper to superReadCSV which wraps pandas.read_csv().
+    """
+    A wrapper to superReadCSV which wraps pandas.read_csv().
     The benefit of using this function is that it automatically identifies the
     column separator.
     .tsv files are assumed to have a \t (tab) separation
@@ -157,7 +161,8 @@ def superReadText(filepath, **kwargs):
 
 
 def superReadFile(filepath, **kwargs):
-    """ Uses pandas.read_excel (on excel files) and returns a dataframe of the
+    """
+    Uses pandas.read_excel (on excel files) and returns a dataframe of the
     first sheet (unless sheet is specified in kwargs)
     Uses superReadText (on .txt,.tsv, or .csv files) and returns a dataframe of
     the data. One function to read almost all types of data files.
@@ -178,7 +183,8 @@ def superReadFile(filepath, **kwargs):
 
 
 def dedupe_cols(frame):
-    """Need to dedupe columns that have the same name.
+    """
+    Need to dedupe columns that have the same name.
     """
 
     cols = list(frame.columns)
@@ -190,7 +196,8 @@ def dedupe_cols(frame):
 
 
 def rename_dupe_cols(cols):
-    """Takes a list of strings and appends 2,3,4 etc to duplicates. Never
+    """
+    Takes a list of strings and appends 2,3,4 etc to duplicates. Never
     appends a 0 or 1. Appended #s are not always in order...but if you wrap
     this in a dataframe.to_sql function you're guaranteed to not have dupe
     column name errors importing data to SQL...you'll just have to check
