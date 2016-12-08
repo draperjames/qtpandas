@@ -103,15 +103,15 @@ class TestCSVImportWidget(object):
         lineedits = csvwidget.findChildren(QtGui.QLineEdit)
         qtbot.keyClicks(lineedits[0], csv_file)
         assert csvwidget._previewTableView.model() is not None
-        assert csvwidget._delimiter == ';'
-        assert csvwidget._header is None
+        assert csvwidget._delimiter in [';',',','|']
+        assert csvwidget._header is None, "csvwidget header should be None not {}.".format(csvwidget._header)
 
     def test_header(self, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
 
-        assert csvwidget._header == None
+        assert csvwidget._header is None
         checkboxes = csvwidget.findChildren(QtGui.QCheckBox)
         checkboxes[0].toggle()
         assert csvwidget._header == 0
@@ -253,9 +253,9 @@ class TestCSVExportWidget(object):
         for button in buttons:
             qtbot.mouseClick(button, QtCore.Qt.LeftButton)
             if button.text() == 'Export Data':
-                assert csvwidget.isVisible() == True
+                assert csvwidget.isVisible() is True
             else:
-                assert csvwidget.isVisible() == False
+                assert csvwidget.isVisible() is False
 
 class TestDateTimeConversion(object):
 

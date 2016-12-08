@@ -4,6 +4,7 @@ from qtpandas.compat import QtCore
 
 PandasCellMimeType = "application/pandas-cell" # comparable to a QModelIndex for DataFrames
 
+
 class MimeData(QtCore.QMimeData):
     
     def __init__(self, mimeType=PandasCellMimeType):
