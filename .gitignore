@@ -57,3 +57,4 @@ target/
 .eric4project
 *.e4p
 *.bak
+*.idea/

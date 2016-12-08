@@ -7,9 +7,11 @@ from qtpandas.compat import QtGui
 import codecs
 import os
 import tempfile
+import sys
 # fallback solution to show a OS independent messagebox
 from easygui.boxes.derived_boxes import msgbox
 
+python_version = sys.version_info[0]
 
 def excepthook(excType, excValue, tracebackobj):
     """
@@ -30,10 +32,19 @@ def excepthook(excType, excValue, tracebackobj):
     traceback.print_tb(tracebackobj, None, tbinfofile)
     tbinfofile.seek(0)
     tbinfo = tbinfofile.read()
-    tbinfo = tbinfo.encode('utf-8')
+    if python_version > 3:
+        # Python3 has no str().decode()
+        tbinfo = tbinfo.decode('utf-8')
+    else:
+        pass
 
     try:
-        excValueStr = str(excValue).encode('utf-8')
+        if python_version > 3:
+            # Python3 has no str().decode()
+            excValueStr = str(excValue).decode('utf-8')
+        else:
+            excValueStr = str(excValue)
+
     except UnicodeEncodeError as e:
         excValueStr = str(excValue)
 
