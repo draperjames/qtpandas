@@ -30,10 +30,10 @@ def excepthook(excType, excValue, tracebackobj):
     traceback.print_tb(tracebackobj, None, tbinfofile)
     tbinfofile.seek(0)
     tbinfo = tbinfofile.read()
-    tbinfo = tbinfo.decode('utf-8')
+    tbinfo = tbinfo.encode('utf-8')
 
     try:
-        excValueStr = str(excValue).decode('utf-8')
+        excValueStr = str(excValue).encode('utf-8')
     except UnicodeEncodeError as e:
         excValueStr = str(excValue)
 
