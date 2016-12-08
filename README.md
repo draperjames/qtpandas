@@ -30,16 +30,8 @@
     </a>
   </td>
 </tr>
-<tr>
-    <td>
-    Codacity grade
-    </td>
-    <td>
-    [![Codacy Badge](https://api.codacy.com/project/badge/Grade/795dad8f6dfd4697ab8474265c4d47cb)](https://www.codacy.com/app/james-draper/qtpandas?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=draperjames/qtpandas&amp;utm_campaign=Badge_Grade)
-    </td>
-</tr>
 </table>
-
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/795dad8f6dfd4697ab8474265c4d47cb)](https://www.codacy.com/app/james-draper/qtpandas?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=draperjames/qtpandas&amp;utm_campaign=Badge_Grade)
 [![Join the chat at https://gitter.im/qtpandas/Lobby#](https://badges.gitter.im/qtpandas/lobby.svg)](https://gitter.im/qtpandas/Lobby#)
 [![open issues](https://img.shields.io/github/issues-raw/draperjames/qtpandas.svg)](https://github.com/draperjames/qtpandas/issues)
 [![closed issues](https://img.shields.io/github/issues-closed/draperjames/qtpandas.svg)](https://github.com/draperjames/qtpandas/issues)
