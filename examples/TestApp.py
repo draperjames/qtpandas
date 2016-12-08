@@ -19,11 +19,11 @@ from qtpandas.models.mime import PandasCellMimeType, PandasCellPayload
 from util import getCsvData, getRandomData
 
 class DropLineEdit(QtGui.QLineEdit):
-    
+
     def __init__(self, text, parent=None):
         super(DropLineEdit, self).__init__(text, parent)
         self.setAcceptDrops(True)
-        
+
     def dragEnterEvent(self, event):
         """recieve a drag event and check if we want to accept or reject
 
@@ -47,15 +47,16 @@ class DropLineEdit(QtGui.QLineEdit):
         super(DropLineEdit, self).dropEvent(event)
         mimeDataPayload = event.mimeData().data()
         self.setText("dropped column: {0}".format(mimeDataPayload.column))
-        
+
+
 class ComplexDropWidget(QtGui.QLineEdit):
-    
+
     dropRecieved = Signal(QtCore.QMimeData)
 
     def __init__(self, parent=None):
         super(ComplexDropWidget, self).__init__(parent)
         self.setAcceptDrops(True)
-        
+
     def dragEnterEvent(self, event):
         """recieve a drag event and check if we want to accept or reject
 
@@ -69,7 +70,7 @@ class ComplexDropWidget(QtGui.QLineEdit):
                 event.ignore()
         else:
             event.ignore()
-            
+
     def dropEvent(self, event):
         """process the dragged data
 
@@ -77,11 +78,12 @@ class ComplexDropWidget(QtGui.QLineEdit):
             event (QDragEnterEvent)
         """
         self.dropRecieved.emit(event.mimeData())
-    
+
 class TestWidget(QtGui.QWidget):
 
     def __init__(self, parent=None):
         super(TestWidget, self).__init__(parent)
+        #FIXME: Make resize adapt to users screen.
         self.resize(1680, 756)
         self.move(0, 0)
 
@@ -156,14 +158,14 @@ class TestWidget(QtGui.QWidget):
         self.chooseColumnComboBox.currentIndexChanged.connect(self.setModelColumn)
 
         self.dataListView.mouseReleaseEvent = self.mouseReleaseEvent
-        
+
         self.dropLineEdit = DropLineEdit("drop data from table here", self)
         self.rightLayout.addWidget(self.dropLineEdit)
-        
+
         self.dropWidget = ComplexDropWidget(self)
         self.dropWidget.dropRecieved.connect(self.processDataDrops)
         self.rightLayout.addWidget(self.dropWidget)
-        
+
     @Slot('QMimeData')
     def processDataDrops(self, mimeData):
         """if you have more complicated stuff to do and you want to match some models, might be possible like that"""
@@ -177,7 +179,7 @@ class TestWidget(QtGui.QWidget):
         self.df = dataFrame
         dataModel = DataFrameModel()
         dataModel.setDataFrame(self.df)
-        
+
         self.dataModel = dataModel
 
         self.dataListView.setModel(dataModel)
@@ -241,8 +243,8 @@ if __name__ == '__main__':
     widget = TestWidget()
     widget.show()
 
-    widget.setDataFrame( getCsvData() )
+    widget.setDataFrame(getCsvData())
 
-    #widget.setDataFrame( getRandomData(2, 2) )
+    # widget.setDataFrame(getRandomData(rows=100,columns=20))
 
     app.exec_()

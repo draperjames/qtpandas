@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
 import os
-
 import pandas
 import numpy
+
 
 def getCsvData():
     dtypes = {
         "int8_value": numpy.int8,
         "int16_value": numpy.int16,
         "int32_value": numpy.int32,
-        #"int64_value": numpy.int64, # OverFlowError
+        # "int64_value": numpy.int64, # OverFlowError
         "uint8_value": numpy.uint8,
         "uint16_value": numpy.uint16,
         "uint32_value": numpy.uint32,
-        #"uint64_value": numpy.uint64, # OverFlowError
+        # "uint64_value": numpy.uint64, # OverFlowError
         "float16_value": numpy.float16,
         "float32_value": numpy.float32,
         "float64_value": numpy.float64,
@@ -45,8 +45,8 @@ def getCsvData():
 
     return df
 
-def getRandomData(rows=100, columns=5):
-    columns = ["column {}".format(column) for column in range(columns) ]
+def getRandomData(rows=100, columns=20):
+    columns = ["column {}".format(column) for column in range(columns)]
     data = {}
     for column in columns:
         data[column] = numpy.random.rand(rows)

@@ -9,17 +9,19 @@ if sys.platform == 'win32':
     envpath = os.environ['PATH']
     os.environ['PATH'] = ';'.join([lib, envpath])
 
-try:
-    import magic
-    AUTODETECT = True
-except ImportError as e:
-    # if sys.platform == 'darwin':
-    # raise ImportError('Please install libmagic')
-    warnings.warn("Please install libmagic - got an error: {}".format(e))
-    AUTODETECT = False
-except OSError as e:
-    warnings.warn("Detector.Issues importing libmagic - got an error: {}".format(e))
-    AUTODETECT = False
+# FIXME : Can we phase out all of this libmagic crap?
+
+# try:
+#     import magic
+#     AUTODETECT = True
+# except ImportError as e:
+#     # if sys.platform == 'darwin':
+#     # raise ImportError('Please install libmagic')
+#     warnings.warn("Please install libmagic - got an error: {}".format(e))
+#     AUTODETECT = False
+# except OSError as e:
+#     warnings.warn("Detector.Issues importing libmagic - got an error: {}".format(e))
+#     AUTODETECT = False
 
 
 class Detector(object):

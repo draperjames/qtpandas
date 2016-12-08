@@ -7,9 +7,12 @@ from qtpandas.compat import QtGui
 import codecs
 import os
 import tempfile
+import sys
 # fallback solution to show a OS independent messagebox
 from easygui.boxes.derived_boxes import msgbox
 
+# Load python version, an int with value 2 or 3.
+python_version = sys.version_info[0]
 
 def excepthook(excType, excValue, tracebackobj):
     """
@@ -22,24 +25,43 @@ def excepthook(excType, excValue, tracebackobj):
     separator = '-' * 80
 
     logFile = os.path.join(tempfile.gettempdir(), "error.log")
-    notice = """An unhandled exception occurred. Please report the problem.\n"""
+
+    notice = "An unhandled exception occurred. Please report the problem.\n"
+
     notice += """A log has been written to "{}".\n\nError information:""".format(logFile)
+
     timeString = time.strftime("%Y-%m-%d, %H:%M:%S")
 
     tbinfofile = io.StringIO()
     traceback.print_tb(tracebackobj, None, tbinfofile)
     tbinfofile.seek(0)
     tbinfo = tbinfofile.read()
-    tbinfo = tbinfo.decode('utf-8')
+    if python_version > 3:
+        # Python3 has no str().decode()
+        tbinfo = tbinfo.decode('utf-8')
+    else:
+        pass
 
     try:
-        excValueStr = str(excValue).decode('utf-8')
+        if python_version > 3:
+            # Python3 has no str().decode()
+            excValueStr = str(excValue).decode('utf-8')
+        else:
+            excValueStr = str(excValue)
+
     except UnicodeEncodeError as e:
         excValueStr = str(excValue)
 
     errmsg = '{0}: \n{1}'.format(excType, excValueStr)
-    sections = ['\n', separator, timeString, separator, errmsg, separator, tbinfo]
-    msg = '\n'.join(sections)
+
+    sections = ['\n', separator, timeString, separator,
+                errmsg, separator, tbinfo]
+    try:
+        msg = '\n'.join(sections)
+    except:
+        # Remove all things not string.
+        sections = [item for item in sections if type(item) == str]
+        msg = '\n'.join(sections)
     try:
         f = codecs.open(logFile, "a+", encoding='utf-8')
         f.write(msg)
