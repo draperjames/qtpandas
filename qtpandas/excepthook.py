@@ -14,6 +14,7 @@ from easygui.boxes.derived_boxes import msgbox
 # Load python version, an int with value 2 or 3.
 python_version = sys.version_info[0]
 
+
 def excepthook(excType, excValue, tracebackobj):
     """
     Global function to catch unhandled exceptions.

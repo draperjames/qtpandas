@@ -1,7 +1,7 @@
 import sys
 import time
 from qtpandas.compat import QtCore, QtGui, Qt, Slot, Signal
-import imgs
+# import imgs
 
 from qtpandas.views.OverlayProgressView import OverlayProgressWidget
 
@@ -32,7 +32,6 @@ class Example(QtGui.QWidget):
 
         self.initUI()
 
-
     def initUI(self):
         self.setGeometry(100, 100, 300, 300)
 
@@ -45,7 +44,7 @@ class Example(QtGui.QWidget):
         self.imgContainer.resize(size.width(), self.height())
 
         self.vlayout.addWidget(self.imgContainer)
-        self.vlayout.addWidget(QtGui.QLabel('FOOO',self))
+        self.vlayout.addWidget(QtGui.QLabel('FOOO', self))
 
         threads = []
 
@@ -59,7 +58,8 @@ class Example(QtGui.QWidget):
             threads.append(thread)
             worker.finished.connect(self.debugPrint)
 
-        self.pgFrame = OverlayProgressWidget(self.imgContainer, workers=workers)
+        self.pgFrame = OverlayProgressWidget(self.imgContainer,
+                                             workers=workers)
 
         for t in threads:
             t.start()
