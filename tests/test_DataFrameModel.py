@@ -131,14 +131,14 @@ class TestSort(object):
             "layoutAboutToBeChanged",
             "layoutChanged",
             "sortingAboutToStart",
-            "sortingFinished",
-        ]
+            "sortingFinished", ]
     )
     def test_signals(self, model, qtbot, signal):
         with qtbot.waitSignal(getattr(model, signal)) as blocker:
             model.sort(0)
         assert blocker.signal_triggered
 
+    @pytest.fixture
     def test_returnValues(self, model):
         model.sort(0)
 
@@ -171,6 +171,7 @@ class TestData(object):
         assert index.isValid()
         return index
 
+    @pytest.fixture
     def test_invalidIndex(self, model):
         assert model.data(QtCore.QModelIndex()) is None
 

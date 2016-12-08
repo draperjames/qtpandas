@@ -122,15 +122,15 @@ class TestCustomDelegates(object):
             qtbot.mouseClick(tableView.viewport(), QtCore.Qt.LeftButton, pos=QtCore.QPoint(10, 10))
         assert blocker.signal_triggered
 
+
 class TestTextDelegate(object):
 
     @pytest.fixture
     def dataFrame(self):
-        data = [
-            ['zero', 1, 2, 3, 4],
-            ['five', 6, 7, 8, 9],
-            ['ten', 11, 12, 13, 14]
-        ]
+        data = [['zero', 1, 2, 3, 4],
+                ['five', 6, 7, 8, 9],
+                ['ten', 11, 12, 13, 14]]
+
         columns = ['Foo', 'Bar', 'Spam', 'Eggs', 'Baz']
         dataFrame = pandas.DataFrame(data, columns=columns)
         return dataFrame
