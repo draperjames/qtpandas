@@ -1,16 +1,41 @@
 # QtPandas
 
-### Utilities to use pandas (the data analysis/manipulation library for Python) with Qt.
+### Utilities to use [pandas](https://github.com/pandas-dev/pandas)  (the data analysis/manipulation library for Python) with Qt.
 
 ## Project Information
 
+<table>
+    <tr>
+        <td>Latest Release</td>
+        <td><img src="https://img.shields.io/pypi/v/qtpandas.svg" alt="latest release" /></td>
+    </tr>
+    <tr>
+        <td>Package Status</td>
+        <td><img src="https://img.shields.io/pypi/status/qtpandas.svg" alt="status" /></td>
+    </tr>
+    <tr>
+    <tr>
+        <td>Build Status</td>
+        <td>
+            <a href="https://travis-ci.org/draperjames/qtpandas">
+            <img src="https://travis-ci.org/draperjames/qtpandas.svg?branch=master" alt="travis build status" />
+            </a>
+        </td>
+    </tr>
+    <tr>
+  <td>PyPI</td>
+  <td>
+    <a href="https://pypi.python.org/pypi/qtpandas/">
+    <img src="https://img.shields.io/pypi/dm/qtpandas.svg" alt="pypi downloads" />
+    </a>
+  </td>
+</tr>
+</table>
 [![Join the chat at https://gitter.im/qtpandas/Lobby#](https://badges.gitter.im/qtpandas/lobby.svg)](https://gitter.im/qtpandas/Lobby#)
+[![open issues](https://img.shields.io/github/issues-raw/draperjames/qtpandas.svg)](https://github.com/draperjames/qtpandas/issues)
+[![closed issues](https://img.shields.io/github/issues-closed/draperjames/qtpandas.svg)](https://github.com/draperjames/qtpandas/issues)
 
-## Build Status
-
-[![Travis status](https://travis-ci.org/draperjames/qtpandas.svg?branch=master)](https://travis-ci.org/draperjames/qtpandas)
-
-Requirements;
+## Requirements;
 > Python 3.4 or greater    
 > Pthon 2.7 or greater     
 > PyQt4
@@ -61,4 +86,4 @@ Any feedback is apprecaited.
 - Check out the wiki for development info (coming soon!)
 - Fork us.
 
-Forked from @datalyze-solutions's [master](https://github.com/datalyze-solutions/qtpandas).
+Forked from @datalyze-solutions's [master](https://github.com/datalyze-solutions/pandas-qt).
