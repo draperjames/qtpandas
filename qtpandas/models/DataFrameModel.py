@@ -8,7 +8,6 @@ from datetime import datetime
 from qtpandas.utils import superReadFile
 from qtpandas.compat import Qt, QtCore, QtGui, Slot, Signal
 
-
 import pandas
 import numpy
 
@@ -66,7 +65,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     dataFrameChanged = Signal()
 
     def __init__(self, dataFrame=None, copyDataFrame=False, filePath=None):
-        """the __init__ method.
+        """
 
         Args:
             dataFrame (pandas.core.frame.DataFrame, optional): initializes the model with given DataFrame.
@@ -80,8 +79,10 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         super(DataFrameModel, self).__init__()
 
         self._dataFrame = pandas.DataFrame()
+
         if dataFrame is not None:
             self.setDataFrame(dataFrame, copyDataFrame=copyDataFrame)
+
         self.dataChanged.emit()
 
         self._dataFrameOriginal = None
@@ -91,25 +92,42 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
     @property
     def filePath(self):
+        """
+        Access to the internal _filepath property (could be None)
+        :return: qtpandas.models.DataFrameModel._filepath
+        """
         return self._filePath
 
-
-
     def dataFrame(self):
-        """getter function to _dataFrame. Holds all data.
+        """
+        getter function to _dataFrame. Holds all data.
 
         Note:
             It's not implemented with python properties to keep Qt conventions.
-
+            Not sure why??
         """
         return self._dataFrame
 
     def setDataFrameFromFile(self, filepath, **kwargs):
+        """
+        Sets the model's dataFrame by reading a file.
+        Accepted file formats:
+            - .xlsx (sheet1 is read unless specified in kwargs)
+            - .csv (comma separated unless specified in kwargs)
+            - .txt (any separator)
+
+        :param filepath: (str)
+            The path to the file to be read.
+        :param kwargs:
+            pandas.read_csv(**kwargs) or pandas.read_excel(**kwargs)
+        :return: None
+        """
         df = superReadFile(filepath, **kwargs)
         self.setDataFrame(df, filePath=filepath)
 
     def setDataFrame(self, dataFrame, copyDataFrame=False, filePath=None):
-        """setter function to _dataFrame. Holds all data.
+        """
+        Setter function to _dataFrame. Holds all data.
 
         Note:
             It's not implemented with python properties to keep Qt conventions.
@@ -146,6 +164,13 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
     @Slot(int, object)
     def propagateDtypeChanges(self, column, dtype):
+        """
+        Emits a dtypeChanged signal with the column and dtype.
+
+        :param column: (str)
+        :param dtype: ??
+        :return: None
+        """
         self.dtypeChanged.emit(column, dtype)
 
     @property
@@ -155,7 +180,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
     @timestampFormat.setter
     def timestampFormat(self, timestampFormat):
-        """setter to _timestampFormat. Formatting string for conversion of timestamps to QtCore.QDateTime
+        """
+        Setter to _timestampFormat. Formatting string for conversion of timestamps to QtCore.QDateTime
 
         Raises:
             AssertionError: if timestampFormat is not of type unicode.
@@ -171,7 +197,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self._timestampFormat = timestampFormat
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
-        """return the header depending on section, orientation and Qt::ItemDataRole
+        """
+        Return the header depending on section, orientation and Qt::ItemDataRole
 
         Args:
             section (int): For horizontal headers, the section number corresponds to the column number.
@@ -415,14 +442,16 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         return len(self._dataFrame.columns)
 
     def sort(self, columnId, order=Qt.AscendingOrder):
-        """sort the model column
+        """
+        Sorts the model column
 
         After sorting the data in ascending or descending order, a signal
         `layoutChanged` is emitted.
 
-        Args:
-            columnId (int): columnIndex
-            order (Qt::SortOrder, optional): descending(1) or ascending(0). defaults to Qt.AscendingOrder
+        :param: columnId (int)
+            the index of the column to sort on.
+        :param: order (Qt::SortOrder, optional)
+            descending(1) or ascending(0). defaults to Qt.AscendingOrder
 
         """
         self.layoutAboutToBeChanged.emit()
@@ -433,7 +462,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self.sortingFinished.emit()
 
     def setFilter(self, search):
-        """apply a filter and hide rows.
+        """
+        Apply a filter and hide rows.
 
         The filter must be a `DataSearch` object, which evaluates a python
         expression.
@@ -472,8 +502,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self.dataFrameChanged.emit()
 
     def clearFilter(self):
-        """clear all filters.
-
+        """
+        Clear all filters.
         """
         if self._dataFrameOriginal is not None:
             self.layoutAboutToBeChanged.emit()
@@ -482,22 +512,48 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             self.layoutChanged.emit()
 
     def columnDtypeModel(self):
-        """Getter for a ColumnDtypeModel.
+        """
+        Getter for a ColumnDtypeModel.
 
-        Returns:
-            ColumnDtypeModel
+        :return:
+            qtpandas.models.ColumnDtypeModel
         """
         return self._columnDtypeModel
 
 
-    def enableEditing(self, editable):
+    def enableEditing(self, editable=True):
+        """
+        Sets the DataFrameModel and columnDtypeModel's
+        editable properties.
+        :param editable: bool
+            defaults to True,
+            False disables most editing methods.
+        :return:
+            None
+        """
         self.editable = editable
         self._columnDtypeModel.setEditable(self.editable)
 
     def dataFrameColumns(self):
+        """
+        :return: list containing dataframe columns
+        """
         return self._dataFrame.columns.tolist()
 
-    def addDataFrameColumn(self, columnName, dtype, defaultValue):
+    def addDataFrameColumn(self, columnName, dtype=str, defaultValue=None):
+        """
+        Adds a column to the dataframe as long as
+        the model's editable property is set to True and the
+        dtype is supported.
+
+        :param columnName: str
+            name of the column.
+        :param dtype: qtpandas.models.SupportedDtypes option
+        :param defaultValue: (object)
+            to default the column's value to, should be the same as the dtype or None
+        :return: (bool)
+            True on success, False otherwise.
+        """
         if not self.editable or dtype not in SupportedDtypes.allTypes():
             return False
 
@@ -520,6 +576,16 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         return True
 
     def addDataFrameRows(self, count=1):
+        """
+
+        Adds rows to the dataframe.
+
+        :param count: (int)
+            The number of rows to add to the dataframe.
+        :return: (bool)
+            True on success, False on failure.
+
+        """
         # don't allow any gaps in the data rows.
         # and always append at the end
 
@@ -557,12 +623,18 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         return True
 
     def removeDataFrameColumns(self, columns):
+        """
+        Removes columns from the dataframe.
+        :param columns: [(int, str)]
+        :return: (bool)
+            True on success, False on failure.
+        """
         if not self.editable:
             return False
 
         if columns:
             deleted = 0
-            errorOccured = False
+            errored = False
             for (position, name) in columns:
                 position = position - deleted
                 if position < 0:
@@ -571,19 +643,27 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 try:
                     self._dataFrame.drop(name, axis=1, inplace=True)
                 except ValueError as e:
-                    errorOccured = True
+                    errored = True
                     continue
                 self.endRemoveColumns()
                 deleted += 1
             self.dataChanged.emit()
 
-            if errorOccured:
+            if errored:
                 return False
             else:
                 return True
         return False
 
     def removeDataFrameRows(self, rows):
+        """
+        Removes rows from the dataframe.
+
+        :param rows: (list)
+            of row indexes to removes.
+        :return: (bool)
+            True on success, False on failure.
+        """
         if not self.editable:
             return False
 
