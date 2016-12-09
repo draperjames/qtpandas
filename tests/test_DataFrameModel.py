@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 import random
 
-from qtpandas.compat import Qt, QtCore, QtGui
+from qtpandas.compat import Qt, QtCore  # , QtGui
 
 
 import pytest
-import pytestqt
-
-import decimal
+# import pytestqt
+# import decimal
 import numpy
 import pandas
 
@@ -122,12 +121,14 @@ def test_columnCount():
 
 class TestSort(object):
 
-    @pytest.fixture
-    def dataFrame(self):
+    # @pytest.fixture
+    @classmethod
+    def dataFrame(cls):
         return pandas.DataFrame(numpy.random.rand(10), columns=['A'])
 
-    @pytest.fixture
-    def model(self, dataFrame):
+    # @pytest.fixture
+    @classmethod
+    def model(cls, dataFrame):
         return DataFrameModel(dataFrame)
 
     @pytest.mark.parametrize(
