@@ -3,7 +3,6 @@ import random
 
 from qtpandas.compat import Qt, QtCore, QtGui
 
-
 import pytest
 import pytestqt
 
@@ -589,6 +588,34 @@ class TestEditMode(object):
             columns.append((desc, _type))
 
         return columns
+
+    def test_rename(self, model, dataFrame):
+        renames = {'Foo':'Booyah', 'Bar':'Boogam'}
+        cols = dataFrame.columns.tolist()
+        assert not 'Booyah' in cols and not 'Boogam' in cols
+        model.rename(columns=renames)
+        cols = model._dataFrame.columns.tolist()
+        assert 'Booyah' in cols and 'Boogam' in cols
+        assert 'Foo' not in cols and 'Bar' not in cols
+
+    def test_apply_function(self, model):
+        def mini_func(df):
+            return df
+        def bad_func(df):
+            return False
+
+        model.applyFunction(mini_func)
+
+        expected = False
+        try:
+            model.applyFunction(bad_func)
+        except:
+            expected = True
+            pass
+
+        assert expected
+
+
 
     def test_edit_data(self, model):
         index = model.index(0, 0)
