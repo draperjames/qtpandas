@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
-
 from encodings.aliases import aliases as _encodings
+
 import pandas
 
-from qtpandas.compat import Qt, QtCore, QtGui, Slot, Signal
+from qtpandas.compat import QtCore, QtGui, Slot, Signal
 from qtpandas.encoding import Detector
 from qtpandas.models.DataFrameModel import DataFrameModel
-from qtpandas.views.CustomDelegates import DtypeComboDelegate
-from qtpandas.views._ui import icons_rc
-
 from qtpandas.utils import fillNoneValues, convertTimestamps, superReadFile
+from qtpandas.views.CustomDelegates import DtypeComboDelegate
 
 class DelimiterValidator(QtGui.QRegExpValidator):
     """A Custom RegEx Validator.
@@ -497,7 +495,7 @@ class CSVExportDialog(QtGui.QDialog):
     """An widget to serialize a `DataFrameModel` to a `CSV-File`.
 
     """
-    exported = Signal('QBool')
+    exported = Signal(bool)
 
     def __init__(self, model=None, parent=None):
         super(CSVExportDialog, self).__init__(parent)

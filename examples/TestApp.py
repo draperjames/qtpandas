@@ -4,15 +4,13 @@ import sys
 from qtpandas.excepthook import excepthook
 sys.excepthook = excepthook
 
-from qtpandas.compat import QtCore, QtGui, Qt, Slot, Signal
+from qtpandas.compat import QtCore, QtGui, Slot, Signal
 
 import pandas
-import numpy
 
 from qtpandas.models.DataFrameModel import DataFrameModel
 from qtpandas.models.DataSearch import DataSearch
 from qtpandas.views.CSVDialogs import CSVImportDialog, CSVExportDialog
-from qtpandas.views._ui import icons_rc
 from qtpandas.views.DataTableView import DataTableWidget
 from qtpandas.views.CustomDelegates import DtypeComboDelegate
 from qtpandas.models.mime import PandasCellMimeType, PandasCellPayload

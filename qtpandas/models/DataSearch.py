@@ -40,7 +40,10 @@ class DataSearch(object):
 
     def __repr__(self):
         string = "DataSearch({}): {} ({})".format(hex(id(self)), self.name, self._filterString)
-        string = string.encode("utf-8")
+        try:
+            string = string.encode("utf-8")
+        except Exception as e:
+            string = string
         return string
 
     def dataFrame(self):

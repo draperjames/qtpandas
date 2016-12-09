@@ -207,7 +207,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                     if dtype == np.dtype('<M8[ns]'):
                         if currentDtype in SupportedDtypes.boolTypes():
                             raise Exception("Can't convert a boolean value into a datetime value.")
-                        self._dataFrame[columnName] = self._dataFrame[columnName].apply(pandas.to_datetime)
+                        self._dataFrame[columnName] = pandas.to_datetime(self._dataFrame[columnName], errors='coerce')
                     else:
                         self._dataFrame[columnName] = self._dataFrame[columnName].astype(dtype)
                     self.dtypeChanged.emit(index.row(), dtype)

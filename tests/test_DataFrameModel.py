@@ -57,10 +57,11 @@ def test_TimestampFormat():
     newFormat = "yy-MM-dd hh:mm"
     model.timestampFormat = newFormat
     assert model.timestampFormat == newFormat
-
+    """ # This is no longer being tested for in DataFrameModel
     with pytest.raises(TypeError) as excinfo:
         model.timestampFormat = "yy-MM-dd hh:mm"
     assert "unicode" in str(excinfo.value)
+    """
 
 #def test_signalUpdate(qtbot):
     #model = DataFrameModel()
@@ -491,7 +492,10 @@ class TestSetData(object):
 
         assert index.isValid()
         model.enableEditing(True)
-        assert model.setData(index, value)
+        try:
+            assert model.setData(index, value)
+        except:
+            raise Exception("Failed index {}, value {} ".format(index.__repr__, value))
         assert model.data(index) == getattr(ii, border)
 
 
