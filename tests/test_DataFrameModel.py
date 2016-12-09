@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import random
 
-from qtpandas.compat import Qt, QtCore, QtGui
+from qtpandas.compat import Qt, QtCore  # , QtGui
 
 import pytest
-import pytestqt
-
-import decimal
+# import pytestqt
+# import decimal
 import numpy
 import pandas
 
@@ -91,6 +90,7 @@ def test_headerData(orientation, role, index, expectedHeader):
     model = DataFrameModel(pandas.DataFrame([0], columns=['A']))
     assert model.headerData(index, orientation, role) == expectedHeader
 
+
 def test_flags():
     model = DataFrameModel(pandas.DataFrame([0], columns=['A']))
     index = model.index(0, 0)
@@ -106,11 +106,13 @@ def test_flags():
     assert model.flags(index) != Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
     assert model.flags(index) == Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
 
+
 def test_rowCount():
     model = DataFrameModel(pandas.DataFrame([0], columns=['A']))
     assert model.rowCount() == 1
     model = DataFrameModel(pandas.DataFrame(numpy.arange(100), columns=['A']))
     assert model.rowCount() == 100
+
 
 def test_columnCount():
     model = DataFrameModel(pandas.DataFrame([0], columns=['A']))
@@ -119,14 +121,17 @@ def test_columnCount():
     model = DataFrameModel( pandas.DataFrame(numpy.arange(100).reshape(1, 100), columns=numpy.arange(100)) )
     assert model.columnCount() == 100
 
+
 class TestSort(object):
 
-    @pytest.fixture
-    def dataFrame(self):
+    @pytest.fixture()
+    @classmethod
+    def dataFrame(cls):
         return pandas.DataFrame(numpy.random.rand(10), columns=['A'])
 
-    @pytest.fixture
-    def model(self, dataFrame):
+    @pytest.fixture()
+    @classmethod
+    def model(cls, dataFrame):
         return DataFrameModel(dataFrame)
 
     @pytest.mark.parametrize(
@@ -137,13 +142,15 @@ class TestSort(object):
             "sortingAboutToStart",
             "sortingFinished", ]
     )
-    def test_signals(self, model, qtbot, signal):
+    @classmethod
+    def test_signals(cls, model, qtbot, signal):
         with qtbot.waitSignal(getattr(model, signal)) as blocker:
             model.sort(0)
         assert blocker.signal_triggered
 
-    @pytest.fixture
-    def test_returnValues(self, model):
+    @pytest.fixture()
+    @classmethod
+    def test_returnValues(cls, model):
         model.sort(0)
 
     @pytest.mark.parametrize(
@@ -154,36 +161,45 @@ class TestSort(object):
             (True, Qt.DescendingOrder, False),
         ]
     )
-    def test_sort(self, model, dataFrame, testAscending, modelAscending, isIdentic):
+
+    @classmethod
+    def test_sort(cls, model, dataFrame, testAscending, modelAscending, isIdentic):
         temp = dataFrame.sort('A', ascending=testAscending)
         model.sort(0, order=modelAscending)
         assert (dataFrame['A'] == temp['A']).all() == isIdentic
 
+
 class TestData(object):
 
-    @pytest.fixture
-    def dataFrame(self):
+    @pytest.fixture()
+    @classmethod
+    def dataFrame(cls):
         return pandas.DataFrame(numpy.random.rand(10), columns=['A'])
 
-    @pytest.fixture
-    def model(self, dataFrame):
+    @pytest.fixture()
+    @classmethod
+    def model(cls, dataFrame):
         return DataFrameModel(dataFrame)
 
-    @pytest.fixture
-    def index(self, model):
+    @pytest.fixture()
+    @classmethod
+    def index(cls, model):
         index = model.index(0, 0)
         assert index.isValid()
         return index
 
-    @pytest.fixture
-    def test_invalidIndex(self, model):
+    @pytest.fixture()
+    @classmethod
+    def test_invalidIndex(cls, model):
         assert model.data(QtCore.QModelIndex()) is None
 
-    def test_unknownRole(self, model, index):
+    @classmethod
+    def test_unknownRole(cls, model, index):
         assert index.isValid()
-        assert model.data(index, role="unknownRole") == None
+        assert model.data(index, role="unknownRole") is None
 
-    def test_unhandledDtype(self, model, index):
+    @classmethod
+    def test_unhandledDtype(cls, model, index):
         dataFrame = pandas.DataFrame([92.289+151.96j], columns=['A'])
         dataFrame['A'] = dataFrame['A'].astype(numpy.complex64)
         model.setDataFrame(dataFrame)
@@ -202,7 +218,8 @@ class TestData(object):
             ("äöü", object),
         ]
     )
-    def test_strAndUnicode(self, model, index, value, dtype):
+    @classmethod
+    def test_strAndUnicode(cls, model, index, value, dtype):
         dataFrame = pandas.DataFrame([value], columns=['A'])
         dataFrame['A'] = dataFrame['A'].astype(dtype)
         model.setDataFrame(dataFrame)
@@ -213,7 +230,7 @@ class TestData(object):
         assert model.data(index) == value
         assert model.data(index, role=Qt.DisplayRole) == value
         assert model.data(index, role=Qt.EditRole) == value
-        assert model.data(index, role=Qt.CheckStateRole) == None
+        assert model.data(index, role=Qt.CheckStateRole) is None
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
 
     @pytest.mark.parametrize(
@@ -240,7 +257,7 @@ class TestData(object):
 
         assert index.isValid()
         if precision:
-            modelValue = model.data(index, role=Qt.DisplayRole)
+            # modelValue = model.data(index, role=Qt.DisplayRole)
             assert model.data(index) == round(value, precision)
             assert model.data(index, role=Qt.DisplayRole) == round(value, precision)
             assert model.data(index, role=Qt.EditRole) == round(value, precision)
@@ -252,39 +269,39 @@ class TestData(object):
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
         assert model.data(index, role=DATAFRAME_ROLE).dtype == dtype
 
-    #@pytest.mark.parametrize(
-        #"border1, modifier, border2, dtype", [
-            #("min", -1, "max", numpy.uint8),
-            #("max", +1, "min", numpy.uint8),
-            #("min", -1, "max", numpy.uint16),
-            #("max", +1, "min", numpy.uint16),
-            #("min", -1, "max", numpy.uint32),
-            #("max", +1, "min", numpy.uint32),
-            #("min", -1, "max", numpy.uint64),
-            ##("max", +1, "min", numpy.uint64),  # will raise OverFlowError caused by astype function,
-                                                ## uneffects models data method
-            #("min", -1, "max", numpy.int8),
-            #("max", +1, "min", numpy.int8),
-            #("min", -1, "max", numpy.int16),
-            #("max", +1, "min", numpy.int16),
-            #("min", -1, "max", numpy.int32),
-            #("max", +1, "min", numpy.int32),
-            ##("min", -1, "max", numpy.int64),   # will raise OverFlowError caused by astype function
-                                                ## uneffects models data method
-            ##("max", +1, "min", numpy.int64),   # will raise OverFlowError caused by astype function
-                                                ## uneffects models data method
-        #]
-    #)
-    #def test_integerBorderValues(self, model, index, border1, modifier, border2, dtype):
-        #ii = numpy.iinfo(dtype)
-        #dataFrame = pandas.DataFrame([getattr(ii, border1) + modifier], columns=['A'])
-        #dataFrame['A'] = dataFrame['A'].astype(dtype)
-        #model.setDataFrame(dataFrame)
-        #assert not model.dataFrame().empty
-        #assert model.dataFrame() is dataFrame
-
-        #assert index.isValid()
-        #assert model.data(index) == getattr(ii, border2)
+    # @pytest.mark.parametrize(
+    #     "border1, modifier, border2, dtype", [
+    #         ("min", -1, "max", numpy.uint8),
+    #         ("max", +1, "min", numpy.uint8),
+    #         ("min", -1, "max", numpy.uint16),
+    #         ("max", +1, "min", numpy.uint16),
+    #         ("min", -1, "max", numpy.uint32),
+    #         ("max", +1, "min", numpy.uint32),
+    #         ("min", -1, "max", numpy.uint64),
+    #         #("max", +1, "min", numpy.uint64),  # will raise OverFlowError caused by astype function,
+    #                                             # uneffects models data method
+    #         ("min", -1, "max", numpy.int8),
+    #         ("max", +1, "min", numpy.int8),
+    #         ("min", -1, "max", numpy.int16),
+    #         ("max", +1, "min", numpy.int16),
+    #         ("min", -1, "max", numpy.int32),
+    #         ("max", +1, "min", numpy.int32),
+    #         #("min", -1, "max", numpy.int64),   # will raise OverFlowError caused by astype function
+    #                                             # uneffects models data method
+    #         #("max", +1, "min", numpy.int64),   # will raise OverFlowError caused by astype function
+    #                                             # uneffects models data method
+    #     ]
+    # )
+    # def test_integerBorderValues(self, model, index, border1, modifier, border2, dtype):
+    #     ii = numpy.iinfo(dtype)
+    #     dataFrame = pandas.DataFrame([getattr(ii, border1) + modifier], columns=['A'])
+    #     dataFrame['A'] = dataFrame['A'].astype(dtype)
+    #     model.setDataFrame(dataFrame)
+    #     assert not model.dataFrame().empty
+    #     assert model.dataFrame() is dataFrame
+    #
+    #     assert index.isValid()
+    #     assert model.data(index) == getattr(ii, border2)
 
     @pytest.mark.parametrize(
         "value, qtbool",
@@ -307,7 +324,8 @@ class TestData(object):
         assert model.data(index, role=DATAFRAME_ROLE) == value
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), numpy.bool_)
 
-    def test_date(self, model, index):
+    @classmethod
+    def test_date(cls, model, index):
         pandasDate = pandas.Timestamp("1990-10-08T10:15:45")
         qDate = QtCore.QDateTime.fromString(str(pandasDate), Qt.ISODate)
         dataFrame = pandas.DataFrame([pandasDate], columns=['A'])
@@ -322,27 +340,34 @@ class TestData(object):
         assert model.data(index, role=DATAFRAME_ROLE) == pandasDate
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), pandas.Timestamp)
 
+
 class TestSetData(object):
 
-    @pytest.fixture
-    def dataFrame(self):
+    @pytest.fixture()
+    @classmethod
+    def dataFrame(cls):
         return pandas.DataFrame([10], columns=['A'])
 
-    @pytest.fixture
-    def model(self, dataFrame):
+    @classmethod
+    @pytest.fixture()
+    def model(cls, dataFrame):
         return DataFrameModel(dataFrame)
 
-    @pytest.fixture
-    def index(self, model):
+    @pytest.fixture()
+    @classmethod
+    def index(cls, model):
         return model.index(0, 0)
 
-    def test_invalidIndex(self, model):
-        assert model.setData(QtCore.QModelIndex(), None) == False
+    @classmethod
+    def test_invalidIndex(cls, model):
+        assert model.setData(QtCore.QModelIndex(), None) is False
 
-    def test_nothingHasChanged(self, model, index):
-        assert model.setData(index, 10) == False
+    @classmethod
+    def test_nothingHasChanged(cls, model, index):
+        assert model.setData(index, 10) is False
 
-    def test_unhandledDtype(self, model, index):
+    @classmethod
+    def test_unhandledDtype(cls, model, index):
         dataFrame = pandas.DataFrame([92.289+151.96j], columns=['A'])
         dataFrame['A'] = dataFrame['A'].astype(numpy.complex64)
         model.setDataFrame(dataFrame)
@@ -371,7 +396,7 @@ class TestSetData(object):
         assert model.data(index) == newValue
         assert model.data(index, role=Qt.DisplayRole) == newValue
         assert model.data(index, role=Qt.EditRole) == newValue
-        assert model.data(index, role=Qt.CheckStateRole) == None
+        assert model.data(index, role=Qt.CheckStateRole) is None
         assert model.data(index, role=DATAFRAME_ROLE) == newValue
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
 
@@ -401,7 +426,8 @@ class TestSetData(object):
         assert model.data(index, role=DATAFRAME_ROLE) == value
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), numpy.bool_)
 
-    def test_date(self, model, index):
+    @classmethod
+    def test_date(cls, model, index):
         numpyDate = numpy.datetime64("1990-10-08T10:15:45+0100")
         dataFrame = pandas.DataFrame([numpyDate], columns=['A'])
         model.setDataFrame(dataFrame)
@@ -452,8 +478,8 @@ class TestSetData(object):
         assert model.setData(index, newValue)
 
         if precision:
-            modelValue = model.data(index, role=Qt.DisplayRole)
-            #assert abs(decimal.Decimal(str(modelValue)).as_tuple().exponent) == precision
+            # modelValue = model.data(index, role=Qt.DisplayRole)
+            # assert abs(decimal.Decimal(str(modelValue)).as_tuple().exponent) == precision
             assert model.data(index) == round(newValue, precision)
             assert model.data(index, role=Qt.DisplayRole) == round(newValue, precision)
             assert model.data(index, role=Qt.EditRole) == round(newValue, precision)
@@ -461,7 +487,7 @@ class TestSetData(object):
             assert model.data(index) == newValue
             assert model.data(index, role=Qt.DisplayRole) == newValue
             assert model.data(index, role=Qt.EditRole) == newValue
-        assert model.data(index, role=Qt.CheckStateRole) == None
+        assert model.data(index, role=Qt.CheckStateRole) is None
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
         assert model.data(index, role=DATAFRAME_ROLE).dtype == dtype
 
@@ -513,15 +539,19 @@ class TestFilter(object):
         dataFrame = pandas.DataFrame(data, columns=columns)
         return dataFrame
 
+    # @classmethod
     @pytest.fixture
-    def model(self, dataFrame):
+    @classmethod
+    def model(cls, dataFrame):
+    # def model(self, dataFrame):
         return DataFrameModel(dataFrame)
 
     @pytest.fixture
     def index(self, model):
         return model.index(0, 0)
 
-    def test_filter_single_column(self, model, index):
+    @classmethod
+    def test_filter_single_column(cls, model, index):
         filterString = 'Foo < 10'
         search = DataSearch("Test", filterString)
         preFilterRows = model.rowCount()
@@ -531,7 +561,8 @@ class TestFilter(object):
         assert preFilterRows > postFilterRows
         assert preFilterRows == (postFilterRows + 1)
 
-    def test_filter_freeSearch(self, model, index):
+    @classmethod
+    def test_filter_freeSearch(cls, model, index):
         filterString = 'freeSearch("10")'
         search = DataSearch("Test", filterString)
         preFilterRows = model.rowCount()
@@ -541,7 +572,8 @@ class TestFilter(object):
         assert preFilterRows > postFilterRows
         assert preFilterRows == (postFilterRows + 2)
 
-    def test_filter_multiColumn(self, model, index):
+    @classmethod
+    def test_filter_multiColumn(cls, model, index):
         filterString = '(Foo < 10) & (Bar > 1)'
         search = DataSearch("Test", filterString)
         preFilterRows = model.rowCount()
@@ -551,7 +583,8 @@ class TestFilter(object):
         assert preFilterRows > postFilterRows
         assert preFilterRows == (postFilterRows + 2)
 
-    def test_filter_unknown_keyword(self, model, index):
+    @classmethod
+    def test_filter_unknown_keyword(cls, model, index):
         filterString = '(Foo < 10) and (Bar > 1)'
         search = DataSearch("Test", filterString)
         preFilterRows = model.rowCount()
@@ -577,8 +610,8 @@ class TestEditMode(object):
     def model(self, dataFrame):
         return DataFrameModel(dataFrame)
 
-    @pytest.fixture
-    def newColumns(self):
+    @classmethod
+    def newColumns(cls):
         columns = []
         for dtype, description in SupportedDtypes._all:
             columns.append((description, dtype))
@@ -589,35 +622,6 @@ class TestEditMode(object):
 
         return columns
 
-    def test_rename(self, model, dataFrame):
-        renames = {'Foo':'Booyah', 'Bar':'Boogam'}
-        cols = dataFrame.columns.tolist()
-        assert not 'Booyah' in cols and not 'Boogam' in cols
-        model.rename(columns=renames)
-        cols = model._dataFrame.columns.tolist()
-        assert 'Booyah' in cols and 'Boogam' in cols
-        assert 'Foo' not in cols and 'Bar' not in cols
-
-    def test_apply_function(self, model):
-        def mini_func(df):
-            return df
-        def bad_func(df):
-            return False
-
-        model.applyFunction(mini_func)
-
-        expected = False
-        try:
-            model.applyFunction(bad_func)
-        except:
-            expected = True
-            pass
-
-        assert expected
-
-
-
-    def test_edit_data(self, model):
         index = model.index(0, 0)
         currentData = index.data()
 
@@ -629,7 +633,8 @@ class TestEditMode(object):
         assert index.data() != currentData
         assert index.data() == 42
 
-    def test_add_column(self, model, newColumns):
+    @classmethod
+    def test_add_column(cls, model, newColumns):
         model.enableEditing(True)
 
         columnCount = model.columnCount()
@@ -649,7 +654,8 @@ class TestEditMode(object):
                 newVal = idx.data(DATAFRAME_ROLE)
                 assert newVal == defaultVal
 
-    def test_remove_columns(self, model):
+    @classmethod
+    def test_remove_columns(cls, model):
         model.enableEditing(True)
         df = model.dataFrame().copy()
         columnNames = model.dataFrame().columns.tolist()
@@ -670,7 +676,8 @@ class TestEditMode(object):
         assert model.removeDataFrameColumns(columnNames)
         assert model.columnCount() == 0
 
-    def test_remove_columns_random(self, dataFrame):
+    @classmethod
+    def test_remove_columns_random(cls, dataFrame):
 
         columnNames = dataFrame.columns.tolist()
         columnNames = [(i, n) for i, n in enumerate(columnNames)]
@@ -690,7 +697,8 @@ class TestEditMode(object):
             for idx, col in remainingColumns:
                 assert col in model.dataFrame().columns.tolist()
 
-    def test_add_rows(self, model):
+    @classmethod
+    def test_add_rows(cls, model):
         assert not model.addDataFrameRows()
         model.enableEditing(True)
 
@@ -702,12 +710,13 @@ class TestEditMode(object):
         assert model.rowCount() == rows + 1
 
         assert model.addDataFrameRows(count=5)
-        assert model.rowCount() ==  rows + 1 + 5
+        assert model.rowCount() == rows + 1 + 5
 
         idx = model.index(rows+4, 0)
         assert idx.data() == 0
 
-    def test_remove_rows(self, model):
+    @classmethod
+    def test_remove_rows(cls, model):
         assert not model.removeDataFrameRows([0])
         model.enableEditing(True)
         df = model.dataFrame().copy()

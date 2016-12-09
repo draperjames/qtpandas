@@ -50,7 +50,7 @@ def excepthook(excType, excValue, tracebackobj):
         else:
             excValueStr = str(excValue)
 
-    except UnicodeEncodeError as e:
+    except UnicodeEncodeError:
         excValueStr = str(excValue)
 
     errmsg = '{0}: \n{1}'.format(excType, excValueStr)
@@ -60,7 +60,7 @@ def excepthook(excType, excValue, tracebackobj):
     try:
         msg = '\n'.join(sections)
 
-    except TypeError as e:
+    except TypeError:
         # Remove all things not string.
         sections = [item for item in sections if type(item) == str]
         msg = '\n'.join(sections)

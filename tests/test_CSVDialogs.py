@@ -35,8 +35,10 @@ def tmp(request):
 
 
 class TestValidator(object):
+
     @pytest.fixture()
-    def test_input(self, qtbot):
+    @classmethod
+    def test_input(cls, qtbot):
         widget = QtGui.QLineEdit()
         widget.setValidator(DelimiterValidator())
         qtbot.addWidget(widget)
@@ -50,7 +52,8 @@ class TestValidator(object):
 
 class TestDelimiterBox(object):
     @pytest.fixture()
-    def test_selections_and_signals(self, qtbot):
+    @classmethod
+    def test_selections_and_signals(cls, qtbot):
         box = DelimiterSelectionWidget()
         qtbot.addWidget(box)
         box.show()
@@ -72,7 +75,8 @@ class TestDelimiterBox(object):
             assert char in delimiters
 
     @pytest.fixture()
-    def test_reset(self, qtbot):
+    @classmethod
+    def test_reset(cls, qtbot):
         box = DelimiterSelectionWidget()
         qtbot.addWidget(box)
         box.show()
@@ -93,8 +97,10 @@ class TestDelimiterBox(object):
 
 
 class TestCSVImportWidget(object):
+
     @pytest.fixture()
-    def test_init(self, qtbot):
+    @classmethod
+    def test_init(cls, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -102,7 +108,8 @@ class TestCSVImportWidget(object):
         assert csvwidget.windowTitle() == 'Import CSV'
 
     @pytest.fixture()
-    def test_fileinput(self, qtbot, csv_file):
+    @classmethod
+    def test_fileinput(cls, qtbot, csv_file):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -115,7 +122,8 @@ class TestCSVImportWidget(object):
         assert csvwidget._header is None
 
     @pytest.fixture()
-    def test_header(self, qtbot):
+    @classmethod
+    def test_header(cls, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -125,7 +133,8 @@ class TestCSVImportWidget(object):
         checkboxes[0].toggle()
         assert csvwidget._header == 0
 
-    def test_encoding(self, qtbot):
+    @classmethod
+    def test_encoding(cls, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -138,7 +147,8 @@ class TestCSVImportWidget(object):
         assert csvwidget._encodingKey != 'iso_ir_6'
 
     @pytest.fixture()
-    def test_delimiter(self, qtbot):
+    @classmethod
+    def test_delimiter(cls, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -157,7 +167,8 @@ class TestCSVImportWidget(object):
             assert csvwidget._delimiter == groupboxes[0].currentSelected()
 
     @pytest.fixture()
-    def test_accept_reject(self, qtbot):
+    @classmethod
+    def test_accept_reject(cls, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -168,7 +179,8 @@ class TestCSVImportWidget(object):
             if not csvwidget.isVisible():
                 csvwidget.show()
 
-    def test_preview(self, qtbot, csv_file):
+    @classmethod
+    def test_preview(cls, qtbot, csv_file):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -199,6 +211,7 @@ class TestCSVImportWidget(object):
 
 
 class TestCSVExportWidget(object):
+
     def test_init(self, qtbot):
         csvwidget = CSVExportDialog()
         qtbot.addWidget(csvwidget)
@@ -206,7 +219,8 @@ class TestCSVExportWidget(object):
         assert csvwidget.isModal()
         assert csvwidget.windowTitle() == 'Export to CSV'
 
-    def test_fileoutput(self, qtbot, csv_file):
+    @classmethod
+    def test_fileoutput(cls, qtbot, csv_file):
         csvwidget = CSVExportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
@@ -231,7 +245,7 @@ class TestCSVExportWidget(object):
         csvwidget.show()
 
         comboboxes = csvwidget.findChildren(QtGui.QComboBox)
-        comboboxes[0]
+        # comboboxes[0]
         assert comboboxes[0].itemText(comboboxes[0].currentIndex()) == 'UTF_8'
 
     def test_delimiter(self, qtbot):
@@ -264,13 +278,15 @@ class TestCSVExportWidget(object):
         for button in buttons:
             qtbot.mouseClick(button, QtCore.Qt.LeftButton)
             if button.text() == 'Export Data':
-                assert csvwidget.isVisible() == True
+                assert csvwidget.isVisible() is True
             else:
-                assert csvwidget.isVisible() == False
+                assert csvwidget.isVisible() is False
+
 
 class TestDateTimeConversion(object):
 
-    def test_read_write(self, qtbot, csv_file, tmp):
+    @classmethod
+    def test_read_write(cls, qtbot, csv_file, tmp):
         importWidget = CSVImportDialog()
 
         qtbot.addWidget(importWidget)
@@ -344,4 +360,4 @@ class TestDateTimeConversion(object):
         comparator = model_in.dataFrame() == model_out_in.dataFrame()
         assert all(comparator)
 
-        df = model_out_in.dataFrame()
+        # df = model_out_in.dataFrame()
