@@ -59,10 +59,12 @@ def excepthook(excType, excValue, tracebackobj):
                 errmsg, separator, tbinfo]
     try:
         msg = '\n'.join(sections)
-    except:
+
+    except TypeError as e:
         # Remove all things not string.
         sections = [item for item in sections if type(item) == str]
         msg = '\n'.join(sections)
+
     try:
         f = codecs.open(logFile, "a+", encoding='utf-8')
         f.write(msg)

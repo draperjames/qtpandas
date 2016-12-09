@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 import os
+# import numpy
+import pytest
+# import pytestqt
 import tempfile
 
-from qtpandas.compat import Qt, QtCore, QtGui
-
-
-import numpy
-import pytest
-import pytestqt
+from qtpandas.compat import QtCore, QtGui  # ,Qt
 
 from qtpandas.views.CSVDialogs import (
     DelimiterValidator, DelimiterSelectionWidget,
     CSVImportDialog, CSVExportDialog
 )
+
 from qtpandas.models.DataFrameModel import DataFrameModel
 
-FIXTUREDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures')
+FIXTUREDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          'fixtures')
+
 
 @pytest.fixture()
 def csv_file():
@@ -25,14 +26,16 @@ def csv_file():
 @pytest.fixture()
 def tmp(request):
     handle, name = tempfile.mkstemp(suffix='.csv')
+
     def _teardown():
         os.close(handle)
         os.remove(name)
     request.addfinalizer(_teardown)
     return name
 
-class TestValidator(object):
 
+class TestValidator(object):
+    @pytest.fixture()
     def test_input(self, qtbot):
         widget = QtGui.QLineEdit()
         widget.setValidator(DelimiterValidator())
@@ -46,6 +49,7 @@ class TestValidator(object):
 
 
 class TestDelimiterBox(object):
+    @pytest.fixture()
     def test_selections_and_signals(self, qtbot):
         box = DelimiterSelectionWidget()
         qtbot.addWidget(box)
@@ -67,6 +71,7 @@ class TestDelimiterBox(object):
         for char in [',', ';', '\t', 'a']:
             assert char in delimiters
 
+    @pytest.fixture()
     def test_reset(self, qtbot):
         box = DelimiterSelectionWidget()
         qtbot.addWidget(box)
@@ -86,7 +91,9 @@ class TestDelimiterBox(object):
         box.reset()
         assert not lineedit.isEnabled()
 
+
 class TestCSVImportWidget(object):
+    @pytest.fixture()
     def test_init(self, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
@@ -94,6 +101,7 @@ class TestCSVImportWidget(object):
         assert csvwidget.isModal()
         assert csvwidget.windowTitle() == 'Import CSV'
 
+    @pytest.fixture()
     def test_fileinput(self, qtbot, csv_file):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
@@ -106,6 +114,7 @@ class TestCSVImportWidget(object):
         assert csvwidget._delimiter == ';'
         assert csvwidget._header is None
 
+    @pytest.fixture()
     def test_header(self, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
@@ -122,12 +131,13 @@ class TestCSVImportWidget(object):
         csvwidget.show()
 
         comboboxes = csvwidget.findChildren(QtGui.QComboBox)
-        comboboxes[0]
+        # comboboxes[0]
         assert comboboxes[0].itemText(comboboxes[0].currentIndex()) == 'ASCII'
         qtbot.mouseClick(comboboxes[0], QtCore.Qt.LeftButton)
         qtbot.keyPress(comboboxes[0], QtCore.Qt.Key_Down)
         assert csvwidget._encodingKey != 'iso_ir_6'
 
+    @pytest.fixture()
     def test_delimiter(self, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
@@ -146,6 +156,7 @@ class TestCSVImportWidget(object):
                 assert lineedits[0].text() == 'a'
             assert csvwidget._delimiter == groupboxes[0].currentSelected()
 
+    @pytest.fixture()
     def test_accept_reject(self, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
@@ -154,14 +165,14 @@ class TestCSVImportWidget(object):
         buttons = csvwidget.findChildren(QtGui.QPushButton)
         for button in buttons:
             qtbot.mouseClick(button, QtCore.Qt.LeftButton)
-            assert csvwidget.isVisible() == False
-            csvwidget.show()
+            if not csvwidget.isVisible():
+                csvwidget.show()
 
     def test_preview(self, qtbot, csv_file):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
-        labels = csvwidget.findChildren(QtGui.QLabel)
+        # labels = csvwidget.findChildren(QtGui.QLabel)
         lineedits = csvwidget.findChildren(QtGui.QLineEdit)
         qtbot.keyClicks(lineedits[0], csv_file)
 
@@ -334,4 +345,3 @@ class TestDateTimeConversion(object):
         assert all(comparator)
 
         df = model_out_in.dataFrame()
-
