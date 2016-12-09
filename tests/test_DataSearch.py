@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from qtpandas.compat import Qt, QtCore, QtGui
+from qtpandas.compat import Qt, QtCore  #, QtGui
 
 
 import pytest
-import pytestqt
+# import pytestqt
 
-import decimal
-import numpy
+# import decimal
+# import numpy
 import pandas
 
-from qtpandas.models.DataFrameModel import DataFrameModel, DATAFRAME_ROLE
+from qtpandas.models.DataFrameModel import DATAFRAME_ROLE  # , DataFrameModel
 from qtpandas.models.DataSearch import DataSearch
 
 class TestDataSearch(object):
 
     @pytest.fixture
-    def dataFrame(self):
+    @classmethod
+    def dataFrame(cls):
         data = [
             [0, 1, 2, 3, 4],
             [5, 6, 7, 8, 9],
@@ -27,7 +28,8 @@ class TestDataSearch(object):
         return dataFrame
 
     @pytest.fixture
-    def geoDataFrame(self):
+    @classmethod
+    def geoDataFrame(cls):
         data = [
             [0, 1, 2, 3, 4, 49.1234, 8.123],
             [5, 6, 7, 8, 9, 52.1234, 13.123],
@@ -37,7 +39,8 @@ class TestDataSearch(object):
         dataFrame = pandas.DataFrame(data, columns=columns)
         return dataFrame
 
-    def test_init(self, dataFrame):
+    @classmethod
+    def test_init(cls, dataFrame):
         filterString = 'Foo < 10'
         datasearch = DataSearch("Test", filterString)
         assert datasearch._filterString == filterString
@@ -55,12 +58,14 @@ class TestDataSearch(object):
         assert datasearch.name == 'Test3'
         assert len(datasearch._dataFrame.index) == 3
 
-    def test_repr(self, dataFrame):
+    @classmethod
+    def test_repr(cls, dataFrame):
         datasearch = DataSearch("Test2")
         assert str(datasearch).startswith('DataSearch(')
         assert str(datasearch).endswith('Test2 ()')
 
-    def test_dataFrame(self, dataFrame):
+    @classmethod
+    def test_dataFrame(cls, dataFrame):
         datasearch = DataSearch("Test")
         assert datasearch.dataFrame().empty
         assert isinstance(datasearch.dataFrame(), pandas.DataFrame)
@@ -68,13 +73,15 @@ class TestDataSearch(object):
         datasearch = DataSearch("Test", dataFrame=dataFrame)
         assert len(datasearch.dataFrame()) == 3
 
-    def test_filterString(self):
+    @classmethod
+    def test_filterString(cls):
         datasearch = DataSearch("Test")
         assert datasearch.filterString() == ''
         datasearch = DataSearch('Test2', filterString='Hello World')
         assert datasearch.filterString() == 'Hello World'
 
-    def test_setFilterString(self):
+    @classmethod
+    def test_setFilterString(cls):
         datasearch = DataSearch("Test")
         filterString = 'foo bar'
         datasearch.setFilterString(filterString)
@@ -85,7 +92,8 @@ class TestDataSearch(object):
         assert datasearch.filterString() != filterString
         assert datasearch.filterString() == filterString.strip()
 
-    def test_search(self, dataFrame):
+    @classmethod
+    def test_search(cls, dataFrame):
         datasearch = DataSearch('Test', dataFrame=dataFrame)
 
         filterString = 'Foo < 10'
@@ -110,7 +118,8 @@ class TestDataSearch(object):
         ret, valid = datasearch.search()
         assert not valid
 
-    def test_freeSearch(self, dataFrame):
+    @classmethod
+    def test_freeSearch(cls, dataFrame):
         datasearch = DataSearch('Test', dataFrame=dataFrame)
 
         filterString = 'freeSearch("0")'
@@ -130,7 +139,8 @@ class TestDataSearch(object):
         assert valid
         assert sum(ret) == 1
 
-    def test_extentSearch(self, geoDataFrame, dataFrame):
+    @classmethod
+    def test_extentSearch(cls, geoDataFrame, dataFrame):
         datasearch = DataSearch('Test', dataFrame=geoDataFrame)
 
         filterString = 'extentSearch(51, 9, 55, 14)'
@@ -147,7 +157,8 @@ class TestDataSearch(object):
         assert valid
         assert sum(ret) == 0
 
-    def test_indexSearch(self, dataFrame):
+    @classmethod
+    def test_indexSearch(cls, dataFrame):
         datasearch = DataSearch('Test', dataFrame=dataFrame)
 
         filterString = 'indexSearch([0])'
