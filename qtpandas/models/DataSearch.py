@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-
-from qtpandas.compat import Qt, QtCore, QtGui
-
+import sys
 import parser
 import re
 
 import numpy as np
 import pandas as pd
 
+from qtpandas.compat import Qt, QtCore, QtGui
 
+python_version = sys.version_info[0]
 
 class DataSearch(object):
     """object which provides parsing functionality for a DataFrame.
@@ -18,8 +18,8 @@ class DataSearch(object):
     and return a list with index which either match or fail the expression.
 
     Attributes:
-        name (str): Each `DataSearch` object should have a name. The name could
-            be used to store different `DataSearch` objects as predefined filters.
+        name (str): Each `DataSearch` object should have a name. It could be
+        used to store different `DataSearch` objects as predefined filters.
 
     """
 
@@ -39,9 +39,13 @@ class DataSearch(object):
         self.name = name
 
     def __repr__(self):
-        string = "DataSearch({}): {} ({})".format(hex(id(self)), self.name, self._filterString)
-        string = string.encode("utf-8")
-        return string
+        unformatted = "DataSearch({}): {} ({})"
+        formatted_string = unformatted.format(hex(id(self)),
+                                              self.name, self._filterString)
+        if python_version > 3:
+            formatted_string = unformatted.encode("utf-8")
+
+        return formatted_string
 
     def dataFrame(self):
         """Getter method for the `dataFrame` attribute.
@@ -84,7 +88,7 @@ class DataSearch(object):
                 trailing spaces will be removed.
 
         """
-        ## remove leading whitespaces, they will raise an identation error
+        # remove leading whitespaces, they will raise an identation error
         filterString = filterString.strip()
         self._filterString = filterString
 
@@ -115,7 +119,8 @@ class DataSearch(object):
             safeEnvDict[col] = self._dataFrame[col]
 
         try:
-            searchIndex = eval(self._filterString, {'__builtins__': None}, safeEnvDict)
+            searchIndex = eval(self._filterString, {
+                               '__builtins__': None}, safeEnvDict)
         except NameError as err:
             return [], False
         except SyntaxError as err:
@@ -131,14 +136,15 @@ class DataSearch(object):
     def freeSearch(self, searchString):
         """Execute a free text search for all columns in the dataframe.
 
-        Args:
-            searchString (str): Any string which may be contained in any column.
+        Parameters
+        ----------
+            searchString (str): Any string which may be contained in a column.
 
-        Returns:
-            list: A list containing all indexes with filtered data. Matches will
-                be `True`, the remaining items will be `False`. If the dataFrame
-                is empty, an empty list will be returned.
-
+        Returns
+        -------
+            list: A list containing all indexes with filtered data. Matches
+                will be `True`, the remaining items will be `False`. If the
+                dataFrame is empty, an empty list will be returned.
         """
 
         if not self._dataFrame.empty:
@@ -148,7 +154,9 @@ class DataSearch(object):
                 dfColumn = self._dataFrame[column]
                 dfColumn = dfColumn.apply(str)
 
-                question2 = dfColumn.str.contains(searchString, flags=re.IGNORECASE, regex=True, na=False)
+                question2 = dfColumn.str.contains(searchString,
+                                                  flags=re.IGNORECASE,
+                                                  regex=True, na=False)
                 question = np.logical_or(question, question2)
 
             return question
@@ -168,16 +176,19 @@ class DataSearch(object):
             Check if the method could be removed in the future. (could be done
             via freeSearch)
 
-        Returns:
-            list: A list containing all indexes with filtered data. Matches will
-                be `True`, the remaining items will be `False`. If the dataFrame
-                is empty, an empty list will be returned.
+        Returns
+        -------
+            list: A list containing all indexes with filtered data. Matches
+                will be `True`, the remaining items will be `False`. If the
+                dataFrame is empty, an empty list will be returned.
 
         """
         if not self._dataFrame.empty:
             try:
-                questionMin = (self._dataFrame.lat >= xmin) & (self._dataFrame.lng >= ymin)
-                questionMax = (self._dataFrame.lat <= xmax) & (self._dataFrame.lng <= ymax)
+                questionMin = (self._dataFrame.lat >= xmin) & (
+                    self._dataFrame.lng >= ymin)
+                questionMax = (self._dataFrame.lat <= xmax) & (
+                    self._dataFrame.lng <= ymax)
                 return np.logical_and(questionMin, questionMax)
             except AttributeError:
                 return []
@@ -186,16 +197,17 @@ class DataSearch(object):
 
     def indexSearch(self, indexes):
         """Filters the data by a list of indexes.
-        
+
         Args:
             indexes (list of int): List of index numbers to return.
 
         Returns:
-            list: A list containing all indexes with filtered data. Matches will
-                be `True`, the remaining items will be `False`. If the dataFrame
-                is empty, an empty list will be returned.
+            list: A list containing all indexes with filtered data. Matches
+            will be `True`, the remaining items will be `False`. If the
+            dataFrame is empty, an empty list will be returned.
 
         """
+
         if not self._dataFrame.empty:
             filter0 = self._dataFrame.index == -9999
             for index in indexes:

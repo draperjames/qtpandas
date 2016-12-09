@@ -14,6 +14,7 @@ from easygui.boxes.derived_boxes import msgbox
 # Load python version, an int with value 2 or 3.
 python_version = sys.version_info[0]
 
+
 def excepthook(excType, excValue, tracebackobj):
     """
     Global function to catch unhandled exceptions.
@@ -58,10 +59,12 @@ def excepthook(excType, excValue, tracebackobj):
                 errmsg, separator, tbinfo]
     try:
         msg = '\n'.join(sections)
-    except:
+
+    except TypeError as e:
         # Remove all things not string.
         sections = [item for item in sections if type(item) == str]
         msg = '\n'.join(sections)
+
     try:
         f = codecs.open(logFile, "a+", encoding='utf-8')
         f.write(msg)
