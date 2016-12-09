@@ -91,6 +91,7 @@ def test_headerData(orientation, role, index, expectedHeader):
     model = DataFrameModel(pandas.DataFrame([0], columns=['A']))
     assert model.headerData(index, orientation, role) == expectedHeader
 
+
 def test_flags():
     model = DataFrameModel(pandas.DataFrame([0], columns=['A']))
     index = model.index(0, 0)
@@ -106,11 +107,13 @@ def test_flags():
     assert model.flags(index) != Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
     assert model.flags(index) == Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
 
+
 def test_rowCount():
     model = DataFrameModel(pandas.DataFrame([0], columns=['A']))
     assert model.rowCount() == 1
     model = DataFrameModel(pandas.DataFrame(numpy.arange(100), columns=['A']))
     assert model.rowCount() == 100
+
 
 def test_columnCount():
     model = DataFrameModel(pandas.DataFrame([0], columns=['A']))
@@ -140,13 +143,15 @@ class TestSort(object):
             "sortingAboutToStart",
             "sortingFinished", ]
     )
-    def test_signals(self, model, qtbot, signal):
+    @classmethod
+    def test_signals(cls, model, qtbot, signal):
         with qtbot.waitSignal(getattr(model, signal)) as blocker:
             model.sort(0)
         assert blocker.signal_triggered
 
     @pytest.fixture()
-    def test_returnValues(self, model):
+    @classmethod
+    def test_returnValues(cls, model):
         model.sort(0)
 
     @pytest.mark.parametrize(
@@ -157,23 +162,29 @@ class TestSort(object):
             (True, Qt.DescendingOrder, False),
         ]
     )
-    def test_sort(self, model, dataFrame, testAscending, modelAscending, isIdentic):
+
+    @classmethod
+    def test_sort(cls, model, dataFrame, testAscending, modelAscending, isIdentic):
         temp = dataFrame.sort('A', ascending=testAscending)
         model.sort(0, order=modelAscending)
         assert (dataFrame['A'] == temp['A']).all() == isIdentic
 
+
 class TestData(object):
 
     @pytest.fixture()
-    def dataFrame(self):
+    @classmethod
+    def dataFrame(cls):
         return pandas.DataFrame(numpy.random.rand(10), columns=['A'])
 
     @pytest.fixture()
-    def model(self, dataFrame):
+    @classmethod
+    def model(cls, dataFrame):
         return DataFrameModel(dataFrame)
 
     @pytest.fixture()
-    def index(self, model):
+    @classmethod
+    def index(cls, model):
         index = model.index(0, 0)
         assert index.isValid()
         return index
@@ -313,7 +324,8 @@ class TestData(object):
         assert model.data(index, role=DATAFRAME_ROLE) == value
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), numpy.bool_)
 
-    def test_date(self, model, index):
+    @classmethod
+    def test_date(cls, model, index):
         pandasDate = pandas.Timestamp("1990-10-08T10:15:45")
         qDate = QtCore.QDateTime.fromString(str(pandasDate), Qt.ISODate)
         dataFrame = pandas.DataFrame([pandasDate], columns=['A'])
