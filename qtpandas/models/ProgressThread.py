@@ -1,7 +1,8 @@
 from qtpandas.compat import QtCore, QtGui, Qt, Signal, Slot
 
+
 class ProgressWorker(QtCore.QObject):
-    
+
     progressChanged = Signal(int)       # set value of OverlayProgressView
     finished = Signal()
 

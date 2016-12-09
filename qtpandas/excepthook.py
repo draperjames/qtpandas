@@ -32,8 +32,13 @@ def excepthook(excType, excValue, tracebackobj):
     tbinfo = tbinfofile.read()
     try:
         tbinfo = tbinfo.decode('utf-8')
+<<<<<<< HEAD
     except:
         tbinfo = str(tbinfo)
+=======
+    except AttributeError as e:
+        pass
+>>>>>>> 225a08219f27df88419afd4a0ad5ed9786df1b4d
 
     try:
         excValueStr = str(excValue).decode('utf-8')

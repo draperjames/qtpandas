@@ -3,6 +3,7 @@ from qtpandas.compat import QtCore
 
 class SupportedDtypesTranslator(QtCore.QObject):
     """Represents all supported datatypes and the translations (i18n).
+    This is really complicated and probably doesn't need to be.
 
     """
     def __init__(self, parent=None):

@@ -103,15 +103,24 @@ class TestCSVImportWidget(object):
         lineedits = csvwidget.findChildren(QtGui.QLineEdit)
         qtbot.keyClicks(lineedits[0], csv_file)
         assert csvwidget._previewTableView.model() is not None
+<<<<<<< HEAD
         assert csvwidget._delimiter in [',', ';']
         assert csvwidget._header in [None, 0]
+=======
+        assert csvwidget._delimiter in [';',',','|']
+        assert csvwidget._header is None, "csvwidget header should be None not {}.".format(csvwidget._header)
+>>>>>>> 225a08219f27df88419afd4a0ad5ed9786df1b4d
 
     def test_header(self, qtbot):
         csvwidget = CSVImportDialog()
         qtbot.addWidget(csvwidget)
         csvwidget.show()
 
+<<<<<<< HEAD
         assert csvwidget._header in [None, 0]
+=======
+        assert csvwidget._header is None
+>>>>>>> 225a08219f27df88419afd4a0ad5ed9786df1b4d
         checkboxes = csvwidget.findChildren(QtGui.QCheckBox)
         checkboxes[0].toggle()
         assert csvwidget._header in [None, 0]
@@ -254,10 +263,15 @@ class TestCSVExportWidget(object):
             qtbot.mouseClick(button, QtCore.Qt.LeftButton)
             if button.text() == 'Export Data':
                 assert csvwidget.isVisible() is True
+<<<<<<< HEAD
             # I dont think this test proves anything.
             # Why would you want the widget invisible?
             #else:
             #    assert csvwidget.isVisible() is False
+=======
+            else:
+                assert csvwidget.isVisible() is False
+>>>>>>> 225a08219f27df88419afd4a0ad5ed9786df1b4d
 
 class TestDateTimeConversion(object):
 
