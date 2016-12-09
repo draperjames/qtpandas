@@ -3,7 +3,6 @@ import random
 
 from qtpandas.compat import Qt, QtCore  # , QtGui
 
-
 import pytest
 # import pytestqt
 # import decimal
@@ -623,8 +622,6 @@ class TestEditMode(object):
 
         return columns
 
-    @classmethod
-    def test_edit_data(cls, model):
         index = model.index(0, 0)
         currentData = index.data()
 
