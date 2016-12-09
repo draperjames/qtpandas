@@ -119,14 +119,15 @@ def test_columnCount():
     model = DataFrameModel( pandas.DataFrame(numpy.arange(100).reshape(1, 100), columns=numpy.arange(100)) )
     assert model.columnCount() == 100
 
+
 class TestSort(object):
 
-    # @pytest.fixture
+    @pytest.fixture()
     @classmethod
     def dataFrame(cls):
         return pandas.DataFrame(numpy.random.rand(10), columns=['A'])
 
-    # @pytest.fixture
+    @pytest.fixture()
     @classmethod
     def model(cls, dataFrame):
         return DataFrameModel(dataFrame)
@@ -144,7 +145,7 @@ class TestSort(object):
             model.sort(0)
         assert blocker.signal_triggered
 
-    @pytest.fixture
+    @pytest.fixture()
     def test_returnValues(self, model):
         model.sort(0)
 
@@ -163,21 +164,21 @@ class TestSort(object):
 
 class TestData(object):
 
-    @pytest.fixture
+    @pytest.fixture()
     def dataFrame(self):
         return pandas.DataFrame(numpy.random.rand(10), columns=['A'])
 
-    @pytest.fixture
+    @pytest.fixture()
     def model(self, dataFrame):
         return DataFrameModel(dataFrame)
 
-    @pytest.fixture
+    @pytest.fixture()
     def index(self, model):
         index = model.index(0, 0)
         assert index.isValid()
         return index
 
-    # @pytest.fixture
+    @pytest.fixture()
     @classmethod
     def test_invalidIndex(cls, model):
         assert model.data(QtCore.QModelIndex()) is None
@@ -218,7 +219,7 @@ class TestData(object):
         assert model.data(index) == value
         assert model.data(index, role=Qt.DisplayRole) == value
         assert model.data(index, role=Qt.EditRole) == value
-        assert model.data(index, role=Qt.CheckStateRole) == None
+        assert model.data(index, role=Qt.CheckStateRole) is None
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
 
     @pytest.mark.parametrize(
@@ -691,7 +692,7 @@ class TestEditMode(object):
         assert model.rowCount() == rows + 1
 
         assert model.addDataFrameRows(count=5)
-        assert model.rowCount() ==  rows + 1 + 5
+        assert model.rowCount() == rows + 1 + 5
 
         idx = model.index(rows+4, 0)
         assert idx.data() == 0
