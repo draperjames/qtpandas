@@ -211,7 +211,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         :param kwargs:
             see pandas.DataFrame.rename
         :return:
-            True on success, False on failure.
+            None
         """
         kwargs['inplace'] = True
         self.layoutAboutToBeChanged.emit()
