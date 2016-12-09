@@ -196,6 +196,48 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         #assert isinstance(timestampFormat, unicode) or timestampFormat.__class__.__name__ == "DateFormat", "not of type unicode"
         self._timestampFormat = timestampFormat
 
+    def rename(self, index=None, columns=None, **kwargs):
+        """
+        Renames the dataframe inplace calling appropriate signals.
+        Wraps pandas.DataFrame.rename(*args, **kwargs) - overrides
+        the inplace kwarg setting it to True.
+
+        Example use:
+        renames = {'colname1':'COLNAME_1', 'colname2':'COL2'}
+        DataFrameModel.rename(columns=renames)
+
+        :param args:
+            see pandas.DataFrame.rename
+        :param kwargs:
+            see pandas.DataFrame.rename
+        :return:
+            True on success, False on failure.
+        """
+        kwargs['inplace'] = True
+        self.layoutAboutToBeChanged.emit()
+        self._dataFrame.rename(index, columns, **kwargs)
+        self.layoutChanged.emit()
+        self.dataChanged.emit()
+        self.dataFrameChanged.emit()
+
+    def applyFunction(self, func):
+        """
+        Applies a function to the dataFrame with appropriate signals.
+        :param func: A function (or partial function) that accepts a dataframe as the first argument.
+        :return: None
+        :raise:
+            AssertionError if the func is not callable.
+            AssertionError if the func does not return a DataFrame.
+        """
+        assert callable(func), "function {} is not callable".format(func)
+        self.layoutAboutToBeChanged.emit()
+        df = func(self._dataFrame)
+        assert isinstance(df, pandas.DataFrame), "method {} did not return a DataFrame.".format(func.__name__)
+        self._dataFrame = df
+        self.layoutChanged.emit()
+        self.dataChanged.emit()
+        self.dataFrameChanged.emit()
+
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         """
         Return the header depending on section, orientation and Qt::ItemDataRole
