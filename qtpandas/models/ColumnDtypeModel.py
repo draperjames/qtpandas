@@ -199,8 +199,8 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
 
         if dtype is not None:
             if dtype != currentDtype:
-                col = index.column()
-                #row = self._dataFrame.columns[index.column()]
+                # col = index.column()
+                # Row = self._dataFrame.columns[index.column()]
                 columnName = self._dataFrame.columns[index.row()]
 
                 try:
