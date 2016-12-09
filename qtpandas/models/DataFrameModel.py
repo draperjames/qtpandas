@@ -232,7 +232,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         assert callable(func), "function {} is not callable".format(func)
         self.layoutAboutToBeChanged.emit()
         df = func(self._dataFrame)
-        assert isinstance(df, pandas.DataFrame), "method {} did not return a DataFrame.".format(func.__name__)
+        assert isinstance(df, pandas.DataFrame), "function {} did not return a DataFrame.".format(func.__name__)
         self._dataFrame = df
         self.layoutChanged.emit()
         self.dataChanged.emit()
