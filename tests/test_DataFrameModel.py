@@ -15,15 +15,18 @@ from qtpandas.models.DataFrameModel import DataFrameModel, DATAFRAME_ROLE
 from qtpandas.models.DataSearch import DataSearch
 from qtpandas.models.SupportedDtypes import SupportedDtypes
 
+
 def test_initDataFrame():
     model = DataFrameModel()
     assert model.dataFrame().empty
+
 
 def test_initDataFrameWithDataFrame():
     dataFrame = pandas.DataFrame([0], columns=['A'])
     model = DataFrameModel(dataFrame)
     assert not model.dataFrame().empty
     assert model.dataFrame() is dataFrame
+
 
 def test_setDataFrame():
     dataFrame = pandas.DataFrame([0], columns=['A'])
@@ -35,6 +38,7 @@ def test_setDataFrame():
     with pytest.raises(TypeError) as excinfo:
         model.setDataFrame(None)
     assert "pandas.core.frame.DataFrame" in str(excinfo.value)
+
 
 @pytest.mark.parametrize(
     "copy, operator",
@@ -51,6 +55,7 @@ def test_copyDataFrame(copy, operator):
     model.setDataFrame(dataFrame, copyDataFrame=copy)
     assert operator(id(model.dataFrame()), id(dataFrame))
 
+
 def test_TimestampFormat():
     model = DataFrameModel()
     assert model.timestampFormat == Qt.ISODate
@@ -62,15 +67,15 @@ def test_TimestampFormat():
         model.timestampFormat = "yy-MM-dd hh:mm"
     assert "unicode" in str(excinfo.value)
 
-#def test_signalUpdate(qtbot):
-    #model = DataFrameModel()
-    #with qtbot.waitSignal(model.layoutAboutToBeChanged) as layoutAboutToBeChanged:
-        #model.signalUpdate()
-    #assert layoutAboutToBeChanged.signal_triggered
-
-    #with qtbot.waitSignal(model.layoutChanged) as blocker:
-        #model.signalUpdate()
-    #assert blocker.signal_triggered
+# def test_signalUpdate(qtbot):
+#     model = DataFrameModel()
+#     with qtbot.waitSignal(model.layoutAboutToBeChanged) as layoutAboutToBeChanged:
+#         model.signalUpdate()
+#     assert layoutAboutToBeChanged.signal_triggered
+#
+#     with qtbot.waitSignal(model.layoutChanged) as blocker:
+#         model.signalUpdate()
+#     assert blocker.signal_triggered
 
 @pytest.mark.parametrize(
     "orientation, role, index, expectedHeader",
