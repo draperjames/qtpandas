@@ -219,7 +219,8 @@ class TestData(object):
             ("äöü", object),
         ]
     )
-    def test_strAndUnicode(self, model, index, value, dtype):
+    @classmethod
+    def test_strAndUnicode(cls, model, index, value, dtype):
         dataFrame = pandas.DataFrame([value], columns=['A'])
         dataFrame['A'] = dataFrame['A'].astype(dtype)
         model.setDataFrame(dataFrame)
@@ -343,27 +344,31 @@ class TestData(object):
 
 class TestSetData(object):
 
-    @pytest.fixture
-    def dataFrame(self):
+    @pytest.fixture()
+    @classmethod
+    def dataFrame(cls):
         return pandas.DataFrame([10], columns=['A'])
 
     @classmethod
-    @pytest.fixture
+    @pytest.fixture()
     def model(cls, dataFrame):
         return DataFrameModel(dataFrame)
 
-    @pytest.fixture
-    def index(self, model):
+    @pytest.fixture()
+    @classmethod
+    def index(cls, model):
         return model.index(0, 0)
 
-    def test_invalidIndex(self, model):
-        assert model.setData(QtCore.QModelIndex(), None) == False
+    @classmethod
+    def test_invalidIndex(cls, model):
+        assert model.setData(QtCore.QModelIndex(), None) is False
 
     @classmethod
     def test_nothingHasChanged(cls, model, index):
-        assert model.setData(index, 10) == False
+        assert model.setData(index, 10) is False
 
-    def test_unhandledDtype(self, model, index):
+    @classmethod
+    def test_unhandledDtype(cls, model, index):
         dataFrame = pandas.DataFrame([92.289+151.96j], columns=['A'])
         dataFrame['A'] = dataFrame['A'].astype(numpy.complex64)
         model.setDataFrame(dataFrame)
@@ -392,7 +397,7 @@ class TestSetData(object):
         assert model.data(index) == newValue
         assert model.data(index, role=Qt.DisplayRole) == newValue
         assert model.data(index, role=Qt.EditRole) == newValue
-        assert model.data(index, role=Qt.CheckStateRole) == None
+        assert model.data(index, role=Qt.CheckStateRole) is None
         assert model.data(index, role=DATAFRAME_ROLE) == newValue
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
 
@@ -422,7 +427,8 @@ class TestSetData(object):
         assert model.data(index, role=DATAFRAME_ROLE) == value
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), numpy.bool_)
 
-    def test_date(self, model, index):
+    @classmethod
+    def test_date(cls, model, index):
         numpyDate = numpy.datetime64("1990-10-08T10:15:45+0100")
         dataFrame = pandas.DataFrame([numpyDate], columns=['A'])
         model.setDataFrame(dataFrame)
@@ -473,8 +479,8 @@ class TestSetData(object):
         assert model.setData(index, newValue)
 
         if precision:
-            modelValue = model.data(index, role=Qt.DisplayRole)
-            #assert abs(decimal.Decimal(str(modelValue)).as_tuple().exponent) == precision
+            # modelValue = model.data(index, role=Qt.DisplayRole)
+            # assert abs(decimal.Decimal(str(modelValue)).as_tuple().exponent) == precision
             assert model.data(index) == round(newValue, precision)
             assert model.data(index, role=Qt.DisplayRole) == round(newValue, precision)
             assert model.data(index, role=Qt.EditRole) == round(newValue, precision)
@@ -482,7 +488,7 @@ class TestSetData(object):
             assert model.data(index) == newValue
             assert model.data(index, role=Qt.DisplayRole) == newValue
             assert model.data(index, role=Qt.EditRole) == newValue
-        assert model.data(index, role=Qt.CheckStateRole) == None
+        assert model.data(index, role=Qt.CheckStateRole) is None
         assert isinstance(model.data(index, role=DATAFRAME_ROLE), dtype)
         assert model.data(index, role=DATAFRAME_ROLE).dtype == dtype
 
@@ -534,8 +540,11 @@ class TestFilter(object):
         dataFrame = pandas.DataFrame(data, columns=columns)
         return dataFrame
 
+    # @classmethod
     @pytest.fixture
-    def model(self, dataFrame):
+    @classmethod
+    def model(cls, dataFrame):
+    # def model(self, dataFrame):
         return DataFrameModel(dataFrame)
 
     @pytest.fixture
