@@ -21,6 +21,20 @@ from qtpandas.models.SupportedDtypes import SupportedDtypes
 DATAFRAME_ROLE = Qt.UserRole + 2
 
 
+def read(filepath, **kwargs):
+    """
+    Read a data file into a DataFrameModel.
+
+    :param filepath: The rows/columns filepath to read.
+    :param kwargs:
+            xls/x files - see pandas.read_excel(**kwargs)
+            .csv/.txt/etc - see pandas.read_csv(**kwargs)
+    :return:
+    """
+    return DataFrameModel(dataFrame=superReadFile(filepath, **kwargs),
+                          filePath=filepath)
+
+
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
 
@@ -223,6 +237,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     def applyFunction(self, func):
         """
         Applies a function to the dataFrame with appropriate signals.
+        The function must return a dataframe.
         :param func: A function (or partial function) that accepts a dataframe as the first argument.
         :return: None
         :raise:

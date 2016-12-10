@@ -170,16 +170,18 @@ def superReadFile(filepath, **kwargs):
     if isinstance(filepath, pd.DataFrame):
         return filepath
 
-    excels = ['.xlsx', '.xls']
-    texts = ['.txt', '.tsv', '.csv']
     ext = os.path.splitext(filepath)[1].lower()
 
-    if ext in excels:
-        return pd.read_excel(filepath, **kwargs)
-    elif ext in texts:
-        return superReadText(filepath, **kwargs)
+    if ext in ['.xlsx', '.xls']:
+        df = pd.read_excel(filepath, **kwargs)
     else:
-        raise Exception("Unsupported filetype: {}\n Supported filetypes: {}".format(ext, excels + texts))
+        # Assume it's a text-like file and try to read it.
+        try:
+            df = superReadText(filepath, **kwargs)
+        except Exception as e:
+            # TODO: Make this trace back better? Custom Exception? Raise original?
+            raise Exception("Error reading file: {}".format(e))
+    return df
 
 
 def dedupe_cols(frame):
