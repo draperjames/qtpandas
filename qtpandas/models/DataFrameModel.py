@@ -21,6 +21,48 @@ from qtpandas.models.SupportedDtypes import SupportedDtypes
 DATAFRAME_ROLE = Qt.UserRole + 2
 
 
+def read_file(filepath, **kwargs):
+    """
+    Read a data file into a DataFrameModel.
+
+    :param filepath: The rows/columns filepath to read.
+    :param kwargs:
+            xls/x files - see pandas.read_excel(**kwargs)
+            .csv/.txt/etc - see pandas.read_csv(**kwargs)
+    :return: DataFrameModel
+    """
+    return DataFrameModel(dataFrame=superReadFile(filepath, **kwargs),
+                          filePath=filepath)
+
+
+def read_sql(sql, con, filePath, index_col=None, coerce_float=True,
+             params=None, parse_dates=None, columns=None, chunksize=None):
+    """
+    Read SQL query or database table into a DataFrameModel.
+    Provide a filePath argument in addition to the *args/**kwargs from
+    pandas.read_sql and get a DataFrameModel.
+
+    NOTE: The chunksize option is overridden to None always (for now).
+
+    Reference:
+    http://pandas.pydata.org/pandas-docs/version/0.18.1/generated/pandas.read_sql.html
+    pandas.read_sql(sql, con, index_col=None, coerce_float=True,
+                    params=None, parse_dates=None, columns=None, chunksize=None)
+
+
+
+    :return: DataFrameModel
+    """
+
+    # TODO: Decide if chunksize is worth keeping and how to handle?
+    df = pandas.read_sql(sql, con, index_col, coerce_float,
+                    params, parse_dates, columns, chunksize=None)
+    return DataFrameModel(df, filePath=filePath)
+
+
+
+
+
 class DataFrameModel(QtCore.QAbstractTableModel):
     """data model for use in QTableView, QListView, QComboBox, etc.
 
@@ -211,7 +253,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         :param kwargs:
             see pandas.DataFrame.rename
         :return:
-            True on success, False on failure.
+            None
         """
         kwargs['inplace'] = True
         self.layoutAboutToBeChanged.emit()
@@ -223,6 +265,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
     def applyFunction(self, func):
         """
         Applies a function to the dataFrame with appropriate signals.
+        The function must return a dataframe.
         :param func: A function (or partial function) that accepts a dataframe as the first argument.
         :return: None
         :raise:
