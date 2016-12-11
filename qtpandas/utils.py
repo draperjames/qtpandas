@@ -174,6 +174,10 @@ def superReadFile(filepath, **kwargs):
 
     if ext in ['.xlsx', '.xls']:
         df = pd.read_excel(filepath, **kwargs)
+
+    elif ext in ['.pkl', '.p', '.pickle', '.pk']:
+        df = pd.read_pickle(filepath)
+
     else:
         # Assume it's a text-like file and try to read it.
         try:
