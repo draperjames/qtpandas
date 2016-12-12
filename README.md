@@ -22,7 +22,7 @@
             </a>
         </td>
     </tr>
-    <tr>
+<!--     <tr> -->
   <td>PyPI</td>
   <td>
     <a href="https://pypi.python.org/pypi/qtpandas/">
