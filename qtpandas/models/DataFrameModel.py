@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Easy integration of DataFrame into pyqt framework
+"""
+Easy integration of DataFrame into pyqt framework
 
 @author: Jev Kuznetsov, Matthias Ludwig - Datalyze Solutions
 """

@@ -9,7 +9,7 @@ import pandas as pd
 from qtpandas.models.DataFrameModel import DataFrameModel, read_file
 from collections import defaultdict
 import datetime
-from compat import QtCore
+from qtpandas.compat import QtCore
 
 
 class DataFrameModelManager(QtCore.QObject):
@@ -81,13 +81,13 @@ class DataFrameModelManager(QtCore.QObject):
         if ext == ".xlsx":
             kwargs.pop('sep', None)
             df.to_excel(to_path, **kwargs)
-            
+
         elif ext in ['.csv','.txt']:
             df.to_csv(to_path, **kwargs)
-            
+
         else:
             raise NotImplementedError("Cannot save file of type {}".format(ext))
-        
+
         if save_as is not None:
             if  keep_orig is False:
                 # Re-purpose the original model
@@ -130,7 +130,7 @@ class DataFrameModelManager(QtCore.QObject):
     def get_frame(self, filepath):
         """Returns the DataFrameModel.dataFrame() registered to filepath """
         return self._models[filepath].dataFrame()
-            
+
     def update_file(self, filepath, df, notes=None):
         """
         Sets a new DataFrame for the DataFrameModel registered to filepath.
@@ -144,16 +144,16 @@ class DataFrameModelManager(QtCore.QObject):
 
         """
         assert isinstance(df, pd.DataFrame), "Cannot update file with type '{}'".format(type(df))
-        
+
         self._models[filepath].setDataFrame(df, copyDataFrame=False)
-        
+
         if notes:
             update = dict(date=pd.Timestamp(datetime.datetime.now()),
                                                      notes=notes)
-            
+
             self._updates[filepath].append(update)
         self._paths_updated.append(filepath)
-        
+
     def remove_file(self, filepath):
         """
         Removes the DataFrameModel from being registered.
@@ -190,6 +190,5 @@ class DataFrameModelManager(QtCore.QObject):
             self.signalNewModelRead.emit(filepath)
         finally:
             self._paths_read.append(filepath)
-            
+
         return self._models[filepath]
-    
