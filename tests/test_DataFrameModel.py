@@ -615,8 +615,6 @@ class TestEditMode(object):
 
         assert expected
 
-
-
     def test_edit_data(self, model):
         index = model.index(0, 0)
         currentData = index.data()

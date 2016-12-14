@@ -4,7 +4,6 @@ from qtpandas.compat import Qt, QtCore, QtGui
 
 
 import pytest
-
 from qtpandas.views.BigIntSpinbox import BigIntSpinbox
 
 class TestClass(object):
@@ -13,6 +12,7 @@ class TestClass(object):
     def spinbox(self, qtbot):
         widget = BigIntSpinbox()
         qtbot.addWidget(widget)
+
         return widget
 
     def test_init(self, spinbox):
