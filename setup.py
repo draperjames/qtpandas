@@ -9,7 +9,9 @@ import sys
 
 has_qt4 = True
 try:
-    # TODO: sip is only needed for PyQt4, they should be imported together.
+    # sip is only needed for PyQt4, they should be imported together.
+    # If we can let's remove all of the references to PyQt or Pyside in favor
+    # of qtpy.
     import PyQt4
     import sip
 except ImportError as e:
@@ -66,8 +68,12 @@ class PyTest(TestCommand):
         errcode = pytest.main(self.test_args)
         sys.exit(errcode)
 
-tests_require = ['easygui', 'pandas == 0.17.1', 'pyside', 'pytest',
-                            'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
+# Comment one of the other to test the pandas version
+pandas_version = "pandas == 0.17.1"
+# pandas_version = "pandas"
+
+tests_require = [pandas_version, 'easygui',  'pyside',
+                 'pytest', 'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
 setup(
     name='qtpandas',
     version=__version__,
@@ -76,7 +82,7 @@ setup(
     namespace_packages=['qtpandas'],
     author='Matthias Ludwig, Marcel Radischat, Zeke, James Draper',
     tests_require=tests_require,
-    install_requires=['easygui', 'pandas==0.17.1', 'pytest',
+    install_requires=[pandas_version, 'easygui', 'pytest', 'qtpy',
                       'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
     cmdclass={'test': PyTest},
     author_email='james.draper@duke.edu',
