@@ -38,7 +38,6 @@ __version__ = re.sub(
 )
 version_file.close()
 
-
 def read(*filenames, **kwargs):
     encoding = kwargs.get('encoding', 'utf-8')
     sep = kwargs.get('sep', '\n')
@@ -68,12 +67,9 @@ class PyTest(TestCommand):
         errcode = pytest.main(self.test_args)
         sys.exit(errcode)
 
-# Comment one of the other to test the pandas version
-pandas_version = "pandas == 0.17.1"
-# pandas_version = "pandas"
 
-tests_require = [pandas_version, 'easygui',  'pyside',
-                 'pytest', 'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
+tests_require = ["pandas == 0.17.1", 'easygui',  'pyside',
+                 'pytest', 'pytest-cov', 'pytest-qt']# 'python-magic==0.4.6']
 setup(
     name='qtpandas',
     version=__version__,
@@ -82,8 +78,8 @@ setup(
     namespace_packages=['qtpandas'],
     author='Matthias Ludwig, Marcel Radischat, Zeke, James Draper',
     tests_require=tests_require,
-    install_requires=[pandas_version, 'easygui', 'pytest', 'qtpy',
-                      'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
+    install_requires=["pandas == 0.17.1", 'easygui', 'pytest', 'qtpy',
+                      'pytest-qt==1.2.2', 'pytest-cov'],#, 'python-magic==0.4.6'],
     cmdclass={'test': PyTest},
     author_email='james.draper@duke.edu',
     description=short_description,

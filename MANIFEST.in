@@ -1,4 +1,3 @@
 recursive-include qtpandas *.py
 recursive-include qtpandas/_lib *
-recursive-include qtpandas/i18n *.qm
 prune examples/sample?/build/tests

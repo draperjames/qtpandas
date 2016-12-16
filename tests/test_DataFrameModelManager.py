@@ -1,7 +1,7 @@
 import os
 import pytest
 from qtpandas.models.DataFrameModelManager import DataFrameModelManager
-from tests.main import MainTestClass
+from main import MainTestClass
 
 
 class TestClass(MainTestClass):
@@ -43,14 +43,3 @@ class TestClass(MainTestClass):
         assert sample_file not in manager.file_paths
         assert os.path.exists(check_path)
         os.remove(check_path)
-
-
-
-
-
-
-
-
-
-
-

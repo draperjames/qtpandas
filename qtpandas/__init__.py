@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# __import__('pkg_resources').declare_namespace(__name__)
+__import__('pkg_resources').declare_namespace(__name__)
 __version__ = '1.0.4'
 from qtpandas.models.DataFrameModel import DataFrameModel, read_file, read_sql
 from qtpandas.models.ColumnDtypeModel import ColumnDtypeModel
