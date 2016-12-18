@@ -167,30 +167,30 @@ class TestColumnDType(object):
         assert 'not of type pandas.core.frame.DataFrame' in str(err.value)
 
 
-class TestDtypeComboDelegate(object):
-    def test_editing(self, dataframe, qtbot):
-        model = ColumnDtypeModel(dataFrame=dataframe)
-
-        model.setEditable(True)
-
-        tableView = QtGui.QTableView()
-        qtbot.addWidget(tableView)
-
-        tableView.setModel(model)
-        delegate = DtypeComboDelegate(tableView)
-        tableView.setItemDelegateForColumn(1, delegate)
-        tableView.show()
-
-        index = model.index(0, 1)
-        preedit_data = index.data(DTYPE_ROLE)
-
-        tableView.edit(index)
-        editor = tableView.findChildren(QtGui.QComboBox)[0]
-        selectedIndex = editor.currentIndex()
-        editor.setCurrentIndex(selectedIndex+1)
-        postedit_data = index.data(DTYPE_ROLE)
-
-        assert preedit_data != postedit_data
+# class TestDtypeComboDelegate(object):
+#     def test_editing(self, dataframe, qtbot):
+#         model = ColumnDtypeModel(dataFrame=dataframe)
+#
+#         model.setEditable(True)
+#
+#         tableView = QtGui.QTableView()
+#         qtbot.addWidget(tableView)
+#
+#         tableView.setModel(model)
+#         delegate = DtypeComboDelegate(tableView)
+#         tableView.setItemDelegateForColumn(1, delegate)
+#         tableView.show()
+#
+#         index = model.index(0, 1)
+#         preedit_data = index.data(DTYPE_ROLE)
+#
+#         tableView.edit(index)
+#         editor = tableView.findChildren(QtGui.QComboBox)[0]
+#         selectedIndex = editor.currentIndex()
+#         editor.setCurrentIndex(selectedIndex+1)
+#         postedit_data = index.data(DTYPE_ROLE)
+#
+#         assert preedit_data != postedit_data
 
 if __name__ == '__main__':
     pytest.main()

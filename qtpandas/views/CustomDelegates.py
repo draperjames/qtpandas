@@ -307,7 +307,8 @@ class DtypeComboDelegate(QtGui.QStyledItemDelegate):
         """
         editor.blockSignals(True)
         data = index.data()
-        dataIndex = editor.findData(data, role=Qt.EditRole)
+        dataIndex = editor.findData(data)
+        # dataIndex = editor.findData(data, role=Qt.EditRole)
         editor.setCurrentIndex(dataIndex)
         editor.blockSignals(False)
 
@@ -329,5 +330,3 @@ class DtypeComboDelegate(QtGui.QStyledItemDelegate):
 
         """
         self.commitData.emit(self.sender())
-
-
