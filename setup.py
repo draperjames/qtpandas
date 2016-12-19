@@ -1,11 +1,12 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
+# from __future__ import unicode_literals
+# from __future__ import print_function
+# from __future__ import division
+# from __future__ import absolute_import
+#
+# from builtins import open
+# from future import standard_library
+# standard_library.install_aliases()
 
-from builtins import open
-from future import standard_library
-standard_library.install_aliases()
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 import io
@@ -79,8 +80,16 @@ class PyTest(TestCommand):
         sys.exit(errcode)
 
 
-tests_require = ["pandas == 0.17.1", 'easygui', 'pyqt',#'pyside',
-                 'pytest', 'pytest-cov', 'pytest-qt']# 'python-magic==0.4.6']
+tests_require = ["pandas == 0.17.1",
+                 'easygui',
+                 'pyqt',
+                 # 'pyside',
+                 'pytest',
+                 'pytest-qt',
+                 'pytest-cov',
+                 'future',
+                 # 'python-magic==0.4.6'
+                 ]
 
 setup(
     name='qtpandas',
@@ -90,8 +99,17 @@ setup(
     namespace_packages=['qtpandas'],
     author='Matthias Ludwig, Marcel Radischat, Zeke, James Draper',
     tests_require=tests_require,
-    install_requires=["pandas == 0.17.1", 'easygui', 'pytest', 'qtpy',
-                      'pytest-qt==1.2.2', 'pytest-cov'],#, 'python-magic==0.4.6'],
+    install_requires=[
+                      "pandas == 0.17.1",
+                      'easygui',
+                      'pytest',
+                      'pytest-qt==1.2.2',
+                      'qtpy',
+                      'future',
+                      'pytest-cov',
+                    # 'python-magic==0.4.6'
+                      ],
+
     cmdclass={'test': PyTest},
     author_email='james.draper@duke.edu',
     description=short_description,
