@@ -48,10 +48,10 @@ def convertTimestamps(column):
     try:
         # Try to convert the first row and a random row instead of the complete
         # column, might be faster
-        tempValue = np.datetime64(column[0])
+        # tempValue = np.datetime64(column[0])
         tempValue = np.datetime64(column[randint(0, len(column.index) - 1)])
         tempColumn = column.apply(to_datetime)
-    except:
+    except Exception:
         pass
     return tempColumn
 

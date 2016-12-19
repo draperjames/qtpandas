@@ -206,8 +206,8 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
 
         if dtype is not None:
             if dtype != currentDtype:
-                col = index.column()
-                #row = self._dataFrame.columns[index.column()]
+                # col = index.column()
+                # row = self._dataFrame.columns[index.column()]
                 columnName = self._dataFrame.columns[index.row()]
 
                 try:
@@ -221,7 +221,7 @@ class ColumnDtypeModel(QtCore.QAbstractTableModel):
                     self.layoutChanged.emit()
 
                     return True
-                except Exception as e:
+                except Exception:
                     message = 'Could not change datatype %s of column %s to datatype %s' % (currentDtype, columnName, dtype)
                     self.changeFailed.emit(message, index, dtype)
                     raise

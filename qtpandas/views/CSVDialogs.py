@@ -612,14 +612,18 @@ class CSVExportDialog(QtGui.QDialog):
 
         try:
             dataFrame = self._model.dataFrame()
-        except AttributeError as err:
+        except AttributeError:
             raise AttributeError('No data loaded to export.')
         else:
             try:
-                dataFrame.to_csv(filename, encoding=encoding, header=header, index=index, sep=delimiter)
-            except IOError as err:
+                dataFrame.to_csv(filename,
+                                 encoding=encoding,
+                                 header=header,
+                                 index=index,
+                                 sep=delimiter)
+            except IOError:
                 raise IOError('No filename given')
-            except UnicodeError as err:
+            except UnicodeError:
                 raise UnicodeError('Could not encode all data. Choose a different encoding')
             except Exception:
                 raise

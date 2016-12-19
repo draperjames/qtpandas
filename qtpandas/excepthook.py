@@ -57,7 +57,7 @@ def excepthook(excType, excValue, tracebackobj):
         else:
             excValueStr = str(excValue)
 
-    except UnicodeEncodeError as e:
+    except UnicodeEncodeError:
         excValueStr = str(excValue)
 
     errmsg = '{0}: \n{1}'.format(excType, excValueStr)

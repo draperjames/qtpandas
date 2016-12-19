@@ -129,14 +129,14 @@ class DataSearch(object):
         try:
             searchIndex = eval(self._filterString, {
                                '__builtins__': None}, safeEnvDict)
-        except NameError as err:
+        except NameError:
             return [], False
-        except SyntaxError as err:
+        except SyntaxError:
             return [], False
-        except ValueError as err:
+        except ValueError:
             # the use of 'and'/'or' is not valid, need to use binary operators.
             return [], False
-        except TypeError as err:
+        except TypeError:
             # argument must be string or compiled pattern
             return [], False
         return searchIndex, True
