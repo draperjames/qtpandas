@@ -1,34 +1,17 @@
+"""Systematically imports tools needed from PyQt4, PyQt5 and or Pyside as well
+as attempts to set sip API values if sip is installed.
 
-import logging
-log = logging.getLogger(__name__)
+@author: qtpandas contributors
+"""
+import qtpy.QtGui as _QtGui
+import qtpy.QtWidgets as _QtWidgets
+import qtpy.QtCore as _QtCore
+from qtpy.QtCore import (Signal, Slot, Qt)
+QtGui = _QtGui
+QtCore = _QtCore
+# QtGui compatility
+for sub_mod in dir(_QtWidgets):
+    QtGui.__dict__[sub_mod] = _QtWidgets.__dict__[sub_mod]
 
-
-try:
-    import sip
-    sip.setapi('QString', 2)
-    sip.setapi('QVariant', 2)
-    sip.setapi('QDate', 2)
-    sip.setapi('QDateTime', 2)
-    sip.setapi('QTextStream', 2)
-    sip.setapi('QTime', 2)
-    sip.setapi('QUrl', 2)
-except ValueError as e:
-    log.error(e)
-except ImportError as e:
-    log.error(e)
-
-try:
-    from PyQt4 import QtCore as QtCore_
-    from PyQt4 import QtGui as QtGui_
-    from PyQt4.QtCore import pyqtSlot as Slot, pyqtSignal as Signal
-except ImportError as e:
-    from PySide import QtCore as QtCore_
-    from PySide import QtGui as QtGui_
-    from PySide.QtCore import Slot, Signal
-
-
-QtCore = QtCore_
-QtGui = QtGui_
-Qt = QtCore_.Qt
 
 __all__ = ['QtCore', 'QtGui', 'Qt', 'Signal', 'Slot']

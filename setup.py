@@ -7,24 +7,30 @@ import os
 import re
 import sys
 
-has_qt4 = True
-try:
-    # TODO: sip is only needed for PyQt4, they should be imported together.
-    import PyQt4
-    import sip
-except ImportError as e:
-    has_qt4 = False
+# TODO: Remove the commented out loop below. Users should take care of the
+# PySide or PyQt requirements before they install that way they can decide what
+# works best for them. Then we can just use qtpy through the compat.py file
+# to handle whatever Qt solution they picked.
 
-try:
-    import PySide
-except ImportError as e:
-    # TODO: try to import PySide.
-    if not has_qt4:
-        # We know we failed to import PyQt4/sip...
-        # And we failed to import pyside.
-        raise ImportError("\n\ninstall PyQt4 and sip or PySide")
-    else:
-        print("Using PyQt4")
+# has_qt4 = True
+# try:
+#     # sip is only needed for PyQt4, they should be imported together.
+#     # If we can let's remove all of the references to PyQt or Pyside in favor
+#     # of qtpy.
+#     import PyQt4
+#     # import sip
+# except ImportError as e:
+#     has_qt4 = False
+#
+# try:
+#     import PySide
+# except ImportError as e:
+#     if not has_qt4:
+#         # We know we failed to import PyQt4/sip...
+#         # And we failed to import pyside.
+#         raise ImportError("\n\nPlease install PyQt4 and sip or PySide")
+#     else:
+#         print("Using PyQt4")
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -35,7 +41,6 @@ __version__ = re.sub(
     [line.strip() for line in version_file if '__version__' in line].pop(0)
 )
 version_file.close()
-
 
 def read(*filenames, **kwargs):
     encoding = kwargs.get('encoding', 'utf-8')
@@ -52,7 +57,7 @@ library for Python) with Qt."""
 try:
     long_description = read('README.md')
 except:
-    long_description = "See README.md where installed"
+    long_description = "See README.md where installed."
 
 
 class PyTest(TestCommand):
@@ -66,8 +71,10 @@ class PyTest(TestCommand):
         errcode = pytest.main(self.test_args)
         sys.exit(errcode)
 
-tests_require = ['easygui', 'pandas == 0.17.1', 'pyside', 'pytest',
-                            'pytest-cov', 'pytest-qt', 'python-magic==0.4.6']
+
+tests_require = ["pandas == 0.17.1", 'easygui', 'pyqt',#'pyside',
+                 'pytest', 'pytest-cov', 'pytest-qt']# 'python-magic==0.4.6']
+
 setup(
     name='qtpandas',
     version=__version__,
@@ -76,8 +83,8 @@ setup(
     namespace_packages=['qtpandas'],
     author='Matthias Ludwig, Marcel Radischat, Zeke, James Draper',
     tests_require=tests_require,
-    install_requires=['easygui', 'pandas==0.17.1', 'pytest',
-                      'pytest-qt==1.2.2', 'pytest-cov', 'python-magic==0.4.6'],
+    install_requires=["pandas == 0.17.1", 'easygui', 'pytest', 'qtpy',
+                      'pytest-qt==1.2.2', 'pytest-cov'],#, 'python-magic==0.4.6'],
     cmdclass={'test': PyTest},
     author_email='james.draper@duke.edu',
     description=short_description,

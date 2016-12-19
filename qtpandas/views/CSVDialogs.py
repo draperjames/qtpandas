@@ -8,7 +8,7 @@ from qtpandas.compat import Qt, QtCore, QtGui, Slot, Signal
 # from qtpandas.encoding import Detector
 from qtpandas.models.DataFrameModel import DataFrameModel
 from qtpandas.views.CustomDelegates import DtypeComboDelegate
-from qtpandas.views._ui import icons_rc
+# from qtpandas.views._ui import icons_rc
 
 from qtpandas.utils import fillNoneValues, convertTimestamps, superReadFile
 
@@ -120,7 +120,7 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
         layout.addWidget(self.otherSeparatorLineEdit)
         self.setLayout(layout)
 
-    @Slot('QBool')
+    @Slot(bool)
     def _enableLine(self, toggled):
         self.otherSeparatorLineEdit.setEnabled(toggled)
 
@@ -142,7 +142,7 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
         return
 
 
-    @Slot('QBool')
+    @Slot(bool)
     def _delimiter(self, checked):
         if checked:
             if self.commaRadioButton.isChecked():
@@ -319,7 +319,7 @@ class CSVImportDialog(QtGui.QDialog):
             self._filenameLineEdit.setText(ret)
             self._updateFilename()
 
-    @Slot('QBool')
+    @Slot(bool)
     def _updateHeader(self, toggled):
         """Changes the internal flag, whether the csv file contains a header or not.
 
@@ -498,7 +498,7 @@ class CSVExportDialog(QtGui.QDialog):
     """An widget to serialize a `DataFrameModel` to a `CSV-File`.
 
     """
-    exported = Signal('QBool')
+    exported = Signal(bool)
 
     def __init__(self, model=None, parent=None):
         super(CSVExportDialog, self).__init__(parent)

@@ -37,14 +37,14 @@ def excepthook(excType, excValue, tracebackobj):
     traceback.print_tb(tracebackobj, None, tbinfofile)
     tbinfofile.seek(0)
     tbinfo = tbinfofile.read()
-    if python_version > 3:
+    if python_version < 3:
         # Python3 has no str().decode()
         tbinfo = tbinfo.decode('utf-8')
     else:
         pass
 
     try:
-        if python_version > 3:
+        if python_version < 3:
             # Python3 has no str().decode()
             excValueStr = str(excValue).decode('utf-8')
         else:

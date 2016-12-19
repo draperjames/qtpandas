@@ -7,7 +7,7 @@ from qtpandas.excepthook import excepthook
 from qtpandas.compat import QtGui
 from qtpandas.models.DataFrameModel import DataFrameModel
 from qtpandas.views.DataTableView import DataTableWidget
-from qtpandas.views._ui import icons_rc
+# from qtpandas.views._ui import icons_rc
 
 sys.excepthook = excepthook
 
