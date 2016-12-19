@@ -162,13 +162,13 @@ def textbox(msg="", title=" ", text="", codebox=0):
     text = to_string(text)
     try:
         textArea.insert('end', text, "normal")
-    except:
+    except Exception:
         msgbox("Exception when trying to load the textArea.")
         sys.exit(16)
 
     try:
         okButton.focus_force()
-    except:
+    except Exception:
         msgbox("Exception when trying to put focus on okButton.")
         sys.exit(16)
 
@@ -185,7 +185,7 @@ def to_string(something):
         return something
     try:
         text = "".join(something)  # convert a list or a tuple to a string
-    except:
+    except Exception:
         msgbox(
             "Exception when trying to convert {} to text in textArea"
             .format(type(something)))

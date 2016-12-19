@@ -46,10 +46,12 @@ class BigIntSpinbox(QtGui.QAbstractSpinBox):
         self.setLineEdit(self._lineEdit)
 
     def value(self):
-        """getter function to _lineEdit.text. Returns 0 in case of exception."""
+        """
+        Getter function to _lineEdit.text. Returns 0 in case of exception.
+        """
         try:
             return int(self._lineEdit.text())
-        except:
+        except Exception:
             return 0
 
     def setValue(self, value):

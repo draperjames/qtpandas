@@ -620,9 +620,8 @@ class TestEditMode(object):
         expected = False
         try:
             model.applyFunction(bad_func)
-        except:
+        except Exception:
             expected = True
-            pass
 
         assert expected
 

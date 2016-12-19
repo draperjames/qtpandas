@@ -50,6 +50,7 @@ __version__ = re.sub(
 )
 version_file.close()
 
+
 def read(*filenames, **kwargs):
     encoding = kwargs.get('encoding', 'utf-8')
     sep = kwargs.get('sep', '\n')
@@ -64,7 +65,7 @@ library for Python) with Qt."""
 
 try:
     long_description = read('README.md')
-except:
+except IOError:
     long_description = "See README.md where installed."
 
 
@@ -107,7 +108,7 @@ setup(
                       'qtpy',
                       'future',
                       'pytest-cov',
-                    # 'python-magic==0.4.6'
+                      # 'python-magic==0.4.6'
                       ],
 
     cmdclass={'test': PyTest},

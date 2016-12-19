@@ -67,7 +67,7 @@ def excepthook(excType, excValue, tracebackobj):
     try:
         msg = '\n'.join(sections)
 
-    except TypeError as e:
+    except TypeError:
         # Remove all things not string.
         sections = [item for item in sections if type(item) == str]
         msg = '\n'.join(sections)
@@ -76,7 +76,7 @@ def excepthook(excType, excValue, tracebackobj):
         f = codecs.open(logFile, "a+", encoding='utf-8')
         f.write(msg)
         f.close()
-    except IOError as e:
+    except IOError:
         msgbox("unable to write to {0}".format(logFile), "Writing error")
 
     # always show an error message
@@ -84,7 +84,7 @@ def excepthook(excType, excValue, tracebackobj):
         if not _isQAppRunning():
             app = QtGui.QApplication([])
         _showMessageBox(str(notice) + str(msg))
-    except:
+    except Exception:
         msgbox(str(notice) + str(msg), "Error")
 
 

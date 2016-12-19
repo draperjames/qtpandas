@@ -8,7 +8,8 @@ standard_library.install_aliases()
 from qtpandas.compat import QtCore, QtGui, Qt, Signal, Slot
 
 class OverlayProgressWidget(QtGui.QFrame):
-    def __init__(self, parent, workers=[], debug=True, margin=0):
+    def __init__(self, parent, workers=None, debug=True, margin=0):
+        workers = workers or []
         super(OverlayProgressWidget, self).__init__(parent)
         self._debug = debug
         self._workers = workers
@@ -98,9 +99,9 @@ class OverlayProgressWidget(QtGui.QFrame):
         self._detailProgressBars.append((progressBar, label))
         worker.progressChanged.connect(progressBar.setValue)
         worker.progressChanged.connect(self.calculateTotalProgress)
-        
+
         worker.progressChanged.connect(self.debugProgressChanged)
-        
+
     def debugProgressChanged(self, value):
         print(("debugProgressChanged", value))
 
