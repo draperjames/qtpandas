@@ -42,7 +42,8 @@ install:
     - popd
     - pip install .
 
-script: echo "Done!"
+# script: echo "Done!"
+script: pytest tests
 
 notifications:
   email:
