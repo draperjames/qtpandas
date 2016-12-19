@@ -3,6 +3,12 @@ as attempts to set sip API values if sip is installed.
 
 @author: qtpandas contributors
 """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
 import qtpy.QtGui as _QtGui
 import qtpy.QtWidgets as _QtWidgets
 import qtpy.QtCore as _QtCore

@@ -1,3 +1,9 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
 import os
 import pytest
 import pandas as pd
@@ -8,7 +14,7 @@ from qtpandas.models.DataFrameModelManager import DataFrameModelManager
 class MainTestClass(object):
 
     @pytest.fixture
-    def df(self) -> pd.DataFrame:
+    def df(self):
         sample_cols = ['id', 'name', 'address', 'updated']
         sample_recs = [[1000, 'zeke', '123 street'],
                        [1001, 'larry', '688 road'],
@@ -18,14 +24,14 @@ class MainTestClass(object):
         return pd.DataFrame(sample_recs, columns=sample_cols)
 
     @pytest.fixture
-    def output_dir(self) -> str:
+    def output_dir(self):
         fp = os.path.join(os.path.dirname(__file__), "output")
         if not os.path.exists(fp):
             os.mkdir(fp)
         return fp
 
     @pytest.fixture
-    def fixtures_dir(self) -> str:
+    def fixtures_dir(self):
         fp = os.path.join(os.path.dirname(__file__), "fixtures")
         if not os.path.exists(fp):
             os.mkdir(fp)
@@ -50,14 +56,14 @@ class MainTestClass(object):
 class TestClass(MainTestClass):
 
     @pytest.fixture
-    def sample_file(self, df, output_dir) -> str:
+    def sample_file(self, df, output_dir):
         file_path = os.path.join(output_dir, "test_dfm_manager_file.csv")
         if not os.path.exists(file_path):
             df.to_csv(file_path)
         return file_path
 
     @pytest.fixture
-    def manager(self) -> DataFrameModelManager:
+    def manager(self):
         return DataFrameModelManager()
 
     def test_read_file_basics(self, sample_file, manager):

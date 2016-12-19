@@ -5,8 +5,14 @@
 .. highlight:: python
 
 """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
 
+from future import standard_library
+standard_library.install_aliases()
 from .derived_boxes import codebox
 
 eg_version = '0.97.4'

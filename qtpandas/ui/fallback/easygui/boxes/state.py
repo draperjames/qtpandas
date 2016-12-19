@@ -6,9 +6,15 @@
 
 Version |release|
 """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
 # Starting and global variables
 
+from future import standard_library
+standard_library.install_aliases()
 rootWindowPosition = "+300+200"
 
 PROPORTIONAL_FONT_FAMILY = ("MS", "Sans", "Serif")
