@@ -41,8 +41,9 @@ class DataSearch(object):
     def __repr__(self):
         unformatted = "DataSearch({}): {} ({})"
         formatted_string = unformatted.format(hex(id(self)),
-                                              self.name, self._filterString)
-        if python_version > 3:
+                                              self.name,
+                                              self._filterString)
+        if python_version < 3:
             formatted_string = unformatted.encode("utf-8")
 
         return formatted_string

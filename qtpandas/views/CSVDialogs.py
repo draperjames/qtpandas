@@ -8,7 +8,7 @@ from qtpandas.compat import Qt, QtCore, QtGui, Slot, Signal
 # from qtpandas.encoding import Detector
 from qtpandas.models.DataFrameModel import DataFrameModel
 from qtpandas.views.CustomDelegates import DtypeComboDelegate
-from qtpandas.views._ui import icons_rc
+# from qtpandas.views._ui import icons_rc
 
 from qtpandas.utils import fillNoneValues, convertTimestamps, superReadFile
 
