@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import super
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 from qtpandas.compat import Qt, QtCore, QtGui, Signal, Slot
 
 import numpy
@@ -307,7 +315,8 @@ class DtypeComboDelegate(QtGui.QStyledItemDelegate):
         """
         editor.blockSignals(True)
         data = index.data()
-        dataIndex = editor.findData(data, role=Qt.EditRole)
+        dataIndex = editor.findData(data)
+        # dataIndex = editor.findData(data, role=Qt.EditRole)
         editor.setCurrentIndex(dataIndex)
         editor.blockSignals(False)
 
@@ -329,5 +338,3 @@ class DtypeComboDelegate(QtGui.QStyledItemDelegate):
 
         """
         self.commitData.emit(self.sender())
-
-

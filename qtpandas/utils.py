@@ -1,3 +1,14 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+# For Python 2 compatibility
+# from __future__ import print_function
+
+from builtins import open
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 from random import randint
 from pandas import to_datetime
 import pandas as pd
@@ -37,10 +48,10 @@ def convertTimestamps(column):
     try:
         # Try to convert the first row and a random row instead of the complete
         # column, might be faster
-        tempValue = np.datetime64(column[0])
+        # tempValue = np.datetime64(column[0])
         tempValue = np.datetime64(column[randint(0, len(column.index) - 1)])
         tempColumn = column.apply(to_datetime)
-    except:
+    except Exception:
         pass
     return tempColumn
 

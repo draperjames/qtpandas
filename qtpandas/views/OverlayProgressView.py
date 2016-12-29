@@ -1,7 +1,15 @@
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from builtins import super
+from future import standard_library
+standard_library.install_aliases()
 from qtpandas.compat import QtCore, QtGui, Qt, Signal, Slot
 
 class OverlayProgressWidget(QtGui.QFrame):
-    def __init__(self, parent, workers=[], debug=True, margin=0):
+    def __init__(self, parent, workers=None, debug=True, margin=0):
+        workers = workers or []
         super(OverlayProgressWidget, self).__init__(parent)
         self._debug = debug
         self._workers = workers
@@ -91,9 +99,9 @@ class OverlayProgressWidget(QtGui.QFrame):
         self._detailProgressBars.append((progressBar, label))
         worker.progressChanged.connect(progressBar.setValue)
         worker.progressChanged.connect(self.calculateTotalProgress)
-        
+
         worker.progressChanged.connect(self.debugProgressChanged)
-        
+
     def debugProgressChanged(self, value):
         print(("debugProgressChanged", value))
 

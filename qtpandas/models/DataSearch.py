@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import hex
+from future import standard_library
+standard_library.install_aliases()
 import sys
 import parser
 import re
@@ -41,8 +48,9 @@ class DataSearch(object):
     def __repr__(self):
         unformatted = "DataSearch({}): {} ({})"
         formatted_string = unformatted.format(hex(id(self)),
-                                              self.name, self._filterString)
-        if python_version > 3:
+                                              self.name,
+                                              self._filterString)
+        if python_version < 3:
             formatted_string = unformatted.encode("utf-8")
 
         return formatted_string
@@ -121,14 +129,14 @@ class DataSearch(object):
         try:
             searchIndex = eval(self._filterString, {
                                '__builtins__': None}, safeEnvDict)
-        except NameError as err:
+        except NameError:
             return [], False
-        except SyntaxError as err:
+        except SyntaxError:
             return [], False
-        except ValueError as err:
+        except ValueError:
             # the use of 'and'/'or' is not valid, need to use binary operators.
             return [], False
-        except TypeError as err:
+        except TypeError:
             # argument must be string or compiled pattern
             return [], False
         return searchIndex, True

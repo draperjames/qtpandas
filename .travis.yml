@@ -3,7 +3,6 @@ language: python
 python:
   - "3.5"
   - "3.4"
-  - "3.3"
   - "2.7"
 
 before_install:
@@ -43,6 +42,8 @@ install:
     - pip install .
 
 script: echo "Done!"
+
+# script: pytest tests
 
 notifications:
   email:

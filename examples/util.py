@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
+from future import standard_library
+standard_library.install_aliases()
 import os
 import pandas
 import numpy
@@ -25,9 +32,9 @@ def getCsvData():
     encoding = "utf-8"
     parse_dates = ["timestamp_value"]
 
-    path = os.path.join(os.getcwd(), "examples/testData/test1.csv")
+    path = os.path.join(os.getcwdu(), "examples/testData/test1.csv")
     if not os.path.exists(path):
-        path = os.path.join(os.getcwd(), "testData/test1.csv")
+        path = os.path.join(os.getcwdu(), "testData/test1.csv")
 
     df = pandas.read_csv(
         path,

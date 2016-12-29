@@ -4,6 +4,13 @@ Created on Sun Nov 27 20:57:39 2016
 
 @author: Zeke
 """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import dict
+from future import standard_library
+standard_library.install_aliases()
 import os
 import pandas as pd
 from qtpandas.models.DataFrameModel import DataFrameModel, read_file
@@ -101,7 +108,7 @@ class DataFrameModelManager(QtCore.QObject):
 
             self._models[to_path] = model
 
-    def set_model(self, df_model: DataFrameModel, file_path):
+    def set_model(self, df_model, file_path):
         """
         Sets a DataFrameModel and registers it to the given file_path.
         :param df_model: (DataFrameModel)
@@ -165,7 +172,7 @@ class DataFrameModelManager(QtCore.QObject):
         self._updates.pop(filepath, default=None)
         self.signalModelDestroyed.emit(filepath)
 
-    def read_file(self, filepath, **kwargs) -> DataFrameModel:
+    def read_file(self, filepath, **kwargs):
         """
         Reads a filepath into a DataFrameModel and registers
         it.

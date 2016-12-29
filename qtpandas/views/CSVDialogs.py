@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from builtins import super
+from builtins import map
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 import os
 
 from encodings.aliases import aliases as _encodings
@@ -8,7 +17,7 @@ from qtpandas.compat import Qt, QtCore, QtGui, Slot, Signal
 # from qtpandas.encoding import Detector
 from qtpandas.models.DataFrameModel import DataFrameModel
 from qtpandas.views.CustomDelegates import DtypeComboDelegate
-from qtpandas.views._ui import icons_rc
+# from qtpandas.views._ui import icons_rc
 
 from qtpandas.utils import fillNoneValues, convertTimestamps, superReadFile
 
@@ -120,7 +129,7 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
         layout.addWidget(self.otherSeparatorLineEdit)
         self.setLayout(layout)
 
-    @Slot('QBool')
+    @Slot(bool)
     def _enableLine(self, toggled):
         self.otherSeparatorLineEdit.setEnabled(toggled)
 
@@ -142,7 +151,7 @@ class DelimiterSelectionWidget(QtGui.QGroupBox):
         return
 
 
-    @Slot('QBool')
+    @Slot(bool)
     def _delimiter(self, checked):
         if checked:
             if self.commaRadioButton.isChecked():
@@ -319,7 +328,7 @@ class CSVImportDialog(QtGui.QDialog):
             self._filenameLineEdit.setText(ret)
             self._updateFilename()
 
-    @Slot('QBool')
+    @Slot(bool)
     def _updateHeader(self, toggled):
         """Changes the internal flag, whether the csv file contains a header or not.
 
@@ -498,7 +507,7 @@ class CSVExportDialog(QtGui.QDialog):
     """An widget to serialize a `DataFrameModel` to a `CSV-File`.
 
     """
-    exported = Signal('QBool')
+    exported = Signal(bool)
 
     def __init__(self, model=None, parent=None):
         super(CSVExportDialog, self).__init__(parent)
@@ -603,14 +612,18 @@ class CSVExportDialog(QtGui.QDialog):
 
         try:
             dataFrame = self._model.dataFrame()
-        except AttributeError as err:
+        except AttributeError:
             raise AttributeError('No data loaded to export.')
         else:
             try:
-                dataFrame.to_csv(filename, encoding=encoding, header=header, index=index, sep=delimiter)
-            except IOError as err:
+                dataFrame.to_csv(filename,
+                                 encoding=encoding,
+                                 header=header,
+                                 index=index,
+                                 sep=delimiter)
+            except IOError:
                 raise IOError('No filename given')
-            except UnicodeError as err:
+            except UnicodeError:
                 raise UnicodeError('Could not encode all data. Choose a different encoding')
             except Exception:
                 raise

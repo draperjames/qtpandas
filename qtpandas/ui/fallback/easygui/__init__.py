@@ -2,8 +2,14 @@
 Hello from easygui/__init__.py
 
 """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
 # __all__ must be defined in order for Sphinx to generate the API automatically.
+from future import standard_library
+standard_library.install_aliases()
 __all__ = ['buttonbox',
            'diropenbox',
            'fileopenbox',
