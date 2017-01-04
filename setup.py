@@ -81,7 +81,7 @@ class PyTest(TestCommand):
         sys.exit(errcode)
 
 
-tests_require = ["pandas == 0.17.1",
+tests_require = ["pandas >= 0.17.1",
                  'easygui',
                  'pyqt',
                  # 'pyside',
@@ -98,13 +98,13 @@ setup(
     url='https://github.com/draperjames/qtpandas',
     license='MIT License',
     namespace_packages=['qtpandas'],
-    author='Matthias Ludwig, Marcel Radischat, Zeke, James Draper',
+    author='Matthias Ludwig, Marcel Radischat, Zeke Barge, James Draper',
     tests_require=tests_require,
     install_requires=[
-                      "pandas == 0.17.1",
+                      "pandas >= 0.17.1",
                       'easygui',
                       'pytest',
-                      'pytest-qt==1.2.2',
+                      'pytest-qt>=1.2.2',
                       'qtpy',
                       'future',
                       'pytest-cov',
