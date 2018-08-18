@@ -554,7 +554,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self.layoutAboutToBeChanged.emit()
         self.sortingAboutToStart.emit()
         column = self._dataFrame.columns[columnId]
-        self._dataFrame.sort(column, ascending=not bool(order), inplace=True)
+        self._dataFrame.sort_values(column, ascending=not bool(order), inplace=True)
         self.layoutChanged.emit()
         self.sortingFinished.emit()
 
