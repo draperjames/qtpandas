@@ -71,8 +71,12 @@ def superReadCSV(filepath, first_codec='UTF_8', usecols=None,
 
         assert isinstance(first_codec, str), "first_codec must be a string"
 
-        codecs = list(set([first_codec] + ['UTF_8', 'ISO-8859-1', 'ASCII',
-                                           'UTF_16', 'UTF_32']))
+        codecs = ['UTF_8', 'ISO-8859-1', 'ASCII', 'UTF_16', 'UTF_32']
+        try:
+            codecs.remove(first_codec)
+        except ValueError as not_in_list:
+            pass
+        codecs.insert(0, first_codec)
         errors = []
         for c in codecs:
             try:
@@ -86,8 +90,10 @@ def superReadCSV(filepath, first_codec='UTF_8', usecols=None,
                                    sep=sep,
                                    chunksize=chunksize,
                                    **kwargs)
-
-            except (UnicodeDecodeError, UnboundLocalError) as e:
+            # Need to catch `UnicodeError` here, not just `UnicodeDecodeError`,
+            # because pandas 0.23.1 raises it when decoding with UTF_16 and the
+            # file is not in that format:
+            except (UnicodeError, UnboundLocalError) as e:
                 errors.append(e)
             except Exception as e:
                 errors.append(e)
